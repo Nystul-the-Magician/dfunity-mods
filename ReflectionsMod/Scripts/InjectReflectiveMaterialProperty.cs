@@ -21,9 +21,6 @@ namespace ReflectionsMod
 {
     public class InjectReflectiveMaterialProperty : MonoBehaviour
     {
-        public string iniPathConfigInjectionTextures = ""; // if not specified will use fallback ini-file
-        const string iniPathFallbackConfigInjectionTextures = "configInjectionTextures.ini";
-
         private bool useDeferredReflections = true;
 
         // Streaming World Component
@@ -55,45 +52,6 @@ namespace ReflectionsMod
         private GameObject gameObjectStreamingTarget = null;
 
         private DaggerfallUnity dfUnity;
-
-        private struct TextureRecord
-        {
-            public int archive;
-            public int record;
-            public int frame;
-            public bool useMetallicGlossMap;
-            public Texture2D metallicGlossMap;
-            public float reflectivity;
-            public float smoothness;
-            public Texture2D albedoMap;
-            public Texture2D normalMap;
-        }
-
-        IniParser.FileIniDataParser iniParser = new FileIniDataParser();
-        IniParser.Model.IniData iniData;
-
-        IniParser.Model.IniData getIniParserConfigInjectionTextures()
-        {
-            IniParser.Model.IniData parsedIniData = null;
-
-            // Attempt to load configInjectionTextures.ini
-            string userIniPathConfigInjectionTextures = Path.Combine(Application.dataPath, iniPathConfigInjectionTextures);
-            if (File.Exists(userIniPathConfigInjectionTextures))
-            {
-                parsedIniData = iniParser.ReadFile(userIniPathConfigInjectionTextures);
-            }
-
-            // Load fallback configInjectionTextures .ini
-            TextAsset asset = Resources.Load<TextAsset>(iniPathFallbackConfigInjectionTextures);
-            if (asset != null)
-            {
-                MemoryStream stream = new MemoryStream(asset.bytes);
-                StreamReader reader = new StreamReader(stream);
-                parsedIniData = iniParser.ReadData(reader);
-                reader.Close();
-            }
-            return parsedIniData;
-        }
 
         static string GetGameObjectPath(GameObject obj)
         {
@@ -161,8 +119,6 @@ namespace ReflectionsMod
                     gameObjectStreamingTarget = currentGameObject;
                 }
             }
-
-            iniData = getIniParserConfigInjectionTextures();
         }
 
         void Update()
@@ -290,68 +246,7 @@ namespace ReflectionsMod
 
         void InjectMaterialPropertiesIndoor()
         {
-            List<TextureRecord> listInjectedTextures = new List<TextureRecord>();
-
             // mages guild 4 floors debuging worldpos: 704,337
-            IniParser.Model.IniData textureInjectionData = iniData;
-            if (iniData != null)
-            {
-                foreach (IniParser.Model.SectionData section in iniData.Sections)
-                {
-                    int textureArchive = int.Parse(textureInjectionData[section.SectionName]["textureArchive"]);
-                    int textureRecord = int.Parse(textureInjectionData[section.SectionName]["textureRecord"]);
-                    int textureFrame = int.Parse(textureInjectionData[section.SectionName]["textureFrame"]);
-
-                    TextureRecord texRecord = new TextureRecord();
-                    texRecord.archive = textureArchive;
-                    texRecord.record = textureRecord;
-                    texRecord.frame = textureFrame;
-                    texRecord.albedoMap = null;
-                    texRecord.normalMap = null;
-                    texRecord.useMetallicGlossMap = false;
-                    texRecord.metallicGlossMap = null;
-                    texRecord.reflectivity = 0.0f;
-                    texRecord.smoothness = 0.0f;
-
-                    Texture2D albedoTexture = null;
-                    if (textureInjectionData[section.SectionName].ContainsKey("filenameAlbedoMap"))
-                    {
-                        string fileAlbedoMap = textureInjectionData[section.SectionName]["filenameAlbedoMap"];
-                        albedoTexture = Resources.Load(fileAlbedoMap) as Texture2D;
-                        texRecord.albedoMap = albedoTexture;
-                    }
-
-                    Texture2D normalTexture = null;
-                    if (textureInjectionData[section.SectionName].ContainsKey("filenameNormalMap"))
-                    {
-                        string fileNormalMap = textureInjectionData[section.SectionName]["filenameNormalMap"];
-                        normalTexture = Resources.Load(fileNormalMap) as Texture2D;
-                        texRecord.normalMap = normalTexture;
-                    }
-
-                    bool useMetallicGlossMap = bool.Parse(textureInjectionData[section.SectionName]["useMetallicGlossMap"]);
-
-                    texRecord.useMetallicGlossMap = useMetallicGlossMap;
-
-                    if (useMetallicGlossMap)
-                    {
-                        string fileNameMetallicGlossMap = textureInjectionData[section.SectionName]["filenameMetallicGlossMap"];
-                        Texture2D metallicGlossMapTexture = Resources.Load(fileNameMetallicGlossMap) as Texture2D;
-                        updateMaterial(textureArchive, textureRecord, textureFrame, albedoTexture, normalTexture, metallicGlossMapTexture);
-                        texRecord.metallicGlossMap = metallicGlossMapTexture;
-                    }
-                    else
-                    {
-                        float reflectivity = float.Parse(textureInjectionData[section.SectionName]["reflectivity"]);
-                        float smoothness = float.Parse(textureInjectionData[section.SectionName]["smoothness"]);
-                        updateMaterial(textureArchive, textureRecord, textureFrame, albedoTexture, normalTexture, reflectivity, smoothness);
-                        texRecord.reflectivity = reflectivity;
-                        texRecord.smoothness = smoothness;
-                    }
-
-                    listInjectedTextures.Add(texRecord);
-                }
-            }
 
             // force update to textures loaded in current interior/dungeon models            
             Renderer[] renderers = null;
@@ -362,116 +257,6 @@ namespace ReflectionsMod
             else if (GameManager.Instance.IsPlayerInsideDungeon || GameManager.Instance.IsPlayerInsideCastle)
             {
                 renderers = gameObjectDungeon.GetComponentsInChildren<Renderer>();
-            }
-            if (renderers != null)
-            {
-                //Debug.Log(String.Format("renderers: {0}", renderers.Length));
-                foreach (Renderer r in renderers)
-                {
-                    Material[] mats = r.sharedMaterials;
-                    for (int i = 0; i < mats.Length; i++)
-                    {
-                        Material m = mats[i];
-                        try
-                        {
-                            // name is in format TEXTURE.xxx [Index=y] - if atlas texture - different format then exception will be thrown - so everything is in try-catch block 
-                            string[] parts = m.name.Split('.');
-                            parts = parts[1].Split(' ');
-                            int archive = Convert.ToInt32(parts[0]);
-                            string tmp = parts[1].Replace("[Index=", "").Replace("]", "");
-                            //Debug.Log(String.Format("archive: {0}, record: {1}", parts[0], tmp));
-                            int record = Convert.ToInt32(tmp);
-                            int frame = 0;
-
-                            if (listInjectedTextures.Exists(x => (x.archive == archive) && (x.record == record) && (x.frame == frame)))
-                            {
-                                TextureRecord? texRecord = listInjectedTextures.Find(x => (x.archive == archive) && (x.record == record) && (x.frame == frame));
-                                if (texRecord.HasValue)
-                                {
-                                    CachedMaterial cmat;
-                                    if (dfUnity.MaterialReader.GetCachedMaterial(archive, record, frame, out cmat))
-                                    {
-                                        if (!texRecord.Value.useMetallicGlossMap)
-                                        {
-                                            if (useDeferredReflections)
-                                            {
-                                                updateMaterial(archive, record, frame, texRecord.Value.albedoMap, texRecord.Value.normalMap, texRecord.Value.reflectivity, texRecord.Value.smoothness);
-                                            }
-                                            else
-                                            {
-                                                Material newMat = new Material(Shader.Find("Daggerfall/ReflectionsMod/FloorMaterialWithReflections"));
-                                                newMat.CopyPropertiesFromMaterial(cmat.material);
-                                                newMat.name = cmat.material.name;
-                                                if (texReflectionGround)
-                                                {
-                                                    newMat.SetTexture("_ReflectionGroundTex", texReflectionGround);
-                                                }
-                                                if (texReflectionLowerLevel)
-                                                {
-                                                    newMat.SetTexture("_ReflectionLowerLevelTex", texReflectionLowerLevel);
-                                                }
-                                                newMat.SetFloat("_Metallic", texRecord.Value.reflectivity);
-                                                newMat.SetFloat("_Smoothness", texRecord.Value.smoothness);
-
-                                                if (texRecord.Value.albedoMap != null)
-                                                {
-                                                    newMat.SetTexture("_MainTex", texRecord.Value.albedoMap);
-                                                }
-
-                                                if (texRecord.Value.normalMap != null)
-                                                {
-                                                    newMat.SetTexture("_BumpMap", texRecord.Value.normalMap);
-                                                }
-
-                                                m = newMat;
-                                            }                                            
-                                        }
-                                        else
-                                        {
-                                            if (useDeferredReflections)
-                                            {
-                                                updateMaterial(archive, record, frame, texRecord.Value.albedoMap, texRecord.Value.normalMap, texRecord.Value.metallicGlossMap);
-                                            }
-                                            else
-                                            {
-                                                Material newMat = new Material(Shader.Find("Daggerfall/ReflectionsMod/FloorMaterialWithReflections"));
-                                                newMat.CopyPropertiesFromMaterial(cmat.material);
-                                                newMat.name = cmat.material.name;
-                                                if (texReflectionGround)
-                                                {
-                                                    newMat.SetTexture("_ReflectionGroundTex", texReflectionGround);
-                                                }
-                                                if (texReflectionLowerLevel)
-                                                {
-                                                    newMat.SetTexture("_ReflectionLowerLevelTex", texReflectionLowerLevel);
-                                                }
-                                                newMat.EnableKeyword("USE_METALLICGLOSSMAP");
-                                                newMat.SetTexture("_MetallicGlossMap", texRecord.Value.metallicGlossMap);
-
-                                                if (texRecord.Value.albedoMap != null)
-                                                {
-                                                    newMat.SetTexture("_MainTex", texRecord.Value.albedoMap);
-                                                }
-
-                                                if (texRecord.Value.normalMap != null)
-                                                {
-                                                    newMat.SetTexture("_BumpMap", texRecord.Value.normalMap);
-                                                }
-
-                                                m = newMat;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        catch
-                        {
-                        }
-                        mats[i] = m;
-                    }
-                    r.sharedMaterials = mats;
-                }
             }
         }
 
@@ -538,100 +323,6 @@ namespace ReflectionsMod
                         terrain.materialTemplate = newMat;
                     }
                 }
-            }
-        }
-
-        void updateMaterial(int archive, int record, int frame, Texture2D albedoMap, Texture2D normalMap, float reflectivity, float smoothness)
-        {
-            CachedMaterial cmat;
-            if (dfUnity.MaterialReader.GetCachedMaterial(archive, record, frame, out cmat))
-            {
-                Material newMat;
-                if (useDeferredReflections)
-                {
-                    newMat = cmat.material;
-                    //newMat = new Material(Shader.Find("Standard (Specular setup)"));
-                    //newMat.CopyPropertiesFromMaterial(cmat.material);
-                }
-                else
-                {
-                    newMat = new Material(Shader.Find("Daggerfall/ReflectionsMod/FloorMaterialWithReflections"));
-                    newMat.CopyPropertiesFromMaterial(cmat.material);
-                    newMat.name = cmat.material.name;
-                }
-
-                if (texReflectionGround)
-                {
-                    newMat.SetTexture("_ReflectionGroundTex", texReflectionGround);
-                }
-                if (texReflectionLowerLevel)
-                {
-                    newMat.SetTexture("_ReflectionLowerLevelTex", texReflectionLowerLevel);
-                }
-                newMat.SetFloat("_Metallic", reflectivity);
-                //newMat.SetColor("_SpecColor", new Color(reflectivity, reflectivity, reflectivity));
-                newMat.SetFloat("_Glossiness", smoothness);
-
-                if (albedoMap != null)
-                {
-                    newMat.SetTexture("_MainTex", albedoMap);
-                }
-
-                if (normalMap != null)
-                {
-                    newMat.SetTexture("_BumpMap", normalMap);
-                }
-
-                cmat.material = newMat;
-                dfUnity.MaterialReader.SetCachedMaterial(archive, record, frame, cmat);
-            }
-        }
-
-        void updateMaterial(int archive, int record, int frame, Texture2D albedoMap, Texture2D normalMap, Texture2D metallicGlossMap)
-        {
-            CachedMaterial cmat;
-            if (dfUnity.MaterialReader.GetCachedMaterial(archive, record, frame, out cmat))
-            {
-                Material newMat;
-                if (useDeferredReflections)
-                {
-                    newMat = cmat.material;
-                    //newMat = new Material(Shader.Find("Standard (Specular setup)"));
-                    //newMat.CopyPropertiesFromMaterial(cmat.material);
-                }
-                else
-                {
-                    newMat = new Material(Shader.Find("Daggerfall/ReflectionsMod/FloorMaterialWithReflections"));
-                    newMat.CopyPropertiesFromMaterial(cmat.material);
-                    newMat.name = cmat.material.name;
-                }
-
-                if (texReflectionGround)
-                {
-                    newMat.SetTexture("_ReflectionGroundTex", texReflectionGround);
-                }
-                if (texReflectionLowerLevel)
-                {
-                    newMat.SetTexture("_ReflectionLowerLevelTex", texReflectionLowerLevel);
-                }
-                
-                newMat.EnableKeyword("_METALLICGLOSSMAP");
-                //newMat.EnableKeyword("_SPECGLOSSMAP");
-                newMat.DisableKeyword("_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A");
-                newMat.SetTexture("_MetallicGlossMap", metallicGlossMap);
-
-                if (albedoMap != null)
-                {
-                    newMat.SetTexture("_MainTex", albedoMap);
-                }
-
-                if (normalMap != null)
-                {
-                    newMat.SetTexture("_BumpMap", normalMap);
-                }
-
-                cmat.material = newMat;
-                dfUnity.MaterialReader.SetCachedMaterial(archive, record, frame, cmat);
             }
         }
 
