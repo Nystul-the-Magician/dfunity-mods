@@ -32,8 +32,17 @@ namespace ReflectionsMod
         private Texture texReflectionGround = null;
         private Texture texReflectionLowerLevel = null;
         private bool playerInside = false;
-        private enum InsideSpecification { Building, DungeonOrCastle, Unknown };
-        InsideSpecification whereInside = InsideSpecification.Unknown;
+
+        private struct InsideSpecification
+        { 
+            public const int
+
+            Building = 0,
+            DungeonOrCastle = 1,
+            Unknown = 2; 
+        };
+
+        private int whereInside = InsideSpecification.Unknown;
         private GameObject gameObjectInterior = null;
         private GameObject gameObjectDungeon = null;
 

@@ -30,9 +30,16 @@ namespace ReflectionsMod
 
         private Camera cameraToUse = null;
 
-        public enum EnvironmentSetting {IndoorSetting, OutdoorSetting};
-        private EnvironmentSetting currentBackgroundSettings = EnvironmentSetting.IndoorSetting;
-        public EnvironmentSetting CurrentBackgroundSettings
+        public struct EnvironmentSetting
+        {
+            public const int
+
+            IndoorSetting = 0,
+            OutdoorSetting = 2;        
+        }
+        
+        private int currentBackgroundSettings = EnvironmentSetting.IndoorSetting;
+        public int CurrentBackgroundSettings
         {
             get
             {

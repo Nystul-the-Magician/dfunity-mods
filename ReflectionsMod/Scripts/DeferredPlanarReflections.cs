@@ -129,10 +129,12 @@ namespace ReflectionsMod
         GameObject goCreateReflectionLookupTextures = null;
 
         // Shader pass indices used by the effect
-        private enum PassIndex
+        private struct PassIndex
         {
+            public const int
+
             ReflectionStep = 0,
-            CompositeFinal = 1,
+            CompositeFinal = 1;
         }
 
         private void OnEnable()
