@@ -280,9 +280,6 @@ namespace ReflectionsMod
 
         void Awake()
         {
-            if (!DaggerfallUnity.Settings.Nystul_RealtimeReflections)
-                return;
-
             reflectionPlaneBottom = new GameObject("ReflectionPlaneBottom");
             reflectionPlaneBottom.layer = LayerMask.NameToLayer("Water");
             MeshFilter meshFilter = (MeshFilter)reflectionPlaneBottom.AddComponent(typeof(MeshFilter));
@@ -354,8 +351,6 @@ namespace ReflectionsMod
 
         void OnDestroy()
         {
-            if (!DaggerfallUnity.Settings.Nystul_RealtimeReflections)
-                return;
             PlayerEnterExit.OnTransitionInterior -= OnTransitionToInterior;
             PlayerEnterExit.OnTransitionExterior -= OnTransitionToExterior;
             PlayerEnterExit.OnTransitionDungeonInterior -= OnTransitionToInterior;
@@ -391,9 +386,6 @@ namespace ReflectionsMod
 
         void Update()
         { 
-            if (!DaggerfallUnity.Settings.Nystul_RealtimeReflections)
-                return;
-
             GameObject goPlayerAdvanced = GameObject.Find("PlayerAdvanced");
 
             PlayerGPS playerGPS = GameObject.Find("PlayerAdvanced").GetComponent<PlayerGPS>();
