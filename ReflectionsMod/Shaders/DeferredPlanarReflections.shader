@@ -42,6 +42,9 @@ Shader "Daggerfall/ReflectionsMod/DeferredPlanarReflections" {
 
 	float _GroundLevelHeight;
 	float _LowerLevelHeight;
+	int _NumMipMapLevelsReflectionGroundTex;
+	int _NumMipMapLevelsReflectionLowerLevelTex;
+	float _RoughnessMultiplier;
 
     struct v2f
     {
@@ -102,14 +105,18 @@ Shader "Daggerfall/ReflectionsMod/DeferredPlanarReflections" {
 
 			float roughness = 1.0 - tex2D(_CameraGBufferTexture1, screenUV).a;
 
+			float mipMapLevelReflectionGroundTex = roughness * _RoughnessMultiplier; // (_NumMipMapLevelsReflectionGroundTex - 1 ) * _RoughnessMultiplier;
+			float mipMapLevelReflectionLowerLevelTex = roughness * _RoughnessMultiplier; // * (_NumMipMapLevelsReflectionLowerLevelTex - 1) * _RoughnessMultiplier;
+			
+
 			float indexReflectionsTextureTex = tex2D(_ReflectionsTextureIndexTex, screenUV).r;
 			if (indexReflectionsTextureTex == 1.0f)
 			{
-				refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, roughness * 8 * 0.5f);
+				refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, mipMapLevelReflectionLowerLevelTex);
 			}
 			else if	(abs(indexReflectionsTextureTex - 0.5f) < 0.01f)
 			{
-				refl = getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, roughness * 8 * 0.5f);
+				refl = getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, mipMapLevelReflectionGroundTex);
 			}
 			else if	(abs(indexReflectionsTextureTex - 0.75f) < 0.01f)
 			{
@@ -120,7 +127,7 @@ Shader "Daggerfall/ReflectionsMod/DeferredPlanarReflections" {
 				half fadeOutFact = 0.0f;
 				fadeOutFact = max(fadeOutFactX, fadeOutFactY);
 
-				refl = (1.0f-fadeOutFact) * getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, roughness * 8 *0.5f); //refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, _Smoothness)).rgb;
+				refl = (1.0f-fadeOutFact) * getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, mipMapLevelReflectionGroundTex); //refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, _Smoothness)).rgb;
 			}
 				
 			half metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;

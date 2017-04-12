@@ -16,7 +16,8 @@ namespace ReflectionsMod
     public class MirrorReflection : MonoBehaviour
     {
 	    public bool m_DisablePixelLights = false;
-	    public int m_TextureSize = 256;
+	    public int m_TextureWidth = 256;
+        public int m_TextureHeight = 256;
         public float m_ClipPlaneOffset = 0.05f; //0.0f; //0.07f;
  
 	    public LayerMask m_ReflectLayers = -1;
@@ -24,9 +25,10 @@ namespace ReflectionsMod
 	    private Hashtable m_ReflectionCameras = new Hashtable(); // Camera -> Camera table
  
 	    public RenderTexture m_ReflectionTexture = null;
-	    private int m_OldReflectionTextureSize = 0;
- 
-	    private static bool s_InsideRendering = false;
+	    private int m_OldReflectionTextureWidth = 0;
+        private int m_OldReflectionTextureHeight = 0;
+
+        private static bool s_InsideRendering = false;
 
         private Camera cameraToUse = null;
 
@@ -35,7 +37,7 @@ namespace ReflectionsMod
             public const int
 
             IndoorSetting = 0,
-            OutdoorSetting = 2;        
+            OutdoorSetting = 1;        
         }
         
         private int currentBackgroundSettings = EnvironmentSetting.IndoorSetting;
@@ -217,11 +219,11 @@ namespace ReflectionsMod
 		    reflectionCamera = null;
  
 		    // Reflection render texture
-		    if( !m_ReflectionTexture || m_OldReflectionTextureSize != m_TextureSize )
+		    if( !m_ReflectionTexture || m_OldReflectionTextureWidth != m_TextureWidth || m_OldReflectionTextureHeight != m_TextureHeight)
 		    {
 			    if( m_ReflectionTexture )
 				    Destroy( m_ReflectionTexture );
-                m_ReflectionTexture = new RenderTexture(m_TextureSize, m_TextureSize, 16); //, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+                m_ReflectionTexture = new RenderTexture(m_TextureWidth, m_TextureHeight, 16); //, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
 
 			    m_ReflectionTexture.name = "__MirrorReflection" + GetInstanceID();
 			    m_ReflectionTexture.isPowerOfTwo = true;
@@ -229,10 +231,12 @@ namespace ReflectionsMod
                 //m_ReflectionTexture.generateMips = true;
                 m_ReflectionTexture.useMipMap = true;
                 m_ReflectionTexture.wrapMode = TextureWrapMode.Clamp;
+                m_ReflectionTexture.filterMode = FilterMode.Bilinear;
 
-			    //m_ReflectionTexture.hideFlags = HideFlags.DontSave;
-			    m_OldReflectionTextureSize = m_TextureSize;
-		    }
+                //m_ReflectionTexture.hideFlags = HideFlags.DontSave;
+                m_OldReflectionTextureWidth = m_TextureWidth;
+                m_OldReflectionTextureHeight = m_TextureHeight;
+            }
  
 		    // Camera for reflection
 		    reflectionCamera = m_ReflectionCameras[currentCamera] as Camera;

@@ -18,8 +18,8 @@ namespace ReflectionsMod
 {
     public class UpdateReflectionTextures : MonoBehaviour
     {
-        private GameObject reflectionPlaneBottom = null;
-        private GameObject reflectionPlaneSeaLevel = null;
+        private GameObject reflectionPlaneBottom = null; // = floor
+        private GameObject reflectionPlaneSeaLevel = null; // = lower level
 
         private MirrorReflection mirrorRefl = null; 
         private MirrorReflection mirrorReflSeaLevel = null;
@@ -28,6 +28,65 @@ namespace ReflectionsMod
         private DeferredPlanarReflections componentDeferredPlanarReflections = null;
 
         private bool playerInside = false;
+
+        private int floorReflectionTextureWidth = 512;
+        private int floorReflectionTextureHeight = 512;
+
+        private int lowerLevelReflectionTextureWidth = 512;
+        private int lowerLevelReflectionTextureHeight = 512;
+
+        private float roughnessMultiplier = 0.4f;
+
+        public int FloorReflectionTextureWidth
+        {
+            get { return floorReflectionTextureWidth; }
+            set {
+                floorReflectionTextureWidth = value;
+                if (mirrorRefl)
+                {
+                    mirrorRefl.m_TextureWidth = floorReflectionTextureWidth;                    
+                }
+            }
+        }
+        public int FloorReflectionTextureHeight
+        {
+            get { return floorReflectionTextureHeight; }
+            set {
+                floorReflectionTextureHeight = value;
+                if (mirrorRefl)
+                {                    
+                    mirrorRefl.m_TextureHeight = floorReflectionTextureHeight;
+                }
+            }
+        }
+        public int LowerLevelReflectionTextureWidth
+        {
+            get { return lowerLevelReflectionTextureWidth; }
+            set {
+                lowerLevelReflectionTextureWidth = value;
+                if (mirrorReflSeaLevel)
+                {
+                    mirrorReflSeaLevel.m_TextureWidth = lowerLevelReflectionTextureWidth;                    
+                }
+            }
+        }
+        public int LowerLevelReflectionTextureHeight
+        {
+            get { return lowerLevelReflectionTextureHeight; }
+            set {
+                lowerLevelReflectionTextureHeight = value;
+                if (mirrorReflSeaLevel)
+                {                    
+                    mirrorReflSeaLevel.m_TextureHeight = lowerLevelReflectionTextureHeight;
+                }
+            }
+        }
+
+        public float RoughnessMultiplier
+        {
+            get { return roughnessMultiplier; }
+            set { roughnessMultiplier = value; }
+        }
 
         public RenderTexture getSeaReflectionRenderTexture()
         {
@@ -292,7 +351,8 @@ namespace ReflectionsMod
             renderer.enabled = true; // if this is set to false OnWillRenderObject() in MirrorReflection.cs will not work (workaround would be to change OnWillRenderObject() to Update()
 
             mirrorRefl = reflectionPlaneBottom.AddComponent<MirrorReflection>();
-            mirrorRefl.m_TextureSize = 512;
+            mirrorRefl.m_TextureWidth = floorReflectionTextureWidth;
+            mirrorRefl.m_TextureHeight = floorReflectionTextureHeight;
 
             reflectionPlaneBottom.transform.SetParent(this.transform);
 
@@ -314,7 +374,8 @@ namespace ReflectionsMod
             rendererSeaLevel.enabled = true; // if this is set to false OnWillRenderObject() in MirrorReflection.cs will not work (workaround would be to change OnWillRenderObject() to Update()
 
             mirrorReflSeaLevel = reflectionPlaneSeaLevel.AddComponent<MirrorReflection>();
-            mirrorReflSeaLevel.m_TextureSize = 512;
+            mirrorReflSeaLevel.m_TextureWidth = lowerLevelReflectionTextureWidth;
+            mirrorReflSeaLevel.m_TextureHeight = lowerLevelReflectionTextureHeight;
 
             reflectionPlaneSeaLevel.transform.SetParent(this.transform);
 

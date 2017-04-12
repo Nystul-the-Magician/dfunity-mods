@@ -119,7 +119,6 @@ namespace ReflectionsMod
         private static int kFinalReflectionTexture;
         private static int kTempTexture;
 
-
         private UpdateReflectionTextures componentUpdateReflectionTextures = null;
 
         public RenderTexture reflectionGroundTexture;
@@ -245,7 +244,16 @@ namespace ReflectionsMod
             material.SetTexture("_ReflectionsTextureCoordinatesTex", componentCreateReflectionLookupTextures.renderTextureReflectionTextureCoordinates);
 
             material.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            material.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);            
+            material.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
+
+            int minDimValue = Math.Min(componentUpdateReflectionTextures.FloorReflectionTextureWidth, componentUpdateReflectionTextures.FloorReflectionTextureHeight);
+            int numMipMapLevels = (int)(Math.Log(minDimValue) / Math.Log(2));
+            material.SetInt("_NumMipMapLevelsReflectionGroundTex", numMipMapLevels);
+            minDimValue = Math.Min(componentUpdateReflectionTextures.LowerLevelReflectionTextureWidth, componentUpdateReflectionTextures.LowerLevelReflectionTextureHeight);
+            numMipMapLevels = (int)(Math.Log(minDimValue) / Math.Log(2));
+            material.SetInt("_NumMipMapLevelsReflectionLowerLevelTex", numMipMapLevels);
+
+            material.SetFloat("_RoughnessMultiplier", componentUpdateReflectionTextures.RoughnessMultiplier);
 
             if (m_CommandBuffer == null)
             {
