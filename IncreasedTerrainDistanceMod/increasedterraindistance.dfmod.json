@@ -1,0 +1,25 @@
+{
+    "ModFileName": "increasedterraindistance",
+    "ModTitle": "IncreasedTerrainDistance",
+    "ModVersion": "1.0",
+    "ModAuthor": "Nystul",
+    "ContactInfo": "http://forums.dfworkshop.net",
+    "DFUnity_Verion": "0.4.12",
+    "ModDescription": "adds far terrain and increases terrain and view distance",
+    "Files": [
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Resources/mapLocationRangeY.bin.txt",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Resources/mapLocationRangeX.bin.txt",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Resources/mapTreeCoverage.bin.txt",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Shaders/DaggerfallBillboardBatchFaded.shader",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Shaders/DaggerfallIncreasedTerrainTilemap.shader",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Shaders/TransitionRingTilemap.shader",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Shaders/FarTerrainCommon.cginc",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Scripts/RenderSkyboxWithoutSun.cs",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Scripts/CloneCameraRotationFromMainCamera.cs",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Scripts/ImprovedWorldTerrain.cs",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Scripts/IncreasedTerrainDistance.cs",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Scripts/ImprovedTerrainSampler.cs",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Scripts/_startupMod.cs",
+        "Assets/Game/Addons/IncreasedTerrainDistanceMod_standalone/Scripts/CloneCameraPositionFromMainCamera.cs"
+    ]
+}
