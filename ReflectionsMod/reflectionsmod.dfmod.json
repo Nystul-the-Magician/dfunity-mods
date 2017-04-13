@@ -3,22 +3,23 @@
     "ModTitle": "ReflectionsMod",
     "ModVersion": "1.0",
     "ModAuthor": "Nystul",
-    "ContactInfo": "nystul@dfworkshop.net",
+    "ContactInfo": "http://forums.dfworkshop.net",
     "DFUnity_Verion": "0.4.12",
-    "ModDescription": "adds realtime reflections on floor textures (interiors) and on water tiles (exteriors)",
+    "ModDescription": "realtime reflections for floor textures (interiors) and water tiles (exteriors)",
     "Files": [
-        "Assets\\Untracked\\ModBuilder\\ReflectionsMod\\_startupMod.cs.txt",
         "Assets/Game/Addons/ReflectionsMod_standalone/Resources/tileatlas_reflective.png",
         "Assets/Game/Addons/ReflectionsMod_standalone/Resources/tileatlas_reflective_raining.png",
-        "Assets\\Untracked\\ModBuilder\\ReflectionsMod\\InjectReflectiveMaterialProperty.cs.txt",
-        "Assets\\Untracked\\ModBuilder\\ReflectionsMod\\MirrorReflection.cs.txt",
-        "Assets\\Untracked\\ModBuilder\\ReflectionsMod\\CreateReflectionLookupTextures.cs.txt",
-        "Assets\\Untracked\\ModBuilder\\ReflectionsMod\\UpdateReflectionTextures.cs.txt",
-        "Assets\\Untracked\\ModBuilder\\ReflectionsMod\\DeferredPlanarReflections.cs.txt",
         "Assets/Game/Addons/ReflectionsMod_standalone/Shaders/CreateLookupReflectionTextureIndex.shader",
         "Assets/Game/Addons/ReflectionsMod_standalone/Shaders/DaggerfallTilemapWithReflections.shader",
         "Assets/Game/Addons/ReflectionsMod_standalone/Shaders/CreateLookupReflectionTextureCoordinates.shader",
         "Assets/Game/Addons/ReflectionsMod_standalone/Shaders/DeferredPlanarReflections.shader",
-        "Assets\\Untracked\\ModBuilder\\ReflectionsMod\\reflectionsmod.dfmod.json"
+        "Assets\\Untracked\\ModBuilder\\ReflectionsMod\\reflectionsmod.dfmod.json",
+        "Assets/Game/Addons/ReflectionsMod_standalone/Scripts/InjectReflectiveMaterialProperty.cs",
+        "Assets/Game/Addons/ReflectionsMod_standalone/Scripts/MirrorReflection.cs",
+        "Assets/Game/Addons/ReflectionsMod_standalone/Scripts/CreateReflectionLookupTextures.cs",
+        "Assets/Game/Addons/ReflectionsMod_standalone/Scripts/UpdateReflectionTextures.cs",
+        "Assets/Game/Addons/ReflectionsMod_standalone/Scripts/DeferredPlanarReflections.cs",
+        "Assets/Game/Addons/ReflectionsMod_standalone/Scripts/_startupMod.cs",
+        "Assets/Game/Addons/ReflectionsMod_standalone/Resources/ReflectionsMod.ini.txt"
     ]
 }
