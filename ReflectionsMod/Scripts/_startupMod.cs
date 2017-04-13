@@ -61,7 +61,7 @@ namespace ReflectionsMod
         {
             //Debug.Log("init of ReflectionMod standalone");
             gameobjectReflectionsMod = new GameObject("ReflectionsMod");
-            componentUpdateReflectionTextures = gameobjectReflectionsMod.AddComponent<UpdateReflectionTextures>();            
+            componentUpdateReflectionTextures = gameobjectReflectionsMod.AddComponent<UpdateReflectionTextures>();
             componentUpdateReflectionTextures.FloorReflectionTextureWidth = floorReflectionTextureWidth;
             componentUpdateReflectionTextures.FloorReflectionTextureHeight = floorReflectionTextureHeight;
             componentUpdateReflectionTextures.LowerLevelReflectionTextureWidth = lowerLevelReflectionTextureWidth;

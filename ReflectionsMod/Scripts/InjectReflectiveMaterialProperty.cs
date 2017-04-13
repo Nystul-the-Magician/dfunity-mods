@@ -99,10 +99,10 @@ namespace ReflectionsMod
 
             if (GameObject.Find("IncreasedTerrainDistanceMod") != null)
             {
-                if (DaggerfallUnity.Settings.Nystul_IncreasedTerrainDistance)
-                {
-                    extraTranslationY = GameObject.Find("IncreasedTerrainDistanceMod").GetComponent<ProjectIncreasedTerrainDistance.IncreasedTerrainDistance>().ExtraTranslationY;
-                }
+                //if (DaggerfallUnity.Settings.Nystul_IncreasedTerrainDistance)
+                //{
+                //    extraTranslationY = GameObject.Find("IncreasedTerrainDistanceMod").GetComponent<IncreasedTerrainDistanceMod.IncreasedTerrainDistance>().ExtraTranslationY;
+                //}
             }
 
             gameObjectReflectionPlaneGroundLevel = GameObject.Find("ReflectionPlaneBottom");

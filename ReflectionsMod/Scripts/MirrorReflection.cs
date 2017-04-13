@@ -8,7 +8,7 @@
 
 using UnityEngine;
 using System.Collections;
-using ProjectIncreasedTerrainDistance;
+using IncreasedTerrainDistanceMod;
  
 namespace ReflectionsMod
 {
