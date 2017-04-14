@@ -44,8 +44,8 @@ namespace IncreasedTerrainDistanceMod
         // WeatherManager is used for seasonal textures
         public WeatherManager weatherManager;
 
-        public int stackedCameraDepth = 1;
-        public int stackedNearCameraDepth = 2;
+        public int stackedCameraDepth = -2;
+        public int stackedNearCameraDepth = -1;
         public int cameraRenderSkyboxToTextureDepth = -10;
         public float mainCameraFarClipPlane = 1200.0f;
         public FogMode sceneFogMode = FogMode.Exponential;
@@ -127,9 +127,8 @@ namespace IncreasedTerrainDistanceMod
         Texture2D textureAtlasMountainRain = null;
         Texture2D textureAtlasSwampRain = null;
 
-
-        // List of terrain objects for transition terrain ring
-        private struct TransitionRingBorderDesc
+        
+        private class TransitionRingBorderDesc
         {
             public bool isTopRingBorder;
             public bool isBottomRingBorder;
@@ -137,7 +136,7 @@ namespace IncreasedTerrainDistanceMod
             public bool isRightRingBorder;
         }
 
-        private struct TransitionTerrainDesc
+        private class TransitionTerrainDesc
         {
             public StreamingWorld.TerrainDesc terrainDesc;
             public TransitionRingBorderDesc transitionRingBorderDesc;
@@ -148,6 +147,8 @@ namespace IncreasedTerrainDistanceMod
             //public bool updateSeasonalTextures;  // is it necessary to update the textures due to seasonal change
             //public bool updateMaterialProperties;  // is it necessary to update the update material properties
         }
+
+        // List of terrain objects for transition terrain ring
         TransitionTerrainDesc[] terrainTransitionRingArray = null;
         int numberOfTerrainBlocksInTransitionRingArray;
         Dictionary<int, int> terrainTransitionRingIndexDict = new Dictionary<int, int>();
@@ -425,11 +426,6 @@ namespace IncreasedTerrainDistanceMod
             generateTerrainTransitionRing();
         }
 
-        private struct TestStruct
-        {
-            public bool b;
-        }        
-
         void Start()
         {
             if (GameObject.Find("ReflectionsMod") != null)
@@ -452,13 +448,12 @@ namespace IncreasedTerrainDistanceMod
             }
 
             // reserve terrain objects for transition ring (2 x long sides (with 2 extra terrains for corner terrains) + 2 x normal sides)            
-            numberOfTerrainBlocksInTransitionRingArray = 2 * (streamingWorld.TerrainDistance * 2 + 1 + 2) + 2 * (streamingWorld.TerrainDistance * 2 + 1);
-            //terrainTransitionRingArray = new TransitionTerrainDesc[numberOfTerrainBlocksInTransitionRingArray];
-            
-
-            TestStruct[] testArray = new TestStruct[1];
-            
-            
+            numberOfTerrainBlocksInTransitionRingArray = 2 * (streamingWorld.TerrainDistance * 2 + 1 + 2) + 2 * (streamingWorld.TerrainDistance * 2 + 1);            
+            terrainTransitionRingArray = new TransitionTerrainDesc[numberOfTerrainBlocksInTransitionRingArray];
+            for (int i = 0; i < numberOfTerrainBlocksInTransitionRingArray; i++)
+            {
+                terrainTransitionRingArray[i] = new TransitionTerrainDesc();
+            }
         }
 
         void OnDestroy()
@@ -525,7 +520,7 @@ namespace IncreasedTerrainDistanceMod
             {
                 GameObject goStackedNearCamera = new GameObject("stackedNearCamera");
                 stackedNearCamera = goStackedNearCamera.AddComponent<Camera>();
-                stackedNearCamera.cullingMask = Camera.main.cullingMask;
+                stackedNearCamera.cullingMask = (1 << layerExtendedTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add default, add water layer so reflections are updated in time (workaround)
                 stackedNearCamera.nearClipPlane = 980.0f;
                 stackedNearCamera.farClipPlane = 15000.0f;
                 stackedNearCamera.fieldOfView = Camera.main.fieldOfView;
@@ -539,7 +534,7 @@ namespace IncreasedTerrainDistanceMod
             {
                 GameObject goStackedCamera = new GameObject("stackedCamera");
                 stackedCamera = goStackedCamera.AddComponent<Camera>();
-                stackedCamera.cullingMask = (1 << layerExtendedTerrain) +(1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
+                stackedCamera.cullingMask = (1 << layerExtendedTerrain) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
                 stackedCamera.nearClipPlane = 980.0f;
                 stackedCamera.farClipPlane = 300000.0f;
                 stackedCamera.fieldOfView = Camera.main.fieldOfView;
@@ -1385,7 +1380,7 @@ namespace IncreasedTerrainDistanceMod
 
         private TransitionRingBorderDesc getTransitionRingBorderDesc(int x, int y, int distanceTransitionRingFromCenterX, int distanceTransitionRingFromCenterY)
         {
-            TransitionRingBorderDesc transitionRingBorderDesc;
+            TransitionRingBorderDesc transitionRingBorderDesc = new TransitionRingBorderDesc();
             transitionRingBorderDesc.isLeftRingBorder = false;
             transitionRingBorderDesc.isRightRingBorder = false;
             transitionRingBorderDesc.isTopRingBorder = false;
@@ -1531,7 +1526,6 @@ namespace IncreasedTerrainDistanceMod
                 gameobjectTerrainTransitionRing = new GameObject("TerrainTransitionRing");
                 gameobjectTerrainTransitionRing.transform.SetParent(GameManager.Instance.ExteriorParent.transform);
             }
-
             //// this is not perfect I know - but since events can get in asynchronous and may trigger an update and thus an invocation to generateTerrainTransitionRing() it is important that no update is currently performed
             //while (transitionRingAllBlocksReady == true)
             //{
@@ -1539,18 +1533,15 @@ namespace IncreasedTerrainDistanceMod
             //}
             transitionRingAllBlocksReady = false;
             terrainTransitionRingUpdateRunning = true;
-
             terrainMaterial.SetInt("_TerrainDistance", streamingWorld.TerrainDistance-2); // for time of transition ring update - change far terrain to be rendered to streamingWorld.TerrainDistance-2
 
             int distanceTransitionRingFromCenterX = (streamingWorld.TerrainDistance + 1);
             int distanceTransitionRingFromCenterY = (streamingWorld.TerrainDistance + 1);
-
             // initially mark all blocks as potential blocks to remove - terrain blocks in terrain transition ring that can be reused will be updated next
             for (int i = 0; i < terrainTransitionRingArray.Length; i++)
             {
                 terrainTransitionRingArray[i].keepThisBlock = false;
             }
-
             // mark blocks that will be reused
             for (int y = -distanceTransitionRingFromCenterY; y <= distanceTransitionRingFromCenterY; y++)
             {
@@ -1577,7 +1568,6 @@ namespace IncreasedTerrainDistanceMod
                     }
                 }
             }
-
             // remove unused terrain blocks from terrainTransitionRingArray (and its key from terrainTransitionRingIndexDict)
             for (int i = 0; i < terrainTransitionRingArray.Length; i++)
             {               
@@ -1607,7 +1597,6 @@ namespace IncreasedTerrainDistanceMod
                     terrainTransitionRingArray[i].terrainDesc.updateNature = true;
                 }
             }
-            
             int terrainIndex = 0;
             for (int y = -distanceTransitionRingFromCenterY; y <= distanceTransitionRingFromCenterY; y++)
             {
@@ -1648,7 +1637,6 @@ namespace IncreasedTerrainDistanceMod
                     }
                 }
             }
-
             StartCoroutine(UpdateTerrainsTransitionRing());
         }
 
