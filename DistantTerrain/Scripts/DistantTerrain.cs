@@ -493,14 +493,11 @@ namespace DistantTerrain
 
         void SetupGameObjects()
         {
-            int layerExtendedTerrain = LayerMask.NameToLayer("WorldTerrain");
-            if (layerExtendedTerrain == -1)
+            int layerWorldTerrain = LayerMask.NameToLayer("WorldTerrain");
+            if (layerWorldTerrain == -1)
             {
-                DaggerfallUnity.LogMessage("Layer with name \"WorldTerrain\" missing! Set it in Unity Editor under \"Edit/Project Settings/Tags and Layers!\"", true);
-                if (Application.isEditor)
-                    Debug.Break();
-                else
-                    Application.Quit();
+                DaggerfallUnity.LogMessage("Did not find Layer with name \"WorldTerrain\"! Defaulting to Layer 31\nIt is prefered that Layer \"WorldTerrain\" is set in Unity Editor under \"Edit/Project Settings/Tags and Layers!\"", true);
+                layerWorldTerrain = 31;
             }
 
             // prevent NullReferenceException on application close when coming from EnhancedSkyToggle event (no idea why it is raised on application close)
@@ -520,7 +517,7 @@ namespace DistantTerrain
             {
                 GameObject goStackedNearCamera = new GameObject("stackedNearCamera");
                 stackedNearCamera = goStackedNearCamera.AddComponent<Camera>();
-                stackedNearCamera.cullingMask = (1 << layerExtendedTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add default, add water layer so reflections are updated in time (workaround)
+                stackedNearCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add default, add water layer so reflections are updated in time (workaround)
                 stackedNearCamera.nearClipPlane = 980.0f;
                 stackedNearCamera.farClipPlane = 15000.0f;
                 stackedNearCamera.fieldOfView = Camera.main.fieldOfView;
@@ -534,7 +531,7 @@ namespace DistantTerrain
             {
                 GameObject goStackedCamera = new GameObject("stackedCamera");
                 stackedCamera = goStackedCamera.AddComponent<Camera>();
-                stackedCamera.cullingMask = (1 << layerExtendedTerrain) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
+                stackedCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
                 stackedCamera.nearClipPlane = 980.0f;
                 stackedCamera.farClipPlane = 300000.0f;
                 stackedCamera.fieldOfView = Camera.main.fieldOfView;
@@ -916,9 +913,9 @@ namespace DistantTerrain
             terrainGameObject.gameObject.transform.localPosition = Vector3.zero;
 
             // assign terrainGameObject to layer "WorldTerrain" if available (used for rendering with secondary camera to prevent floating-point precision problems with huge clipping ranges)
-            int layerExtendedTerrain = LayerMask.NameToLayer("WorldTerrain");
-            if (layerExtendedTerrain != -1)
-                terrainGameObject.layer = layerExtendedTerrain;
+            int layerWorldTerrain = LayerMask.NameToLayer("WorldTerrain");
+            if (layerWorldTerrain != -1)
+                terrainGameObject.layer = layerWorldTerrain;
 
             int worldMapResolution = Math.Max(worldMapWidth, worldMapHeight);
 
