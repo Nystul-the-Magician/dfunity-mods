@@ -1,4 +1,4 @@
-﻿//Increased Terrain Distance Mod for Daggerfall Tools For Unity
+﻿//Distant Terrain Mod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -7,13 +7,13 @@
 using UnityEngine;
 using DaggerfallWorkshop.Game;
 
-namespace IncreasedTerrainDistanceMod
+namespace DistantTerrain
 {
-    public class CloneCameraPositionFromMainCamera : MonoBehaviour
+    public class CloneCameraRotationFromMainCamera : MonoBehaviour
     {
         void LateUpdate()
         {
-            this.transform.position = Camera.main.transform.position;
+            this.transform.rotation = Camera.main.transform.rotation;
         }
 
     }

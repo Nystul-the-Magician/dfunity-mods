@@ -1,4 +1,4 @@
-﻿//Increased Terrain Distance Mod for Daggerfall Tools For Unity
+﻿//Distant Terrain Mod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -17,7 +17,7 @@ using DaggerfallWorkshop;
 using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Utility;
 
-namespace IncreasedTerrainDistanceMod
+namespace DistantTerrain
 {
     /// <summary>
     /// Manages a world terrain object built from the world height map for increased terrain/view distance
@@ -31,7 +31,7 @@ namespace IncreasedTerrainDistanceMod
     /// the IncreasedTerrainTilemap shader defined in file DaggerfallIncreasedTerrainTilemap.shader discards fragments inside the area containing the detailed terrain from StreamingWorld,
     /// a terrain transition ring is now matching the heights of the detailed terrain with those of the far terrain in a ring of terrain blocks in between them.
     /// </summary>
-    public class IncreasedTerrainDistance : MonoBehaviour
+    public class DistantTerrain : MonoBehaviour
     {
         #region Fields
 
@@ -215,14 +215,14 @@ namespace IncreasedTerrainDistanceMod
             //ImprovedTerrainSampler improvedTerrainSampler = DaggerfallUnity.Instance.TerrainSampler as ImprovedTerrainSampler;
             //if (improvedTerrainSampler == null)
             //{
-            //    DaggerfallUnity.LogMessage("IncreasedTerrainDistance: TerrainSampler instance is not of type ImprovedTerrainSampler (use ITerrainSampler terrainSampler = new ImprovedTerrainSampler() in DaggerfallUnity.cs)", true);
+            //    DaggerfallUnity.LogMessage("DistantTerrain: TerrainSampler instance is not of type ImprovedTerrainSampler (use ITerrainSampler terrainSampler = new ImprovedTerrainSampler() in DaggerfallUnity.cs)", true);
             //}
 
             if (!streamingWorld)
                 streamingWorld = GameObject.Find("StreamingWorld").GetComponent<StreamingWorld>();
             if (!streamingWorld)
             {
-                DaggerfallUnity.LogMessage("IncreasedTerrainDistance: Missing StreamingWorld reference.", true);
+                DaggerfallUnity.LogMessage("DistantTerrain: Missing StreamingWorld reference.", true);
                 if (Application.isEditor)
                     Debug.Break();
                 else
@@ -233,7 +233,7 @@ namespace IncreasedTerrainDistanceMod
                 playerGPS = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerGPS>();
             if (!playerGPS)
             {
-                DaggerfallUnity.LogMessage("IncreasedTerrainDistance: Missing PlayerGPS reference.", true);
+                DaggerfallUnity.LogMessage("DistantTerrain: Missing PlayerGPS reference.", true);
                 if (Application.isEditor)
                     Debug.Break();
                 else
@@ -257,7 +257,7 @@ namespace IncreasedTerrainDistanceMod
             }
             if (!weatherManager)
             {
-                DaggerfallUnity.LogMessage("IncreasedTerrainDistance: Missing WeatherManager reference.", true);
+                DaggerfallUnity.LogMessage("DistantTerrain: Missing WeatherManager reference.", true);
                 if (Application.isEditor)
                     Debug.Break();
                 else
@@ -296,7 +296,7 @@ namespace IncreasedTerrainDistanceMod
         public void EnhancedSkyToggle(bool toggle)
         {
 #if DEBUG
-            Debug.Log("IncreasedTerrainDistance.EnhancedSkyToggle() : " + toggle);
+            Debug.Log("DistantTerrain.EnhancedSkyToggle() : " + toggle);
 #endif
 
             if (toggle)

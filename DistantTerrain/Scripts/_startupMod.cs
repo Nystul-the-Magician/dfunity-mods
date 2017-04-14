@@ -1,19 +1,25 @@
-﻿using UnityEngine;
+﻿//Distant Terrain Mod for Daggerfall-Unity
+//http://www.reddit.com/r/dftfu
+//http://www.dfworkshop.net/
+//Author: Michael Rauter (a.k.a. Nystul)
+//License: MIT License (http://www.opensource.org/licenses/mit-license.php)
+
+using UnityEngine;
 using System.Collections;
 using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Game.UserInterface;
 using DaggerfallWorkshop.Game.Utility.ModSupport;   //required for modding features
 using DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings; //required for mod settings
 
-using IncreasedTerrainDistanceMod;
+using DistantTerrain;
 
-namespace IncreasedTerrainDistanceMod
+namespace DistantTerrain
 {
     public class _startupMod : MonoBehaviour
     {
         public static Mod mod;
-        private static GameObject gameobjectIncreasedTerrainDistanceMod = null;
-        private static IncreasedTerrainDistance componentIncreasedTerrainDistance = null;
+        private static GameObject gameobjectDistantTerrain = null;
+        private static DistantTerrain componentDistantTerrain = null;
 
         // Settings
 
@@ -50,9 +56,9 @@ namespace IncreasedTerrainDistanceMod
 
         public static void initMod()
         {
-            Debug.Log("init of IncreasedTerrainDistanceMod standalone");
-            gameobjectIncreasedTerrainDistanceMod = new GameObject("IncreasedTerrainDistanceMod");
-            componentIncreasedTerrainDistance = gameobjectIncreasedTerrainDistanceMod.AddComponent<IncreasedTerrainDistance>();
+            Debug.Log("init of DistantTerrain standalone");
+            gameobjectDistantTerrain = new GameObject("DistantTerrain");
+            componentDistantTerrain = gameobjectDistantTerrain.AddComponent<DistantTerrain>();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿//Increased Terrain Distance Mod for Daggerfall Tools For Unity
+﻿//Distant Terrain Mod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -11,10 +11,10 @@ using DaggerfallConnect;
 using DaggerfallConnect.Arena2;
 using DaggerfallWorkshop;
 using DaggerfallWorkshop.Utility;
-using IncreasedTerrainDistanceMod;
+using DistantTerrain;
 
 //namespace DaggerfallWorkshop
-namespace IncreasedTerrainDistanceMod
+namespace DistantTerrain
 {
     /// <summary>
     /// Default TerrainSampler for StreamingWorld.

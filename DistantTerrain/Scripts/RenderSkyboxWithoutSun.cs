@@ -1,4 +1,4 @@
-﻿//Increased Terrain Distance Mod for Daggerfall Tools For Unity
+﻿//Distant Terrain Mod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -16,7 +16,7 @@ using UnityEngine;
 using DaggerfallWorkshop.Game;
 //using DaggerfallWorkshop.Utility;
 
-namespace IncreasedTerrainDistanceMod
+namespace DistantTerrain
 {
     public class RenderSkyboxWithoutSun : MonoBehaviour
     {

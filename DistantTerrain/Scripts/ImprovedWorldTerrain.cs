@@ -1,4 +1,4 @@
-﻿//Increased Terrain Distance Mod for Daggerfall Tools For Unity
+﻿//Distant Terrain Mod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -22,7 +22,7 @@ using DaggerfallWorkshop;
 using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Utility;
 
-namespace IncreasedTerrainDistanceMod
+namespace DistantTerrain
 {
     /// <summary>    
     /// </summary>
@@ -33,9 +33,9 @@ namespace IncreasedTerrainDistanceMod
         const string filenameMapLocationRangeY = "mapLocationRangeY.bin";
         const string filenameTreeCoverageMap = "mapTreeCoverage.bin";
         
-        const string out_filepathMapLocationRangeX = "Game/Addons/IncreasedTerrainDistanceMod/Resources/mapLocationRangeX_out.bin"; // only used on manual trigger in unity editor - never in executable - so it should be ok
-        const string out_filepathMapLocationRangeY = "Game/Addons/IncreasedTerrainDistanceMod/Resources/mapLocationRangeY_out.bin"; //  only used on manual trigger in unity editor - never in executable - so it should be ok
-        const string out_filepathOutTreeCoverageMap = "Game/Addons/IncreasedTerrainDistanceMod/Resources/mapTreeCoverage_out.bin"; //  only used on manual trigger in unity editor - never in executable - so it should be ok
+        const string out_filepathMapLocationRangeX = "Game/Addons/DistantTerrain/Resources/mapLocationRangeX_out.bin"; // only used on manual trigger in unity editor - never in executable - so it should be ok
+        const string out_filepathMapLocationRangeY = "Game/Addons/DistantTerrain/Resources/mapLocationRangeY_out.bin"; //  only used on manual trigger in unity editor - never in executable - so it should be ok
+        const string out_filepathOutTreeCoverageMap = "Game/Addons/DistantTerrain/Resources/mapTreeCoverage_out.bin"; //  only used on manual trigger in unity editor - never in executable - so it should be ok
 
         const float minDistanceFromWaterForExtraExaggeration = 3.0f; // when does exaggeration start in terms of how far does terrain have to be away from water
         const float exaggerationFactorWaterDistance = 0.15f; // how strong is the distance from water incorporated into the multiplier
