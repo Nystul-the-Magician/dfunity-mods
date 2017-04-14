@@ -69,6 +69,7 @@ Shader "Daggerfall/TransitionRingTilemap" {
 		// extra pass that renders to depth buffer only (world terrain is semi-transparent) - important for reflections to work
 		Pass {
 			ZWrite On
+			ZTest Always // important - transition ring geometry always passes ztest - so it is always rendered before world terrain
 			Cull Back
 			ColorMask 0		
 		}
