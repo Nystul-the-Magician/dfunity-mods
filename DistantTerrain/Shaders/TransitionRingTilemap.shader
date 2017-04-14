@@ -1,11 +1,11 @@
-﻿//Increased Terrain Distance Mod for Daggerfall Tools For Unity
+﻿//Distant Terrain Mod for Daggerfall Tools For Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
 //License: MIT License (http://www.opensource.org/licenses/mit-license.php)
 //based on the DaggerfallTilemap shader by Gavin Clayton (interkarma@dfworkshop.net)
 
-Shader "Daggerfall/TransitionRingTilemap" {
+Shader "Daggerfall/DistantTerrain/TransitionRingTilemap" {
 	Properties {
 		// These params are required to stop terrain system throwing errors
 		// However we won't be using them as Unity likes to init these textures

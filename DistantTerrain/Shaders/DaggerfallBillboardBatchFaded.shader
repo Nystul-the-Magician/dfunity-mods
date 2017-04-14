@@ -1,11 +1,11 @@
-﻿// Project:         Daggerfall Tools For Unity
-// Copyright:       Copyright (C) 2009-2015 Gavin Clayton
-// License:         MIT License (http://www.opensource.org/licenses/mit-license.php)
-// Web Site:        http://www.dfworkshop.net
-// Contact:         Gavin Clayton (interkarma@dfworkshop.net)
-// Project Page:    https://github.com/Interkarma/daggerfall-unity
+﻿//Distant Terrain Mod for Daggerfall Tools For Unity
+//http://www.reddit.com/r/dftfu
+//http://www.dfworkshop.net/
+//Author: Michael Rauter (a.k.a. Nystul)
+//License: MIT License (http://www.opensource.org/licenses/mit-license.php)
+//based on the DaggerfallBillboardPatch shader by Gavin Clayton (interkarma@dfworkshop.net)
 
-Shader "Daggerfall/BillboardBatchFaded" {
+Shader "Daggerfall/DistantTerrain/BillboardBatchFaded" {
 	// Efficient transparent-cutout styled billboard batch.
 	// NOTES:
 	//  - Use this shader for best billboard performance.

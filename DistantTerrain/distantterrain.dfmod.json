@@ -11,7 +11,7 @@
         "Assets/Game/Addons/DistantTerrain_standalone/Resources/mapLocationRangeX.bin.txt",
         "Assets/Game/Addons/DistantTerrain_standalone/Resources/mapTreeCoverage.bin.txt",
         "Assets/Game/Addons/DistantTerrain_standalone/Shaders/DaggerfallBillboardBatchFaded.shader",
-        "Assets/Game/Addons/DistantTerrain_standalone/Shaders/DaggerfallIncreasedTerrainTilemap.shader",
+        "Assets/Game/Addons/DistantTerrain_standalone/Shaders/DaggerfallDistantTerrainTilemap.shader",
         "Assets/Game/Addons/DistantTerrain_standalone/Shaders/TransitionRingTilemap.shader",
         "Assets/Game/Addons/DistantTerrain_standalone/Shaders/FarTerrainCommon.cginc",
         "Assets/Game/Addons/DistantTerrain_standalone/Scripts/RenderSkyboxWithoutSun.cs",

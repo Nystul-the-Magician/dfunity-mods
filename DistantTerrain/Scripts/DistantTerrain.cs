@@ -1026,8 +1026,8 @@ namespace DistantTerrain
 
             textureAtlasSwampRain = dfUnity.MaterialReader.TextureReader.GetTerrainTilesetTexture(404).albedoMap;
             textureAtlasSwampRain.filterMode = FilterMode.Point;
-          
-            terrainMaterial = new Material(Shader.Find("Daggerfall/IncreasedTerrainTilemap"));
+
+            terrainMaterial = new Material(Shader.Find("Daggerfall/DistantTerrain/DistantTerrainTilemap"));
             terrainMaterial.name = string.Format("world terrain material");
 
             // Assign textures and parameters     
@@ -1121,7 +1121,7 @@ namespace DistantTerrain
             {
                 Terrain terrain = terrainTransitionRingArray[i].terrainDesc.terrainObject.GetComponent<Terrain>();
                 Material oldMaterial = terrain.materialTemplate;
-                Material mat = new Material(Shader.Find("Daggerfall/TransitionRingTilemap"));
+                Material mat = new Material(Shader.Find("Daggerfall/DistantTerrain/TransitionRingTilemap"));
                 mat.CopyPropertiesFromMaterial(oldMaterial);
 
                 Vector3 vecWaterHeight = new Vector3(0.0f, (ImprovedTerrainSampler.scaledOceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
@@ -1234,7 +1234,7 @@ namespace DistantTerrain
             // inject transition ring shader
             Terrain terrain = transitionTerrainDesc.terrainDesc.terrainObject.GetComponent<Terrain>();
             Material oldMaterial = terrain.materialTemplate;
-            Material newMaterial = new Material(Shader.Find("Daggerfall/TransitionRingTilemap"));
+            Material newMaterial = new Material(Shader.Find("Daggerfall/DistantTerrain/TransitionRingTilemap"));
             newMaterial.CopyPropertiesFromMaterial(oldMaterial);
             newMaterial.mainTexture = oldMaterial.mainTexture;
             newMaterial.mainTextureOffset = oldMaterial.mainTextureOffset;
@@ -1495,7 +1495,7 @@ namespace DistantTerrain
                         Material[] rendererMaterials = meshRenderer.materials;
                         for (int m = 0; m < rendererMaterials.Length; m++)
                         {
-                            Material newMaterial = new Material(Shader.Find("Daggerfall/BillboardBatchFaded"));
+                            Material newMaterial = new Material(Shader.Find("Daggerfall/DistantTerrain/BillboardBatchFaded"));
                             newMaterial.CopyPropertiesFromMaterial(rendererMaterials[m]);
                             newMaterial.SetInt("_TerrainDistance", streamingWorld.TerrainDistance);
                             newMaterial.SetFloat("_TerrainBlockSize", (MapsFile.WorldMapTerrainDim * MeshReader.GlobalScale));
