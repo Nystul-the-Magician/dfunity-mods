@@ -1,11 +1,11 @@
 {
-    "ModFileName": "distantterrain_2.0.0",
+    "ModFileName": "distantterrain",
     "ModTitle": "Distant Terrain",
     "ModVersion": "2.0.0",
     "ModAuthor": "Nystul",
     "ContactInfo": "http://forums.dfworkshop.net",
     "DFUnity_Verion": "0.4.12",
-    "ModDescription": "adds far terrain and increases terrain and view distance",
+    "ModDescription": "adds distant terrain and increases view distance",
     "Files": [
         "Assets/Game/Addons/DistantTerrain_standalone/Resources/mapLocationRangeY.bin.txt",
         "Assets/Game/Addons/DistantTerrain_standalone/Resources/mapLocationRangeX.bin.txt",
@@ -21,6 +21,6 @@
         "Assets/Game/Addons/DistantTerrain_standalone/Scripts/ImprovedTerrainSampler.cs",
         "Assets/Game/Addons/DistantTerrain_standalone/Scripts/_startupMod.cs",
         "Assets/Game/Addons/DistantTerrain_standalone/Scripts/CloneCameraPositionFromMainCamera.cs",
-		"Assets\\Untracked\\ModBuilder\\Distant Terrain\\distantterrain_2.0.0.dfmod.json"
+		"Assets\\Untracked\\ModBuilder\\Distant Terrain\\distantterrain.dfmod.json"
     ]
 }
