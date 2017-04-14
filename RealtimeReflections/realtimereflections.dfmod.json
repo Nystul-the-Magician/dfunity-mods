@@ -1,0 +1,25 @@
+{
+    "ModFileName": "realtimereflections",
+    "ModTitle": "Realtime Reflections",
+    "ModVersion": "2.0.0",
+    "ModAuthor": "Nystul",
+    "ContactInfo": "http://forums.dfworkshop.net",
+    "DFUnity_Verion": "0.4.12",
+    "ModDescription": "realtime reflections for floor textures (interiors) and water tiles (exteriors)",
+    "Files": [
+        "Assets/Game/Addons/RealtimeReflections_standalone/Resources/tileatlas_reflective.png",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Resources/tileatlas_reflective_raining.png",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Shaders/CreateLookupReflectionTextureIndex.shader",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Shaders/DaggerfallTilemapWithReflections.shader",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Shaders/CreateLookupReflectionTextureCoordinates.shader",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Shaders/DeferredPlanarReflections.shader",
+        "Assets\\Untracked\\ModBuilder\\Realtime Reflections\\realtimereflections.dfmod.json",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/InjectReflectiveMaterialProperty.cs",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/MirrorReflection.cs",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/CreateReflectionLookupTextures.cs",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/UpdateReflectionTextures.cs",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/DeferredPlanarReflections.cs",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/_startupMod.cs",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Resources/RealtimeReflections.ini.txt"
+    ]
+}
