@@ -1,4 +1,4 @@
-﻿//ReflectionsMod for Daggerfall Tools For Unity
+﻿//ReflectionsMod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -247,17 +247,6 @@ namespace ReflectionsMod
         void InjectMaterialPropertiesIndoor()
         {
             // mages guild 4 floors debuging worldpos: 704,337
-
-            // force update to textures loaded in current interior/dungeon models            
-            Renderer[] renderers = null;
-            if (GameManager.Instance.IsPlayerInsideBuilding)
-            {
-                renderers = gameObjectInterior.GetComponentsInChildren<Renderer>();
-            }
-            else if (GameManager.Instance.IsPlayerInsideDungeon || GameManager.Instance.IsPlayerInsideCastle)
-            {
-                renderers = gameObjectDungeon.GetComponentsInChildren<Renderer>();
-            }
         }
 
         void InjectMaterialPropertiesOutdoor()

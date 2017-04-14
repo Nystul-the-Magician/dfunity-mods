@@ -1,4 +1,4 @@
-//ReflectionsMod for Daggerfall Tools For Unity
+//ReflectionsMod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -8,7 +8,7 @@
 
 using UnityEngine;
 using System.Collections;
-using IncreasedTerrainDistanceMod;
+using DistantTerrain;
  
 namespace ReflectionsMod
 {

@@ -1,3 +1,9 @@
+//ReflectionsMod for Daggerfall-Unity
+//http://www.reddit.com/r/dftfu
+//http://www.dfworkshop.net/
+//Author: Michael Rauter (a.k.a. Nystul)
+//License: MIT License (http://www.opensource.org/licenses/mit-license.php)
+
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
