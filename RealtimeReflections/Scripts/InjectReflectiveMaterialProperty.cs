@@ -97,12 +97,19 @@ namespace RealtimeReflections
                     Application.Quit();
             }
 
-            if (GameObject.Find("IncreasedTerrainDistanceMod") != null)
+            if (GameObject.Find("DistantTerrain") != null)
             {
-                //if (DaggerfallUnity.Settings.Nystul_IncreasedTerrainDistance)
-                //{
-                //    extraTranslationY = GameObject.Find("IncreasedTerrainDistanceMod").GetComponent<IncreasedTerrainDistanceMod.IncreasedTerrainDistance>().ExtraTranslationY;
-                //}
+                Component[] components = GameObject.Find("DistantTerrain").GetComponents(typeof(Component));
+                foreach (Component component in components)
+                {
+                    Type type = component.GetType();
+                    if (type.Name == "DistantTerrain")
+                    {
+                        //System.Reflection.PropertyInfo pinfo = type.GetProperty("ExtraTranslationY");
+                        System.Reflection.PropertyInfo extraTranslationYPropertyInfo = type.GetProperty("ExtraTranslationY");
+                        extraTranslationY = (float)extraTranslationYPropertyInfo.GetValue(component, null);
+                    }
+                }
             }
 
             gameObjectReflectionPlaneGroundLevel = GameObject.Find("ReflectionPlaneBottom");
