@@ -210,6 +210,12 @@ namespace DistantTerrain
         {
             dfUnity = DaggerfallUnity.Instance;
 
+            // Streaming world terrain distance
+            int terrainDistance = DaggerfallUnity.Settings.TerrainDistance;
+            // Reduce terrain distance by 1 if distant terrain enabled
+            terrainDistance = Mathf.Clamp(terrainDistance - 1, 1, 4);
+            GameManager.Instance.StreamingWorld.TerrainDistance = terrainDistance;
+
             dfUnity.TerrainSampler = new ImprovedTerrainSampler();
 
             //ImprovedTerrainSampler improvedTerrainSampler = DaggerfallUnity.Instance.TerrainSampler as ImprovedTerrainSampler;
