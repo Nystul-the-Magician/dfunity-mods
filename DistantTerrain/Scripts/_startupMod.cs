@@ -22,7 +22,10 @@ namespace DistantTerrain
         private static DistantTerrain componentDistantTerrain = null;
 
         // Settings
-
+        private static bool enableTerrainTransition = true;
+        private static bool enableSeaReflections = true;
+        private static bool enableImprovedTerrain = true;
+        private static bool indicateLocations = true;
 
         [Invoke(StateManager.StateTypes.Start)]
         public static void InitStart(InitParams initParams)
@@ -31,9 +34,13 @@ namespace DistantTerrain
             mod = initParams.Mod;
 
             // Load settings. Pass this mod as paramater
-            //ModSettings settings = new ModSettings(mod);
+            ModSettings settings = new ModSettings(mod);
 
             // settings
+            enableTerrainTransition = settings.GetBool("TerrainTransition", "enable");
+            enableSeaReflections = settings.GetBool("SeaReflections", "enable");
+            enableImprovedTerrain = settings.GetBool("ImprovedTerrain", "enable");
+            indicateLocations = settings.GetBool("ImprovedTerrain", "indicateLocations");
 
             initMod();
 
@@ -59,6 +66,10 @@ namespace DistantTerrain
             Debug.Log("init of DistantTerrain standalone");
             gameobjectDistantTerrain = new GameObject("DistantTerrain");
             componentDistantTerrain = gameobjectDistantTerrain.AddComponent<DistantTerrain>();
+            componentDistantTerrain.EnableTerrainTransition = enableTerrainTransition;
+            componentDistantTerrain.EnableSeaReflections = enableSeaReflections;
+            componentDistantTerrain.EnableImprovedTerrain = enableImprovedTerrain;
+            componentDistantTerrain.IndicateLocations = indicateLocations;
         }
     }
 }

@@ -79,6 +79,33 @@ namespace DistantTerrain
             }
         }
 
+        bool enableTerrainTransition = true;
+        public bool EnableTerrainTransition
+        {
+            get { return enableTerrainTransition; }
+            set { enableTerrainTransition = value; }
+        }
+
+        bool enableSeaReflections = true;
+        public bool EnableSeaReflections
+        {
+            get { return enableSeaReflections; }
+            set { enableSeaReflections = value; }
+        }
+
+        bool enableImprovedTerrain = true;
+        public bool EnableImprovedTerrain
+        {
+            get { return enableImprovedTerrain; }
+            set { enableImprovedTerrain = value; }
+        }
+
+        bool indicateLocations = true;
+        public bool IndicateLocations
+        {
+            get { return indicateLocations; }
+            set { indicateLocations = value; }
+        }
 
         bool isActiveReflectionsMod = false;
         bool isActiveEnhancedSkyMod = false;
@@ -211,14 +238,6 @@ namespace DistantTerrain
         void Awake()
         {
             dfUnity = DaggerfallUnity.Instance;
-
-            // Streaming world terrain distance
-            int terrainDistance = DaggerfallUnity.Settings.TerrainDistance;
-            // Reduce terrain distance by 1 if distant terrain enabled
-            terrainDistance = Mathf.Clamp(terrainDistance - 1, 1, 4);
-            GameManager.Instance.StreamingWorld.TerrainDistance = terrainDistance;
-
-            dfUnity.TerrainSampler = new ImprovedTerrainSampler();
 
             //ImprovedTerrainSampler improvedTerrainSampler = DaggerfallUnity.Instance.TerrainSampler as ImprovedTerrainSampler;
             //if (improvedTerrainSampler == null)
@@ -374,7 +393,10 @@ namespace DistantTerrain
 
         void InitFarTerrain()
         {
-            InitImprovedWorldTerrain();
+            if (enableImprovedTerrain)
+            {
+                InitImprovedWorldTerrain();
+            }
 
             generateWorldTerrain();
 
@@ -429,13 +451,20 @@ namespace DistantTerrain
 
                     byte locationMapRangeX = 0;
                     byte locationMapRangeY = 0;
-                    if (x < worldMapWidth - 1)
-                    {
-                        locationMapRangeX = ImprovedWorldTerrain.MapLocationRangeX[(500 - 1 - y) * worldMapWidth + x + 1];
-                        locationMapRangeY = ImprovedWorldTerrain.MapLocationRangeY[(500 - 1 - y) * worldMapWidth + x + 1];
-                    }
+                    byte treeCoverage = 0;
 
-                    byte treeCoverage = ImprovedWorldTerrain.MapTreeCoverage[y * worldMapWidth + x];
+                    if (enableImprovedTerrain)
+                    {
+                        if (indicateLocations)
+                        {
+                            if (x < worldMapWidth - 1)
+                            {
+                                locationMapRangeX = ImprovedWorldTerrain.MapLocationRangeX[(500 - 1 - y) * worldMapWidth + x + 1];
+                                locationMapRangeY = ImprovedWorldTerrain.MapLocationRangeY[(500 - 1 - y) * worldMapWidth + x + 1];
+                            }
+                        }
+                        treeCoverage = ImprovedWorldTerrain.MapTreeCoverage[y * worldMapWidth + x];
+                    }
 
                     // Assign to tileMap
                     tileColor.r = Convert.ToByte(climateIndex);
@@ -466,6 +495,20 @@ namespace DistantTerrain
 
         void Start()
         {
+            if (enableTerrainTransition)
+            {
+                // Streaming world terrain distance
+                int terrainDistance = DaggerfallUnity.Settings.TerrainDistance;
+                // Reduce terrain distance by 1 if distant terrain enabled
+                terrainDistance = Mathf.Clamp(terrainDistance - 1, 1, 4);
+                GameManager.Instance.StreamingWorld.TerrainDistance = terrainDistance;
+            }
+
+            if (enableImprovedTerrain)
+            {
+                dfUnity.TerrainSampler = new ImprovedTerrainSampler();
+            }
+
             if (GameObject.Find("RealtimeReflections") != null)
             {
                 isActiveReflectionsMod = true;
@@ -667,7 +710,7 @@ namespace DistantTerrain
                 if (curMapPixel.X != MapPixelX ||
                     curMapPixel.Y != MapPixelY)
                 {
-                    UpdateWorldTerrain(curMapPixel);                
+                    UpdateWorldTerrain(curMapPixel);
                 }
 
                 Terrain terrain = worldTerrainGameObject.GetComponent<Terrain>();
@@ -698,37 +741,41 @@ namespace DistantTerrain
                 }
             }
 
-            // if terrain transition ring was marked to be updated
-            if (updateTerrainTransitionRing)
+            if (enableTerrainTransition)
             {
-                if (!terrainTransitionRingUpdateRunning) // if at the moment no terrain transition ring update is still in progress
+                // if terrain transition ring was marked to be updated
+                if (updateTerrainTransitionRing)
                 {
-                    // update terrain transition ring in this Update() iteration if no terrain transition ring update is still in progress - otherwise postprone
-                    generateTerrainTransitionRing(); // update
-                    updateTerrainTransitionRing = false; // mark as updated
+                    if (!terrainTransitionRingUpdateRunning) // if at the moment no terrain transition ring update is still in progress
+                    {
+                        // update terrain transition ring in this Update() iteration if no terrain transition ring update is still in progress - otherwise postprone
+                        generateTerrainTransitionRing(); // update
+                        updateTerrainTransitionRing = false; // mark as updated
+                    }
                 }
-            }
 
-            if (gameobjectTerrainTransitionRing != null)
-            {
-                if (doSeasonalTexturesUpdate)
+                if (gameobjectTerrainTransitionRing != null)
                 {
-                    terrainTransitionRingUpdateSeasonalTextures = true;
-                }                
+                    if (doSeasonalTexturesUpdate)
+                    {
+                        terrainTransitionRingUpdateSeasonalTextures = true;
+                    }
 
-                if (!terrainTransitionRingUpdateRunning) // if at the moment no terrain transition ring update is still in progress
-                {
-                    terrainTransitionRingUpdateMaterialProperties = true;                    
+                    if (!terrainTransitionRingUpdateRunning) // if at the moment no terrain transition ring update is still in progress
+                    {
+                        terrainTransitionRingUpdateMaterialProperties = true;
+                    }
+
+
+                    if (terrainTransitionRingUpdateSeasonalTextures)
+                    {
+                        updateSeasonalTexturesTerrainTransitionRing();
+                    }
+                    if (terrainTransitionRingUpdateMaterialProperties)
+                    {
+                        updateMaterialShaderPropertiesTerrainTransitionRing();
+                    }
                 }
-            }
-
-            if (terrainTransitionRingUpdateSeasonalTextures)
-            {
-                updateSeasonalTexturesTerrainTransitionRing();
-            }
-            if (terrainTransitionRingUpdateMaterialProperties)
-            {
-                updateMaterialShaderPropertiesTerrainTransitionRing();
             }
 
             if (justToggledEnhancedSky)
@@ -1077,6 +1124,10 @@ namespace DistantTerrain
             terrainMaterial.SetInt("_PlayerPosY", this.playerGPS.CurrentMapPixel.Y);
 
             terrainMaterial.SetInt("_TerrainDistance", streamingWorld.TerrainDistance);
+            if (!enableTerrainTransition)
+            {
+                terrainMaterial.SetInt("_TerrainDistance", streamingWorld.TerrainDistance-1); // compensate for terrain transition ring being not present
+            }
 
             Vector3 vecWaterHeight = new Vector3(0.0f, (ImprovedTerrainSampler.scaledOceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
             Vector3 vecWaterHeightTransformed = terrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
@@ -1090,7 +1141,9 @@ namespace DistantTerrain
             terrainMaterial.SetFloat("_BlendStart", blendStart);
             terrainMaterial.SetFloat("_BlendEnd", blendEnd);
 
-            if (isActiveReflectionsMod)
+            terrainMaterial.SetInt("_UseSeaReflectionTex", 0);
+
+            if ((isActiveReflectionsMod) && (enableSeaReflections))
             {
                 updateSeaReflectionTextureReference();
 
@@ -1100,11 +1153,7 @@ namespace DistantTerrain
                     terrainMaterial.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
                     terrainMaterial.SetInt("_UseSeaReflectionTex", 1);
                 }
-                else
-                {
-                    terrainMaterial.SetInt("_UseSeaReflectionTex", 0);
-                }
-            }
+            }            
 
             // Promote material
             terrain.materialType = Terrain.MaterialType.Custom;
@@ -1320,7 +1369,9 @@ namespace DistantTerrain
             newMaterial.SetFloat("_BlendStart", blendStart);
             newMaterial.SetFloat("_BlendEnd", blendEnd);
 
-            if (isActiveReflectionsMod)
+            newMaterial.SetInt("_UseSeaReflectionTex", 0);
+
+            if ((isActiveReflectionsMod) && (enableSeaReflections))
             {
                 updateSeaReflectionTextureReference();
 
@@ -1333,10 +1384,6 @@ namespace DistantTerrain
                         newMaterial.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
                     }
                     newMaterial.SetInt("_UseSeaReflectionTex", 1);
-                }
-                else
-                {
-                    newMaterial.SetInt("_UseSeaReflectionTex", 0);
                 }
             }
 
@@ -1553,6 +1600,9 @@ namespace DistantTerrain
 
         private void generateTerrainTransitionRing()
         {
+            if (!enableTerrainTransition)
+                return;
+
             if (gameobjectTerrainTransitionRing == null)
             {
                 gameobjectTerrainTransitionRing = new GameObject("TerrainTransitionRing");

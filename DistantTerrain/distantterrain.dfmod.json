@@ -21,6 +21,7 @@
         "Assets/Game/Addons/DistantTerrain_standalone/Scripts/ImprovedTerrainSampler.cs",
         "Assets/Game/Addons/DistantTerrain_standalone/Scripts/_startupMod.cs",
         "Assets/Game/Addons/DistantTerrain_standalone/Scripts/CloneCameraPositionFromMainCamera.cs",
-		"Assets\\Untracked\\ModBuilder\\Distant Terrain\\distantterrain.dfmod.json"
+		"Assets\\Untracked\\ModBuilder\\Distant Terrain\\distantterrain.dfmod.json",
+		"Assets/Game/Addons/DistantTerrain_standalone/Resources/DistantTerrain.ini.txt"
     ]
 }
