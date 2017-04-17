@@ -118,7 +118,7 @@ namespace RealtimeReflections
 		    Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
 		    reflectionCamera.projectionMatrix = projection;
 
-            reflectionCamera.cullingMask = ~(1 << 4) & m_ReflectLayers.value; // never render water layer
+            reflectionCamera.cullingMask = ~(1 << 4) & LayerMask.NameToLayer("Everything"); //m_ReflectLayers.value; // never render water layer
 		    reflectionCamera.targetTexture = m_ReflectionTexture;
 
             UnityEngine.Rendering.ShadowCastingMode oldShadowCastingMode = rend.shadowCastingMode;
