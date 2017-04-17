@@ -4,7 +4,8 @@ DISTANT TERRAIN mod for Daggerfall-Unity
 This mod adds distant terrain to Daggerfall Unity.
 
 **REQUIREMENTS**
-Daggerfall Unity build 55 or higher (v0.3.2 +).
+developed and tested with Daggerfall Unity v0.4.12.
+so make sure you use a at least this version.
 
 **INSTALLATION**
 Put the distantterrain.dfmod package inside 'DaggerfallUnity_Data/StreamingAssets/Mods'. 

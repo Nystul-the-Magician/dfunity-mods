@@ -4,8 +4,9 @@ REALTIME REFLECTIONS mod for Daggerfall-Unity
 This mod adds realtime reflections for floor textures (interiors) and water tiles (exteriors).
 
 **REQUIREMENTS**
-Daggerfall Unity build 55 or higher (v0.3.2 +).
-Deferred Rendering activated in settings
+developed and tested with Daggerfall Unity v0.4.12.
+so make sure you use a at least this version.
+Deferred Rendering must be activated in the settings of Daggerfall Unity!
 
 **INSTALLATION**
 Put the realtimereflections.dfmod package inside 'DaggerfallUnity_Data/StreamingAssets/Mods'.
