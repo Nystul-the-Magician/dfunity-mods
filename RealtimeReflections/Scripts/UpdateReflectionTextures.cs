@@ -400,6 +400,15 @@ namespace RealtimeReflections
 
             playerInside = GameManager.Instance.IsPlayerInside;
 
+            if (playerInside == true)
+            {
+                updateBackgroundSettingsIndoor();
+            }
+            else
+            {
+                updateBackgroundSettingsOutdoor();
+            }            
+
             PlayerEnterExit.OnTransitionInterior += OnTransitionToInterior;
             PlayerEnterExit.OnTransitionExterior += OnTransitionToExterior;
             PlayerEnterExit.OnTransitionDungeonInterior += OnTransitionToInterior;
@@ -439,6 +448,32 @@ namespace RealtimeReflections
 
             mirrorRefl.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
             mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
+        }
+
+        void updateBackgroundSettingsIndoor()
+        {
+            playerInside = true; // player now inside
+
+            mirrorRefl.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.IndoorSetting;
+            mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.IndoorSetting;
+
+            if (useDeferredReflections)
+            {
+                componentDeferredPlanarReflections.enabled = true;
+            }
+        }
+
+        void updateBackgroundSettingsOutdoor()
+        {
+            playerInside = false; // player now outside
+
+            mirrorRefl.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
+            mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
+
+            if (useDeferredReflections)
+            {
+                componentDeferredPlanarReflections.enabled = false;
+            }
         }
 
         void Update()
@@ -558,27 +593,11 @@ namespace RealtimeReflections
 
             if (GameManager.Instance.IsPlayerInside && !playerInside)
             {
-                playerInside = true; // player now inside
-
-                mirrorRefl.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.IndoorSetting;
-                mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.IndoorSetting;
-
-                if (useDeferredReflections)
-                {
-                    componentDeferredPlanarReflections.enabled = true;
-                }
+                updateBackgroundSettingsIndoor();
             }
             else if (!GameManager.Instance.IsPlayerInside && playerInside)
             {
-                playerInside = false; // player now outside
-
-                mirrorRefl.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
-                mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
-
-                if (useDeferredReflections)
-                {
-                    componentDeferredPlanarReflections.enabled = false;
-                }
+                updateBackgroundSettingsOutdoor();
             }
         }
 	}
