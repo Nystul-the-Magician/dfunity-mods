@@ -73,6 +73,12 @@ namespace RealtimeReflections
             componentUpdateReflectionTextures.LowerLevelReflectionTextureWidth = lowerLevelReflectionTextureWidth;
             componentUpdateReflectionTextures.LowerLevelReflectionTextureHeight = lowerLevelReflectionTextureHeight;
             componentUpdateReflectionTextures.RoughnessMultiplier = roughnessMultiplier;
+            componentUpdateReflectionTextures.ShaderTilemapWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapWithReflections.shader");
+            componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureCoordinates = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureCoordinates.shader");
+            componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureIndex = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureIndex.shader");
+            componentUpdateReflectionTextures.ShaderDeferredPlanarReflections = mod.GetAsset<Shader>("Shaders/DeferredPlanarReflections.shader");
+            componentUpdateReflectionTextures.TextureTileatlasReflective = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective");
+            componentUpdateReflectionTextures.TextureTileatlasReflectiveRaining = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective_raining");
         }
     }
 }

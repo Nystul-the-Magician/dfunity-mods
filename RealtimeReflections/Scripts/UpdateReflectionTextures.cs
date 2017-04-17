@@ -120,6 +120,48 @@ namespace RealtimeReflections
             }
         }
 
+        Texture2D textureTileatlasReflective = null;
+        public Texture2D TextureTileatlasReflective
+        {
+            get { return textureTileatlasReflective; }
+            set { textureTileatlasReflective = value; }
+        }
+
+        Texture2D textureTileatlasReflectiveRaining = null;
+        public Texture2D TextureTileatlasReflectiveRaining
+        {
+            get { return textureTileatlasReflectiveRaining; }
+            set { textureTileatlasReflectiveRaining = value; }
+        }
+
+        Shader shaderTilemapWithReflections = null;
+        public Shader ShaderTilemapWithReflections
+        {
+            get { return shaderTilemapWithReflections; }
+            set { shaderTilemapWithReflections = value; }
+        }
+
+        Shader shaderCreateLookupReflectionTextureCoordinates = null;
+        public Shader ShaderCreateLookupReflectionTextureCoordinates
+        {
+            get { return shaderCreateLookupReflectionTextureCoordinates; }
+            set { shaderCreateLookupReflectionTextureCoordinates = value; }
+        }
+
+        Shader shaderCreateLookupReflectionTextureIndex = null;
+        public Shader ShaderCreateLookupReflectionTextureIndex
+        {
+            get { return shaderCreateLookupReflectionTextureIndex; }
+            set { shaderCreateLookupReflectionTextureIndex = value; }
+        }
+
+        Shader shaderDeferredPlanarReflections = null;
+        public Shader ShaderDeferredPlanarReflections
+        {
+            get { return shaderDeferredPlanarReflections; }
+            set { shaderDeferredPlanarReflections = value; }
+        }
+
         bool computeStepDownRaycast(Vector3 raycastStartPoint, Vector3 directionVec, float maxDiffMagnitude, out RaycastHit hit)
         {
             if (Physics.Raycast(raycastStartPoint, directionVec, out hit, 1000.0F))

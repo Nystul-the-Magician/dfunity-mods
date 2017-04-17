@@ -90,7 +90,7 @@ namespace RealtimeReflections
             get
             {
                 if (m_Shader == null)
-                    m_Shader = Shader.Find("Daggerfall/RealtimeReflections/DeferredPlanarReflections");
+                    m_Shader = componentUpdateReflectionTextures.ShaderDeferredPlanarReflections;
 
                 return m_Shader;
             }
@@ -161,7 +161,7 @@ namespace RealtimeReflections
 
             goCreateReflectionLookupTextures = new GameObject("CreateReflectionLookupTextures");
             goCreateReflectionLookupTextures.transform.SetParent(goRealtimeReflections.transform);
-            componentCreateReflectionLookupTextures = goCreateReflectionLookupTextures.AddComponent<CreateReflectionLookupTextures>();     
+            componentCreateReflectionLookupTextures = goCreateReflectionLookupTextures.AddComponent<CreateReflectionLookupTextures>();
         }
 
         void OnDisable()

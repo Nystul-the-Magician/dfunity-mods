@@ -23,7 +23,7 @@ namespace RealtimeReflections
             get
             {
                 if (m_ShaderCreateReflectionTextureCoordinates == null)
-                    m_ShaderCreateReflectionTextureCoordinates = Shader.Find("Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates");
+                    m_ShaderCreateReflectionTextureCoordinates = componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureCoordinates;
 
                 return m_ShaderCreateReflectionTextureCoordinates;
             }
@@ -47,7 +47,7 @@ namespace RealtimeReflections
             get
             {
                 if (m_ShaderCreateReflectionTextureIndex == null)
-                    m_ShaderCreateReflectionTextureIndex = Shader.Find("Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex");
+                    m_ShaderCreateReflectionTextureIndex = componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureIndex;
 
                 return m_ShaderCreateReflectionTextureIndex;
             }
@@ -98,10 +98,12 @@ namespace RealtimeReflections
             }
         }
 
-        private UpdateReflectionTextures instanceUpdateReflectionTextures = null;
+        private UpdateReflectionTextures componentUpdateReflectionTextures = null;
 
         private void Awake()
         {
+            componentUpdateReflectionTextures = GameObject.Find("RealtimeReflections").GetComponent<UpdateReflectionTextures>();
+
             if (m_Camera == null)
             {
                 m_Camera = this.gameObject.AddComponent<Camera>();
@@ -112,8 +114,7 @@ namespace RealtimeReflections
         }
 
         void Start()
-        {
-            instanceUpdateReflectionTextures = GameObject.Find("RealtimeReflections").GetComponent<UpdateReflectionTextures>();
+        {            
         }
 
         private void OnEnable()
@@ -138,8 +139,8 @@ namespace RealtimeReflections
             m_Camera.transform.position = Camera.main.transform.position;
             m_Camera.transform.rotation = Camera.main.transform.rotation;
 
-            Shader.SetGlobalFloat("_GroundLevelHeight", instanceUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            Shader.SetGlobalFloat("_LowerLevelHeight", instanceUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
+            Shader.SetGlobalFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            Shader.SetGlobalFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
             m_Camera.targetTexture = renderTextureReflectionTextureCoordinates;
             m_Camera.RenderWithShader(shaderCreateReflectionTextureCoordinates, ""); // apply custom fragment shader and write into renderTextureReflectionTextureCoordinates
             m_Camera.targetTexture = renderTextureReflectionTextureIndex;

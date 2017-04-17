@@ -26,6 +26,8 @@ namespace RealtimeReflections
         // Streaming World Component
         public StreamingWorld streamingWorld;
 
+        private UpdateReflectionTextures componentUpdateReflectionTextures = null;
+
         private Texture texReflectionGround = null;
         private Texture texReflectionLowerLevel = null;
         private bool playerInside = false;
@@ -66,6 +68,17 @@ namespace RealtimeReflections
 
         void Awake()
         {
+            if (!componentUpdateReflectionTextures)
+                componentUpdateReflectionTextures = GameObject.Find("RealtimeReflections").GetComponent<UpdateReflectionTextures>();
+            if (!componentUpdateReflectionTextures)
+            {
+                DaggerfallUnity.LogMessage("InjectReflectiveMaterialProperty: Could not locate UpdateReflectionTextures component.", true);
+                if (Application.isEditor)
+                    Debug.Break();
+                else
+                    Application.Quit();
+            }
+
             StreamingWorld.OnInitWorld += InjectMaterialProperties;
             StreamingWorld.OnTeleportToCoordinates += InjectMaterialProperties;
             FloatingOrigin.OnPositionUpdate += InjectMaterialProperties;
@@ -263,6 +276,7 @@ namespace RealtimeReflections
             {
                 return;
             }
+
             foreach (Transform child in go.transform)
             {
                 DaggerfallTerrain dfTerrain = child.GetComponent<DaggerfallTerrain>();
@@ -278,6 +292,7 @@ namespace RealtimeReflections
 
 
                 Terrain terrain = child.GetComponent<Terrain>();
+
                 if (terrain)
                 {
                     if ((terrain.materialTemplate)) //&&(terrain.materialTemplate.shader.name != "Daggerfall/TilemapWithReflections")) // uncommenting this makes initial location (after startup, not fast travelling) not receive correct shader - don't know why - so workaround is to force injecting materialshader even for unset material (not sure why it works, but it does)
@@ -290,7 +305,7 @@ namespace RealtimeReflections
                         Texture tileMapTexture = terrain.materialTemplate.GetTexture("_TilemapTex");
                         int tileMapDim = terrain.materialTemplate.GetInt("_TilemapDim");
 
-                        Material newMat = new Material(Shader.Find("Daggerfall/RealtimeReflections/TilemapWithReflections"));
+                        Material newMat = new Material(componentUpdateReflectionTextures.ShaderTilemapWithReflections);
 
                         newMat.SetTexture("_TileAtlasTex", tileSetTexture);
                         newMat.SetTexture("_TilemapTex", tileMapTexture);
@@ -307,12 +322,14 @@ namespace RealtimeReflections
                         WeatherManager weatherManager = GameObject.Find("WeatherManager").GetComponent<WeatherManager>();
                         if (!weatherManager.IsRaining)
                         {
-                            Texture2D tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective") as Texture2D;
+                            //Texture2D tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective") as Texture2D;
+                            Texture2D tileAtlasReflectiveTexture = componentUpdateReflectionTextures.TextureTileatlasReflective;
                             newMat.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
                         }
                         else
                         {
-                            Texture2D tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective_raining") as Texture2D;
+                            //Texture2D tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective_raining") as Texture2D;
+                            Texture2D tileAtlasReflectiveTexture = componentUpdateReflectionTextures.TextureTileatlasReflectiveRaining;
                             newMat.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
                         }
 

@@ -156,7 +156,27 @@ namespace DistantTerrain
         Texture2D textureAtlasMountainRain = null;
         Texture2D textureAtlasSwampRain = null;
 
-        
+        Shader shaderDistantTerrainTilemap = null;
+        public Shader ShaderDistantTerrainTilemap
+        {
+            get { return shaderDistantTerrainTilemap; }
+            set { shaderDistantTerrainTilemap = value; }
+        }
+
+        Shader shaderBillboardBatchFaded = null;
+        public Shader ShaderBillboardBatchFaded
+        {
+            get { return shaderBillboardBatchFaded; }
+            set { shaderBillboardBatchFaded = value; }
+        }
+
+        Shader shaderTransitionRingTilemap = null;
+        public Shader ShaderTransitionRingTilemap
+        {
+            get { return shaderTransitionRingTilemap; }
+            set { shaderTransitionRingTilemap = value; }
+        }
+
         private class TransitionRingBorderDesc
         {
             public bool isTopRingBorder;
@@ -366,6 +386,8 @@ namespace DistantTerrain
                     if (type.Name == "UpdateReflectionTextures")
                     {
                         reflectionSeaTexture = (RenderTexture)type.InvokeMember("getSeaReflectionRenderTexture", System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public, null, component, null);
+                        System.Reflection.PropertyInfo tileAtlasReflectiveTexturePropertyInfo = type.GetProperty("TextureTileatlasReflective");
+                        tileAtlasReflectiveTexture = (Texture2D)tileAtlasReflectiveTexturePropertyInfo.GetValue(component, null);                        
                     }
                 }
             }
@@ -511,8 +533,7 @@ namespace DistantTerrain
 
             if (GameObject.Find("RealtimeReflections") != null)
             {
-                isActiveReflectionsMod = true;
-                tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective") as Texture2D;                
+                isActiveReflectionsMod = true;            
             }
 
             SetUpCameras();
@@ -993,7 +1014,7 @@ namespace DistantTerrain
             // Create Unity Terrain game object
             GameObject terrainGameObject = Terrain.CreateTerrainGameObject(null);
             terrainGameObject.name = string.Format("WorldTerrain");
-            
+
             terrainGameObject.gameObject.transform.localPosition = Vector3.zero;
 
             // assign terrainGameObject to layer layerWorldTerrain (used for rendering with secondary camera to prevent floating-point precision problems with huge clipping ranges)
@@ -1005,7 +1026,7 @@ namespace DistantTerrain
             {
                 worldHeights = new float[worldMapResolution, worldMapResolution];
             }
-            
+
             for (int y = 0; y < worldMapHeight; y++)
             {
                 for (int x = 0; x < worldMapWidth; x++)
@@ -1106,7 +1127,7 @@ namespace DistantTerrain
             textureAtlasSwampRain = dfUnity.MaterialReader.TextureReader.GetTerrainTilesetTexture(404).albedoMap;
             textureAtlasSwampRain.filterMode = FilterMode.Point;
 
-            terrainMaterial = new Material(Shader.Find("Daggerfall/DistantTerrain/DistantTerrainTilemap"));
+            terrainMaterial = new Material(shaderDistantTerrainTilemap);
             terrainMaterial.name = string.Format("world terrain material");
 
             // Assign textures and parameters     
@@ -1133,7 +1154,7 @@ namespace DistantTerrain
             Vector3 vecWaterHeightTransformed = terrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
             terrainMaterial.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y);
 
-            terrainMaterial.SetTexture("_SkyTex", renderTextureSky);           
+            terrainMaterial.SetTexture("_SkyTex", renderTextureSky);
 
             setMaterialFogParameters(ref terrainMaterial);
 
@@ -1145,6 +1166,7 @@ namespace DistantTerrain
 
             if ((isActiveReflectionsMod) && (enableSeaReflections))
             {
+
                 updateSeaReflectionTextureReference();
 
                 if (reflectionSeaTexture != null)
@@ -1153,7 +1175,7 @@ namespace DistantTerrain
                     terrainMaterial.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
                     terrainMaterial.SetInt("_UseSeaReflectionTex", 1);
                 }
-            }            
+            }
 
             // Promote material
             terrain.materialType = Terrain.MaterialType.Custom;
@@ -1201,7 +1223,7 @@ namespace DistantTerrain
             {
                 Terrain terrain = terrainTransitionRingArray[i].terrainDesc.terrainObject.GetComponent<Terrain>();
                 Material oldMaterial = terrain.materialTemplate;
-                Material mat = new Material(Shader.Find("Daggerfall/DistantTerrain/TransitionRingTilemap"));
+                Material mat = new Material(shaderTransitionRingTilemap);
                 mat.CopyPropertiesFromMaterial(oldMaterial);
 
                 Vector3 vecWaterHeight = new Vector3(0.0f, (ImprovedTerrainSampler.scaledOceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
@@ -1314,7 +1336,7 @@ namespace DistantTerrain
             // inject transition ring shader
             Terrain terrain = transitionTerrainDesc.terrainDesc.terrainObject.GetComponent<Terrain>();
             Material oldMaterial = terrain.materialTemplate;
-            Material newMaterial = new Material(Shader.Find("Daggerfall/DistantTerrain/TransitionRingTilemap"));
+            Material newMaterial = new Material(shaderTransitionRingTilemap);
             newMaterial.CopyPropertiesFromMaterial(oldMaterial);
             newMaterial.mainTexture = oldMaterial.mainTexture;
             newMaterial.mainTextureOffset = oldMaterial.mainTextureOffset;
@@ -1574,7 +1596,7 @@ namespace DistantTerrain
                         Material[] rendererMaterials = meshRenderer.materials;
                         for (int m = 0; m < rendererMaterials.Length; m++)
                         {
-                            Material newMaterial = new Material(Shader.Find("Daggerfall/DistantTerrain/BillboardBatchFaded"));
+                            Material newMaterial = new Material(shaderBillboardBatchFaded);
                             newMaterial.CopyPropertiesFromMaterial(rendererMaterials[m]);
                             newMaterial.SetInt("_TerrainDistance", streamingWorld.TerrainDistance);
                             newMaterial.SetFloat("_TerrainBlockSize", (MapsFile.WorldMapTerrainDim * MeshReader.GlobalScale));

@@ -70,6 +70,9 @@ namespace DistantTerrain
             componentDistantTerrain.EnableSeaReflections = enableSeaReflections;
             componentDistantTerrain.EnableImprovedTerrain = enableImprovedTerrain;
             componentDistantTerrain.IndicateLocations = indicateLocations;
+            componentDistantTerrain.ShaderDistantTerrainTilemap = mod.GetAsset<Shader>("Shaders/DaggerfallDistantTerrainTilemap.shader");
+            componentDistantTerrain.ShaderBillboardBatchFaded = mod.GetAsset<Shader>("Shaders/DaggerfallBillboardBatchFaded.shader");
+            componentDistantTerrain.ShaderTransitionRingTilemap = mod.GetAsset<Shader>("Shaders/TransitionRingTilemap.shader");
         }
     }
 }
