@@ -62,6 +62,8 @@ namespace DistantTerrain
         [Range(0.0f, 300000.0f)]
         public float blendEnd = 145000.0f;
 
+        int layerWorldTerrain;
+
         public RenderTexture reflectionSeaTexture = null;
 
         private float extraTranslationY = -10.0f;
@@ -270,6 +272,18 @@ namespace DistantTerrain
                     Application.Quit();
             }
 
+            if (GameObject.Find("RealtimeReflections") != null)
+            {
+                isActiveReflectionsMod = true;
+            }
+
+            layerWorldTerrain = LayerMask.NameToLayer("WorldTerrain");
+            if (layerWorldTerrain == -1)
+            {
+                DaggerfallUnity.LogMessage("Did not find Layer with name \"WorldTerrain\"! Defaulting to Layer 31\nIt is prefered that Layer \"WorldTerrain\" is set in Unity Editor under \"Edit/Project Settings/Tags and Layers!\"", true);
+                layerWorldTerrain = 31;
+            }
+
             SetupGameObjects(); // create cameras here in OnAwake() so MirrorReflection script of ReflectionsMod can find cameras in its Start() function
         }
 
@@ -308,8 +322,10 @@ namespace DistantTerrain
             if (toggle)
             {
                 isActiveEnhancedSkyMod = true;
-                //if(DaggerfallUnity.Settings.Nystul_RealtimeReflections)
-                //    isActiveReflectionsMod = true;
+                if (GameObject.Find("RealtimeReflections") != null)
+                {
+                    isActiveReflectionsMod = true;
+                }
             }
             else
             {
@@ -318,6 +334,22 @@ namespace DistantTerrain
             }
 
             justToggledEnhancedSky = true;
+        }
+
+        void updateSeaReflectionTextureReference()
+        {
+            if (GameObject.Find("RealtimeReflections") != null)
+            {
+                Component[] components = GameObject.Find("RealtimeReflections").GetComponents(typeof(Component));
+                foreach (Component component in components)
+                {
+                    Type type = component.GetType();
+                    if (type.Name == "UpdateReflectionTextures")
+                    {
+                        reflectionSeaTexture = (RenderTexture)type.InvokeMember("getSeaReflectionRenderTexture", System.Reflection.BindingFlags.InvokeMethod | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public, null, component, null);
+                    }
+                }
+            }
         }
 
         void InitImprovedWorldTerrain()
@@ -434,7 +466,7 @@ namespace DistantTerrain
 
         void Start()
         {
-            if (GameObject.Find("ReflectionsMod") != null)
+            if (GameObject.Find("RealtimeReflections") != null)
             {
                 isActiveReflectionsMod = true;
                 tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective") as Texture2D;                
@@ -495,17 +527,12 @@ namespace DistantTerrain
         void TransitionToExterior(PlayerEnterExit.TransitionEventArgs args)
         {
             SetUpCameras();
+
+            updateSeaReflectionTextureReference();
         }
 
         void SetupGameObjects()
         {
-            int layerWorldTerrain = LayerMask.NameToLayer("WorldTerrain");
-            if (layerWorldTerrain == -1)
-            {
-                DaggerfallUnity.LogMessage("Did not find Layer with name \"WorldTerrain\"! Defaulting to Layer 31\nIt is prefered that Layer \"WorldTerrain\" is set in Unity Editor under \"Edit/Project Settings/Tags and Layers!\"", true);
-                layerWorldTerrain = 31;
-            }
-
             // prevent NullReferenceException on application close when coming from EnhancedSkyToggle event (no idea why it is raised on application close)
             if (Camera.main == null)
                 return;
@@ -523,7 +550,7 @@ namespace DistantTerrain
             {
                 GameObject goStackedNearCamera = new GameObject("stackedNearCamera");
                 stackedNearCamera = goStackedNearCamera.AddComponent<Camera>();
-                stackedNearCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add default, add water layer so reflections are updated in time (workaround)
+                stackedNearCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
                 stackedNearCamera.nearClipPlane = 980.0f;
                 stackedNearCamera.farClipPlane = 15000.0f;
                 stackedNearCamera.fieldOfView = Camera.main.fieldOfView;
@@ -537,7 +564,7 @@ namespace DistantTerrain
             {
                 GameObject goStackedCamera = new GameObject("stackedCamera");
                 stackedCamera = goStackedCamera.AddComponent<Camera>();
-                stackedCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
+                stackedCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
                 stackedCamera.nearClipPlane = 980.0f;
                 stackedCamera.farClipPlane = 300000.0f;
                 stackedCamera.fieldOfView = Camera.main.fieldOfView;
@@ -746,6 +773,8 @@ namespace DistantTerrain
                     terrainTransitionRingUpdateSeasonalTextures = true;
                 }
 
+                updateSeaReflectionTextureReference();
+
                 Resources.UnloadUnusedAssets();
 
                 //System.GC.Collect();
@@ -906,6 +935,8 @@ namespace DistantTerrain
                 }
             }
 
+            updateSeaReflectionTextureReference();
+
             MapPixelX = playerGPS.CurrentMapPixel.X;
             MapPixelY = playerGPS.CurrentMapPixel.Y;
         }
@@ -918,10 +949,8 @@ namespace DistantTerrain
             
             terrainGameObject.gameObject.transform.localPosition = Vector3.zero;
 
-            // assign terrainGameObject to layer "WorldTerrain" if available (used for rendering with secondary camera to prevent floating-point precision problems with huge clipping ranges)
-            int layerWorldTerrain = LayerMask.NameToLayer("WorldTerrain");
-            if (layerWorldTerrain != -1)
-                terrainGameObject.layer = layerWorldTerrain;
+            // assign terrainGameObject to layer layerWorldTerrain (used for rendering with secondary camera to prevent floating-point precision problems with huge clipping ranges)
+            terrainGameObject.layer = layerWorldTerrain;
 
             int worldMapResolution = Math.Max(worldMapWidth, worldMapHeight);
 
@@ -1063,20 +1092,19 @@ namespace DistantTerrain
 
             if (isActiveReflectionsMod)
             {
-                //reflectionSeaTexture = GameObject.Find("ReflectionsMod").GetComponent< ReflectionsMod.UpdateReflectionTextures>().getSeaReflectionRenderTexture();
-                //if (reflectionSeaTexture != null)
-                //{
-                //    terrainMaterial.EnableKeyword("ENABLE_WATER_REFLECTIONS");
-                //    terrainMaterial.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
-                //    terrainMaterial.SetInt("_UseSeaReflectionTex", 1);
-                //}
-                //else
+                updateSeaReflectionTextureReference();
+
+                if (reflectionSeaTexture != null)
+                {
+                    terrainMaterial.EnableKeyword("ENABLE_WATER_REFLECTIONS");
+                    terrainMaterial.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
+                    terrainMaterial.SetInt("_UseSeaReflectionTex", 1);
+                }
+                else
                 {
                     terrainMaterial.SetInt("_UseSeaReflectionTex", 0);
                 }
             }
-
-            terrainMaterial.SetInt("_UseSeaReflectionTex", 0);
 
             // Promote material
             terrain.materialType = Terrain.MaterialType.Custom;
@@ -1294,18 +1322,19 @@ namespace DistantTerrain
 
             if (isActiveReflectionsMod)
             {
-                //reflectionSeaTexture = GameObject.Find("ReflectionsMod").GetComponent<ReflectionsMod2.UpdateReflectionTextures>().getSeaReflectionRenderTexture();
-                //if (reflectionSeaTexture != null)
-                //{
-                //    newMaterial.EnableKeyword("ENABLE_WATER_REFLECTIONS");
-                //    newMaterial.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
-                //    if (tileAtlasReflectiveTexture != null)
-                //    {
-                //        newMaterial.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
-                //    }
-                //    newMaterial.SetInt("_UseSeaReflectionTex", 1);
-                //}
-                //else
+                updateSeaReflectionTextureReference();
+
+                if (reflectionSeaTexture != null)
+                {
+                    newMaterial.EnableKeyword("ENABLE_WATER_REFLECTIONS");
+                    newMaterial.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
+                    if (tileAtlasReflectiveTexture != null)
+                    {
+                        newMaterial.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
+                    }
+                    newMaterial.SetInt("_UseSeaReflectionTex", 1);
+                }
+                else
                 {
                     newMaterial.SetInt("_UseSeaReflectionTex", 0);
                 }
