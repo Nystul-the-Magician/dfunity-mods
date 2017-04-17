@@ -22,4 +22,4 @@ height = 512
 ;roughness (less smoothness) because of mip map level selection of higher levels
 ;to get approximately the same roughness for double the reflection texture resolution you have
 ;to double this value
-roughnessMultiplier = 3.2
+roughnessMultiplier = 4.0
