@@ -16,6 +16,7 @@ using DaggerfallConnect.Utility;
 using DaggerfallWorkshop;
 using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Utility;
+using DaggerfallWorkshop.Game.Utility.ModSupport;
 
 namespace DistantTerrain
 {
@@ -84,6 +85,13 @@ namespace DistantTerrain
         {
             get { return enableTerrainTransition; }
             set { enableTerrainTransition = value; }
+        }
+
+        bool enableFadeIntoSkybox = true;
+        public bool EnableFadeIntoSkybox
+        {
+            get { return enableFadeIntoSkybox; }
+            set { enableFadeIntoSkybox = value; }
         }
 
         bool enableSeaReflections = true;
@@ -536,6 +544,17 @@ namespace DistantTerrain
                 isActiveReflectionsMod = true;            
             }
 
+            //if (GameObject.Find("EnhancedSkyController") != null)
+            string[] modTitles = ModManager.Instance.GetAllModTitles();
+
+            foreach (string title in modTitles)
+            {
+                if (title == "Enhanced Sky")
+                {
+                    isActiveEnhancedSkyMod = true;
+                }
+            }
+
             SetUpCameras();
 
             if (worldTerrainGameObject == null) // lazy creation
@@ -739,7 +758,7 @@ namespace DistantTerrain
                 {
                     setMaterialFogParameters(ref this.terrainMaterial);
 
-                    if (isActiveEnhancedSkyMod && !weatherManager.IsOvercast)
+                    if (isActiveEnhancedSkyMod && enableFadeIntoSkybox && !weatherManager.IsOvercast)
                     {
                         terrain.materialTemplate.SetInt("_FogFromSkyTex", 1);
                     }
@@ -1243,7 +1262,7 @@ namespace DistantTerrain
                 mat.SetFloat("_WorldOffsetY", 0.0f);
 
 
-                if (isActiveEnhancedSkyMod && !weatherManager.IsOvercast)
+                if (isActiveEnhancedSkyMod && enableFadeIntoSkybox && !weatherManager.IsOvercast)
                 {
                     mat.SetInt("_FogFromSkyTex", 1);
                 }
@@ -1376,7 +1395,7 @@ namespace DistantTerrain
 
             newMaterial.SetInt("_FogFromSkyTex", 0);
 
-            if (isActiveEnhancedSkyMod && !weatherManager.IsOvercast)
+            if (isActiveEnhancedSkyMod && enableFadeIntoSkybox && !weatherManager.IsOvercast)
             {
                 newMaterial.SetInt("_FogFromSkyTex", 1);
             }

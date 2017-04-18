@@ -23,6 +23,7 @@ namespace DistantTerrain
 
         // Settings
         private static bool enableTerrainTransition = true;
+        private static bool enableFadeIntoSkybox = true;
         private static bool enableSeaReflections = true;
         private static bool enableImprovedTerrain = true;
         private static bool indicateLocations = true;
@@ -46,6 +47,7 @@ namespace DistantTerrain
 
             // settings
             enableTerrainTransition = settings.GetBool("TerrainTransition", "enable");
+            enableFadeIntoSkybox = settings.GetBool("FadeIntoSkybox", "enable");
             enableSeaReflections = settings.GetBool("SeaReflections", "enable");
             enableImprovedTerrain = settings.GetBool("ImprovedTerrain", "enable");
             indicateLocations = settings.GetBool("ImprovedTerrain", "indicateLocations");
@@ -83,6 +85,7 @@ namespace DistantTerrain
             gameobjectDistantTerrain = new GameObject("DistantTerrain");
             componentDistantTerrain = gameobjectDistantTerrain.AddComponent<DistantTerrain>();
             componentDistantTerrain.EnableTerrainTransition = enableTerrainTransition;
+            componentDistantTerrain.EnableFadeIntoSkybox = enableFadeIntoSkybox;
             componentDistantTerrain.EnableSeaReflections = enableSeaReflections;
             componentDistantTerrain.EnableImprovedTerrain = enableImprovedTerrain;
             componentDistantTerrain.IndicateLocations = indicateLocations;

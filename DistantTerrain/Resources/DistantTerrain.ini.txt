@@ -5,6 +5,10 @@ SettingsVersion = 1.0
 [TerrainTransition]
 enable = True
 
+;enable fading into sky box of distant terrain
+[FadeIntoSkybox]
+enable = True
+
 ;enable sea reflections (Realtime Reflections mod must be present)
 [SeaReflections]
 enable = True
