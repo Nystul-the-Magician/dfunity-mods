@@ -28,9 +28,20 @@ namespace RealtimeReflections
         private static int lowerLevelReflectionTextureHeight = 512;
         private static float roughnessMultiplier = 0.4f;
 
+        private static Shader shaderTilemapWithReflections = null;
+        private static Shader shaderCreateLookupReflectionTextureCoordinates = null;
+        private static Shader shaderCreateLookupReflectionTextureIndex = null;
+        private static Shader shaderDeferredPlanarReflections = null;
+        private static Texture2D textureTileatlasReflective = null;
+        private static Texture2D textureTileatlasReflectiveRaining = null;
+
         [Invoke(StateManager.StateTypes.Start)]
         public static void InitStart(InitParams initParams)
         {
+            // check if debug gameobject is present, if so do not initalize mod
+            if (GameObject.Find("debug_RealtimeReflections"))
+                return;
+
             // Get this mod
             mod = initParams.Mod;
 
@@ -43,6 +54,13 @@ namespace RealtimeReflections
             lowerLevelReflectionTextureWidth = settings.GetInt("LowerLevelReflectionTexture", "width");
             lowerLevelReflectionTextureHeight = settings.GetInt("LowerLevelReflectionTexture", "height");
             roughnessMultiplier = settings.GetFloat("ReflectionParameters", "roughnessMultiplier");
+
+            shaderTilemapWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapWithReflections.shader");
+            shaderCreateLookupReflectionTextureCoordinates = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureCoordinates.shader");
+            shaderCreateLookupReflectionTextureIndex = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureIndex.shader");
+            shaderDeferredPlanarReflections = mod.GetAsset<Shader>("Shaders/DeferredPlanarReflections.shader");
+            textureTileatlasReflective = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective");
+            textureTileatlasReflectiveRaining = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective_raining");
 
             initMod();
 
@@ -60,6 +78,13 @@ namespace RealtimeReflections
         */
         void Awake()
         {
+            shaderTilemapWithReflections = Shader.Find("Daggerfall/RealtimeReflections/TilemapWithReflections");
+            shaderCreateLookupReflectionTextureCoordinates = Shader.Find("Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates");
+            shaderCreateLookupReflectionTextureIndex = Shader.Find("Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex");
+            shaderDeferredPlanarReflections = Shader.Find("Daggerfall/RealtimeReflections/DeferredPlanarReflections");
+            textureTileatlasReflective = Resources.Load("tileatlas_reflective") as Texture2D;
+            textureTileatlasReflectiveRaining = Resources.Load("tileatlas_reflective_raining") as Texture2D;
+
             initMod();
         }
 
@@ -73,12 +98,12 @@ namespace RealtimeReflections
             componentUpdateReflectionTextures.LowerLevelReflectionTextureWidth = lowerLevelReflectionTextureWidth;
             componentUpdateReflectionTextures.LowerLevelReflectionTextureHeight = lowerLevelReflectionTextureHeight;
             componentUpdateReflectionTextures.RoughnessMultiplier = roughnessMultiplier;
-            componentUpdateReflectionTextures.ShaderTilemapWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapWithReflections.shader");
-            componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureCoordinates = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureCoordinates.shader");
-            componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureIndex = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureIndex.shader");
-            componentUpdateReflectionTextures.ShaderDeferredPlanarReflections = mod.GetAsset<Shader>("Shaders/DeferredPlanarReflections.shader");
-            componentUpdateReflectionTextures.TextureTileatlasReflective = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective");
-            componentUpdateReflectionTextures.TextureTileatlasReflectiveRaining = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective_raining");
+            componentUpdateReflectionTextures.ShaderTilemapWithReflections = shaderTilemapWithReflections;
+            componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureCoordinates = shaderCreateLookupReflectionTextureCoordinates;
+            componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureIndex = shaderCreateLookupReflectionTextureIndex;
+            componentUpdateReflectionTextures.ShaderDeferredPlanarReflections = shaderDeferredPlanarReflections;
+            componentUpdateReflectionTextures.TextureTileatlasReflective = textureTileatlasReflective;
+            componentUpdateReflectionTextures.TextureTileatlasReflectiveRaining = textureTileatlasReflectiveRaining;
         }
     }
 }

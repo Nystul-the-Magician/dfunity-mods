@@ -27,9 +27,17 @@ namespace DistantTerrain
         private static bool enableImprovedTerrain = true;
         private static bool indicateLocations = true;
 
+        private static Shader shaderDistantTerrainTilemap = null;
+        private static Shader shaderBillboardBatchFaded = null;
+        private static Shader shaderTransitionRingTilemap = null;
+
         [Invoke(StateManager.StateTypes.Start)]
         public static void InitStart(InitParams initParams)
         {
+            // check if debug gameobject is present, if so do not initalize mod
+            if (GameObject.Find("debug_DistantTerrain"))
+                return;
+
             // Get this mod
             mod = initParams.Mod;
 
@@ -41,6 +49,10 @@ namespace DistantTerrain
             enableSeaReflections = settings.GetBool("SeaReflections", "enable");
             enableImprovedTerrain = settings.GetBool("ImprovedTerrain", "enable");
             indicateLocations = settings.GetBool("ImprovedTerrain", "indicateLocations");
+
+            shaderDistantTerrainTilemap = mod.GetAsset<Shader>("Shaders/DaggerfallDistantTerrainTilemap.shader");
+            shaderBillboardBatchFaded = mod.GetAsset<Shader>("Shaders/DaggerfallBillboardBatchFaded.shader");
+            shaderTransitionRingTilemap = mod.GetAsset<Shader>("Shaders/TransitionRingTilemap.shader");
 
             initMod();
 
@@ -58,6 +70,10 @@ namespace DistantTerrain
         */
         void Awake()
         {
+            shaderDistantTerrainTilemap = Shader.Find("Daggerfall/DistantTerrain/DistantTerrainTilemap");
+            shaderBillboardBatchFaded = Shader.Find("Daggerfall/DistantTerrain/BillboardBatchFaded");
+            shaderTransitionRingTilemap = Shader.Find("Daggerfall/DistantTerrain/TransitionRingTilemap");
+
             initMod();
         }
 
@@ -70,9 +86,9 @@ namespace DistantTerrain
             componentDistantTerrain.EnableSeaReflections = enableSeaReflections;
             componentDistantTerrain.EnableImprovedTerrain = enableImprovedTerrain;
             componentDistantTerrain.IndicateLocations = indicateLocations;
-            componentDistantTerrain.ShaderDistantTerrainTilemap = mod.GetAsset<Shader>("Shaders/DaggerfallDistantTerrainTilemap.shader");
-            componentDistantTerrain.ShaderBillboardBatchFaded = mod.GetAsset<Shader>("Shaders/DaggerfallBillboardBatchFaded.shader");
-            componentDistantTerrain.ShaderTransitionRingTilemap = mod.GetAsset<Shader>("Shaders/TransitionRingTilemap.shader");
+            componentDistantTerrain.ShaderDistantTerrainTilemap = shaderDistantTerrainTilemap;
+            componentDistantTerrain.ShaderBillboardBatchFaded = shaderBillboardBatchFaded;
+            componentDistantTerrain.ShaderTransitionRingTilemap = shaderTransitionRingTilemap;
         }
     }
 }
