@@ -221,7 +221,7 @@ namespace RealtimeReflections
                     {
                         if (terrain.materialTemplate)
                         {
-                            if (terrain.materialTemplate.shader.name == "Daggerfall/RealtimeReflections/TilemapWithReflections")
+                            if ((terrain.materialTemplate.shader.name == "Daggerfall/RealtimeReflections/TilemapWithReflections") || (terrain.materialTemplate.shader.name == "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections"))
                             {
                                 terrain.materialTemplate.SetFloat("_GroundLevelHeight", gameObjectReflectionPlaneGroundLevel.transform.position.y - extraTranslationY);
                                 terrain.materialTemplate.SetFloat("_SeaLevelHeight", gameObjectReflectionPlaneSeaLevel.transform.position.y - extraTranslationY);
@@ -297,43 +297,71 @@ namespace RealtimeReflections
                 {
                     if ((terrain.materialTemplate)) //&&(terrain.materialTemplate.shader.name != "Daggerfall/TilemapWithReflections")) // uncommenting this makes initial location (after startup, not fast travelling) not receive correct shader - don't know why - so workaround is to force injecting materialshader even for unset material (not sure why it works, but it does)
                     {
-                        Texture tileSetTexture = terrain.materialTemplate.GetTexture("_TileAtlasTex");
-
-                        //Texture2D tileAtlas = dfUnity.MaterialReader.TextureReader.GetTerrainTilesetTexture(402).albedoMap;
-                        //System.IO.File.WriteAllBytes("./Assets/Daggerfall/RealtimeReflections/Resources/tileatlas_402.png", tileAtlas.EncodeToPNG());
-
-                        Texture tileMapTexture = terrain.materialTemplate.GetTexture("_TilemapTex");
-                        int tileMapDim = terrain.materialTemplate.GetInt("_TilemapDim");
-
-                        Material newMat = new Material(componentUpdateReflectionTextures.ShaderTilemapWithReflections);
-
-                        newMat.SetTexture("_TileAtlasTex", tileSetTexture);
-                        newMat.SetTexture("_TilemapTex", tileMapTexture);
-                        newMat.SetInt("_TilemapDim", tileMapDim);
-
-                        newMat.SetTexture("_ReflectionGroundTex", texReflectionGround);
-
-                        newMat.SetFloat("_GroundLevelHeight", gameObjectReflectionPlaneLowerLevel.transform.position.y);
-
-                        newMat.SetTexture("_ReflectionSeaTex", texReflectionLowerLevel);
-
-                        newMat.SetFloat("_SeaLevelHeight", gameObjectReflectionPlaneSeaLevel.transform.position.y);
-
-                        WeatherManager weatherManager = GameObject.Find("WeatherManager").GetComponent<WeatherManager>();
-                        if (!weatherManager.IsRaining)
+                        if (SystemInfo.supports2DArrayTextures)
                         {
-                            //Texture2D tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective") as Texture2D;
-                            Texture2D tileAtlasReflectiveTexture = componentUpdateReflectionTextures.TextureTileatlasReflective;
-                            newMat.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
+                            Texture tileTextureArray = terrain.materialTemplate.GetTexture("_TileTexArr");
+                            Texture tileMetallicGlossMapTextureArray = terrain.materialTemplate.GetTexture("_TileMetallicGlossMapTexArr");
+
+                            Texture tileMapTexture = terrain.materialTemplate.GetTexture("_TilemapTex");
+                            int tileMapDim = terrain.materialTemplate.GetInt("_TilemapDim");
+
+                            Material newMat = new Material(componentUpdateReflectionTextures.ShaderTilemapTextureArrayWithReflections);
+
+                            newMat.SetTexture("_TileTexArr", tileTextureArray);
+                            newMat.SetTexture("_TileMetallicGlossMapTexArr", tileMetallicGlossMapTextureArray);
+                            newMat.SetTexture("_TilemapTex", tileMapTexture);
+                            newMat.SetInt("_TilemapDim", tileMapDim);
+
+                            newMat.SetTexture("_ReflectionGroundTex", texReflectionGround);
+
+                            newMat.SetFloat("_GroundLevelHeight", gameObjectReflectionPlaneLowerLevel.transform.position.y);
+
+                            newMat.SetTexture("_ReflectionSeaTex", texReflectionLowerLevel);
+
+                            newMat.SetFloat("_SeaLevelHeight", gameObjectReflectionPlaneSeaLevel.transform.position.y);
+
+                            terrain.materialTemplate = newMat;
                         }
                         else
                         {
-                            //Texture2D tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective_raining") as Texture2D;
-                            Texture2D tileAtlasReflectiveTexture = componentUpdateReflectionTextures.TextureTileatlasReflectiveRaining;
-                            newMat.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
-                        }
+                            Texture tileSetTexture = terrain.materialTemplate.GetTexture("_TileAtlasTex");
 
-                        terrain.materialTemplate = newMat;
+                            //Texture2D tileAtlas = dfUnity.MaterialReader.TextureReader.GetTerrainTilesetTexture(402).albedoMap;
+                            //System.IO.File.WriteAllBytes("./Assets/Daggerfall/RealtimeReflections/Resources/tileatlas_402.png", tileAtlas.EncodeToPNG());
+
+                            Texture tileMapTexture = terrain.materialTemplate.GetTexture("_TilemapTex");
+                            int tileMapDim = terrain.materialTemplate.GetInt("_TilemapDim");
+
+                            Material newMat = new Material(componentUpdateReflectionTextures.ShaderTilemapWithReflections);
+
+                            newMat.SetTexture("_TileAtlasTex", tileSetTexture);
+                            newMat.SetTexture("_TilemapTex", tileMapTexture);
+                            newMat.SetInt("_TilemapDim", tileMapDim);
+
+                            newMat.SetTexture("_ReflectionGroundTex", texReflectionGround);
+
+                            newMat.SetFloat("_GroundLevelHeight", gameObjectReflectionPlaneLowerLevel.transform.position.y);
+
+                            newMat.SetTexture("_ReflectionSeaTex", texReflectionLowerLevel);
+
+                            newMat.SetFloat("_SeaLevelHeight", gameObjectReflectionPlaneSeaLevel.transform.position.y);
+
+                            WeatherManager weatherManager = GameObject.Find("WeatherManager").GetComponent<WeatherManager>();
+                            if (!weatherManager.IsRaining)
+                            {
+                                //Texture2D tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective") as Texture2D;
+                                Texture2D tileAtlasReflectiveTexture = componentUpdateReflectionTextures.TextureTileatlasReflective;
+                                newMat.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
+                            }
+                            else
+                            {
+                                //Texture2D tileAtlasReflectiveTexture = Resources.Load("tileatlas_reflective_raining") as Texture2D;
+                                Texture2D tileAtlasReflectiveTexture = componentUpdateReflectionTextures.TextureTileatlasReflectiveRaining;
+                                newMat.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
+                            }
+
+                            terrain.materialTemplate = newMat;
+                        }
                     }
                 }
             }

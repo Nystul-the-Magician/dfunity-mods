@@ -29,6 +29,7 @@ namespace RealtimeReflections
         private static float roughnessMultiplier = 0.4f;
 
         private static Shader shaderTilemapWithReflections = null;
+        private static Shader shaderTilemapTextureArrayWithReflections = null;
         private static Shader shaderCreateLookupReflectionTextureCoordinates = null;
         private static Shader shaderCreateLookupReflectionTextureIndex = null;
         private static Shader shaderDeferredPlanarReflections = null;
@@ -56,6 +57,7 @@ namespace RealtimeReflections
             roughnessMultiplier = settings.GetFloat("ReflectionParameters", "roughnessMultiplier");
 
             shaderTilemapWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapWithReflections.shader");
+            shaderTilemapWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapTextureArrayWithReflections.shader");
             shaderCreateLookupReflectionTextureCoordinates = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureCoordinates.shader");
             shaderCreateLookupReflectionTextureIndex = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureIndex.shader");
             shaderDeferredPlanarReflections = mod.GetAsset<Shader>("Shaders/DeferredPlanarReflections.shader");
@@ -79,6 +81,7 @@ namespace RealtimeReflections
         void Awake()
         {
             shaderTilemapWithReflections = Shader.Find("Daggerfall/RealtimeReflections/TilemapWithReflections");
+            shaderTilemapTextureArrayWithReflections = Shader.Find("Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections");
             shaderCreateLookupReflectionTextureCoordinates = Shader.Find("Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates");
             shaderCreateLookupReflectionTextureIndex = Shader.Find("Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex");
             shaderDeferredPlanarReflections = Shader.Find("Daggerfall/RealtimeReflections/DeferredPlanarReflections");
@@ -99,6 +102,7 @@ namespace RealtimeReflections
             componentUpdateReflectionTextures.LowerLevelReflectionTextureHeight = lowerLevelReflectionTextureHeight;
             componentUpdateReflectionTextures.RoughnessMultiplier = roughnessMultiplier;
             componentUpdateReflectionTextures.ShaderTilemapWithReflections = shaderTilemapWithReflections;
+            componentUpdateReflectionTextures.ShaderTilemapTextureArrayWithReflections = shaderTilemapTextureArrayWithReflections;
             componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureCoordinates = shaderCreateLookupReflectionTextureCoordinates;
             componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureIndex = shaderCreateLookupReflectionTextureIndex;
             componentUpdateReflectionTextures.ShaderDeferredPlanarReflections = shaderDeferredPlanarReflections;

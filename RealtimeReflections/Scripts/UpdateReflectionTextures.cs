@@ -141,6 +141,13 @@ namespace RealtimeReflections
             set { shaderTilemapWithReflections = value; }
         }
 
+        Shader shaderTilemapTextureArrayWithReflections = null;
+        public Shader ShaderTilemapTextureArrayWithReflections
+        {
+            get { return shaderTilemapTextureArrayWithReflections; }
+            set { shaderTilemapTextureArrayWithReflections = value; }
+        }
+
         Shader shaderCreateLookupReflectionTextureCoordinates = null;
         public Shader ShaderCreateLookupReflectionTextureCoordinates
         {
