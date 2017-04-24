@@ -185,6 +185,13 @@ namespace DistantTerrain
             set { shaderTransitionRingTilemap = value; }
         }
 
+        Shader shaderTransitionRingTilemapTextureArray = null;
+        public Shader ShaderTransitionRingTilemapTextureArray
+        {
+            get { return shaderTransitionRingTilemapTextureArray; }
+            set { shaderTransitionRingTilemapTextureArray = value; }
+        }
+
         private class TransitionRingBorderDesc
         {
             public bool isTopRingBorder;
@@ -751,6 +758,8 @@ namespace DistantTerrain
                     curMapPixel.Y != MapPixelY)
                 {
                     UpdateWorldTerrain(curMapPixel);
+                    MapPixelX = curMapPixel.X;
+                    MapPixelY = curMapPixel.Y;
                 }
 
                 Terrain terrain = worldTerrainGameObject.GetComponent<Terrain>();
@@ -1024,8 +1033,8 @@ namespace DistantTerrain
 
             updateSeaReflectionTextureReference();
 
-            MapPixelX = playerGPS.CurrentMapPixel.X;
-            MapPixelY = playerGPS.CurrentMapPixel.Y;
+            //MapPixelX = playerGPS.CurrentMapPixel.X;
+            //MapPixelY = playerGPS.CurrentMapPixel.Y;
         }
 
         private void generateWorldTerrain()
@@ -1242,17 +1251,88 @@ namespace DistantTerrain
             {
                 Terrain terrain = terrainTransitionRingArray[i].terrainDesc.terrainObject.GetComponent<Terrain>();
                 Material oldMaterial = terrain.materialTemplate;
-                Material mat = new Material(shaderTransitionRingTilemap);
-                mat.CopyPropertiesFromMaterial(oldMaterial);
+                Material mat;
+                if ((SystemInfo.supports2DArrayTextures) && DaggerfallTerrain.enableTextureArrays)
+                {
+                    mat = new Material(shaderTransitionRingTilemapTextureArray);
+                    mat.SetTexture("_TileTexArr", oldMaterial.GetTexture("_TileTexArr"));
+                    mat.SetTexture("_TileMetallicGlossMapTexArr", oldMaterial.GetTexture("_TileMetallicGlossMapTexArr"));
+                }
+                else
+                {
+                    mat = new Material(shaderTransitionRingTilemap);
+                    mat.SetTexture("_TileAtlasTex", oldMaterial.GetTexture("_TileAtlasTex"));
+                    mat.SetTexture("_TilemapTex", oldMaterial.GetTexture("_TilemapTex"));
+                    mat.SetTexture("_BumpMap", oldMaterial.GetTexture("_BumpMap"));
+                    mat.SetInt("_TilesetDim", oldMaterial.GetInt("_TilesetDim"));
+                    mat.SetFloat("_AtlasSize", oldMaterial.GetFloat("_AtlasSize"));
+                    mat.SetFloat("_GutterSize", oldMaterial.GetFloat("_GutterSize"));                    
+                }
+
+                mat.SetTexture("_TilemapTex", oldMaterial.GetTexture("_TilemapTex"));
+                mat.SetInt("_TilemapDim", oldMaterial.GetInt("_TilemapDim"));
+                mat.SetInt("_MaxIndex", oldMaterial.GetInt("_MaxIndex"));
+
+                // Assign textures and parameters
+                mat.SetTexture("_FarTerrainTilemapTex", oldMaterial.GetTexture("_FarTerrainTilemapTex"));
+                mat.SetInt("_FarTerrainTilemapDim", oldMaterial.GetInt("_FarTerrainTilemapDim"));
+
+                mat.SetTexture("_TileAtlasTexDesert", oldMaterial.GetTexture("_TileAtlasTexDesert"));
+                mat.SetTexture("_TileAtlasTexWoodland", oldMaterial.GetTexture("_TileAtlasTexWoodland"));
+                mat.SetTexture("_TileAtlasTexMountain", oldMaterial.GetTexture("_TileAtlasTexMountain"));
+                mat.SetTexture("_TileAtlasTexSwamp", oldMaterial.GetTexture("_TileAtlasTexSwamp"));
+
+                mat.SetFloat("_blendWeightFarTerrainTop", oldMaterial.GetFloat("_blendWeightFarTerrainTop"));
+                mat.SetFloat("_blendWeightFarTerrainBottom", oldMaterial.GetFloat("_blendWeightFarTerrainBottom"));
+                mat.SetFloat("_blendWeightFarTerrainLeft", oldMaterial.GetFloat("_blendWeightFarTerrainLeft"));
+                mat.SetFloat("_blendWeightFarTerrainRight", oldMaterial.GetFloat("_blendWeightFarTerrainRight"));
+
+                //newMaterial.SetInt("_TextureSetSeasonCode", 0);
+
+                updateMaterialSeasonalTextures(ref mat, currentSeason); // change seasonal textures if necessary
+
+                mat.SetInt("_MapPixelX", oldMaterial.GetInt("_MapPixelX"));
+                mat.SetInt("_MapPixelY", oldMaterial.GetInt("_MapPixelY"));
+
+                mat.SetInt("_PlayerPosX", this.playerGPS.CurrentMapPixel.X);
+                mat.SetInt("_PlayerPosY", this.playerGPS.CurrentMapPixel.Y);
+
+                mat.SetInt("_TerrainDistance", streamingWorld.TerrainDistance); // - 1); // -1... allow the outer ring of of detailed terrain to intersect with far terrain (to prevent some holes)
 
                 Vector3 vecWaterHeight = new Vector3(0.0f, (ImprovedTerrainSampler.scaledOceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
                 Vector3 vecWaterHeightTransformed = worldTerrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
                 mat.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y);
-                
-                mat.SetTexture("_SkyTex", renderTextureSky);
-                            
+
+                mat.SetTexture("_SkyTex", oldMaterial.GetTexture("_SkyTex"));
+
+                mat.SetInt("_FogFromSkyTex", oldMaterial.GetInt("_FogFromSkyTex"));
+
+                setMaterialFogParameters(ref mat);
+
+                //terrainMaterial.SetFloat("_BlendFactor", blendFactor);
                 mat.SetFloat("_BlendStart", blendStart);
                 mat.SetFloat("_BlendEnd", blendEnd);
+
+                mat.SetInt("_UseSeaReflectionTex", oldMaterial.GetInt("_UseSeaReflectionTex"));
+
+                if ((isActiveReflectionsMod) && (enableSeaReflections))
+                {
+                    updateSeaReflectionTextureReference();
+
+                    if (reflectionSeaTexture != null)
+                    {
+                        mat.EnableKeyword("ENABLE_WATER_REFLECTIONS");
+                        mat.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
+                        if (!(SystemInfo.supports2DArrayTextures) || !DaggerfallTerrain.enableTextureArrays)
+                        {
+                            if (tileAtlasReflectiveTexture != null)
+                            {
+                                mat.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
+                            }
+                        }
+                        mat.SetInt("_UseSeaReflectionTex", 1);
+                    }
+                }
 
                 //DFPosition posMaxPixel = MapsFile.MapPixelToWorldCoord(playerGPS.CurrentMapPixel.X, playerGPS.CurrentMapPixel.Y);
                 //float fractionalPlayerPosInBlockX = (playerGPS.WorldX - posMaxPixel.X) / (MapsFile.WorldMapTerrainDim * MeshReader.GlobalScale) * MeshReader.GlobalScale;
@@ -1260,16 +1340,6 @@ namespace DistantTerrain
                 //Debug.Log(String.Format("relativePosInBlockX: {0}, relativePosInBlockY: {1}", relativePosInBlockX , relativePosInBlockY);
                 mat.SetFloat("_WorldOffsetX", 0.0f);
                 mat.SetFloat("_WorldOffsetY", 0.0f);
-
-
-                if (isActiveEnhancedSkyMod && enableFadeIntoSkybox && !weatherManager.IsOvercast)
-                {
-                    mat.SetInt("_FogFromSkyTex", 1);
-                }
-                else
-                {
-                    mat.SetInt("_FogFromSkyTex", 0);
-                }
 
                 setMaterialFogParameters(ref mat);
 
@@ -1355,11 +1425,26 @@ namespace DistantTerrain
             // inject transition ring shader
             Terrain terrain = transitionTerrainDesc.terrainDesc.terrainObject.GetComponent<Terrain>();
             Material oldMaterial = terrain.materialTemplate;
-            Material newMaterial = new Material(shaderTransitionRingTilemap);
-            newMaterial.CopyPropertiesFromMaterial(oldMaterial);
-            newMaterial.mainTexture = oldMaterial.mainTexture;
-            newMaterial.mainTextureOffset = oldMaterial.mainTextureOffset;
-            newMaterial.mainTextureScale = oldMaterial.mainTextureScale;            
+            Material newMaterial;
+            if ((SystemInfo.supports2DArrayTextures) && DaggerfallTerrain.enableTextureArrays)
+            {
+                newMaterial = new Material(shaderTransitionRingTilemapTextureArray);
+                newMaterial.SetTexture("_TileTexArr", oldMaterial.GetTexture("_TileTexArr"));
+                newMaterial.SetTexture("_TileMetallicGlossMapTexArr", oldMaterial.GetTexture("_TileMetallicGlossMapTexArr"));
+            }
+            else
+            {
+                newMaterial = new Material(shaderTransitionRingTilemap);
+                newMaterial.SetTexture("_TileAtlasTex", oldMaterial.GetTexture("_TileAtlasTex"));                
+                newMaterial.SetTexture("_BumpMap", oldMaterial.GetTexture("_BumpMap"));
+                newMaterial.SetInt("_TilesetDim", oldMaterial.GetInt("_TilesetDim"));
+                newMaterial.SetFloat("_AtlasSize", oldMaterial.GetFloat("_AtlasSize"));
+                newMaterial.SetFloat("_GutterSize", oldMaterial.GetFloat("_GutterSize"));    
+            }
+
+            newMaterial.SetTexture("_TilemapTex", oldMaterial.GetTexture("_TilemapTex"));
+            newMaterial.SetInt("_TilemapDim", oldMaterial.GetInt("_TilemapDim"));
+            newMaterial.SetInt("_MaxIndex", oldMaterial.GetInt("_MaxIndex"));
 
             // Assign textures and parameters
             newMaterial.SetTexture("_FarTerrainTilemapTex", textureTerrainInfoTileMap);
@@ -1420,16 +1505,19 @@ namespace DistantTerrain
                 {
                     newMaterial.EnableKeyword("ENABLE_WATER_REFLECTIONS");
                     newMaterial.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
-                    if (tileAtlasReflectiveTexture != null)
+                    if (!(SystemInfo.supports2DArrayTextures) || !DaggerfallTerrain.enableTextureArrays)
                     {
-                        newMaterial.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
+                        if (tileAtlasReflectiveTexture != null)
+                        {
+                            newMaterial.SetTexture("_TileAtlasReflectiveTex", tileAtlasReflectiveTexture);
+                        }
                     }
                     newMaterial.SetInt("_UseSeaReflectionTex", 1);
                 }
             }
 
             terrain.materialType = Terrain.MaterialType.Custom;
-            terrain.materialTemplate = newMaterial;            
+            terrain.materialTemplate = newMaterial;
             dfTerrain.TerrainMaterial = terrain.materialTemplate; // important so that we can later call DaggerfallTerrain.UpdateClimateMaterial and it will update the correct reference
 
             // Only set active again once complete

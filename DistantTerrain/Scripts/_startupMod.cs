@@ -31,6 +31,7 @@ namespace DistantTerrain
         private static Shader shaderDistantTerrainTilemap = null;
         private static Shader shaderBillboardBatchFaded = null;
         private static Shader shaderTransitionRingTilemap = null;
+        private static Shader shaderTransitionRingTilemapTextureArray = null;
 
         [Invoke(StateManager.StateTypes.Start)]
         public static void InitStart(InitParams initParams)
@@ -55,6 +56,7 @@ namespace DistantTerrain
             shaderDistantTerrainTilemap = mod.GetAsset<Shader>("Shaders/DaggerfallDistantTerrainTilemap.shader");
             shaderBillboardBatchFaded = mod.GetAsset<Shader>("Shaders/DaggerfallBillboardBatchFaded.shader");
             shaderTransitionRingTilemap = mod.GetAsset<Shader>("Shaders/TransitionRingTilemap.shader");
+            shaderTransitionRingTilemapTextureArray = mod.GetAsset<Shader>("Shaders/TransitionRingTilemapTextureArray.shader");
 
             initMod();
 
@@ -75,6 +77,7 @@ namespace DistantTerrain
             shaderDistantTerrainTilemap = Shader.Find("Daggerfall/DistantTerrain/DistantTerrainTilemap");
             shaderBillboardBatchFaded = Shader.Find("Daggerfall/DistantTerrain/BillboardBatchFaded");
             shaderTransitionRingTilemap = Shader.Find("Daggerfall/DistantTerrain/TransitionRingTilemap");
+            shaderTransitionRingTilemapTextureArray = Shader.Find("Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray");
 
             initMod();
         }
@@ -92,6 +95,7 @@ namespace DistantTerrain
             componentDistantTerrain.ShaderDistantTerrainTilemap = shaderDistantTerrainTilemap;
             componentDistantTerrain.ShaderBillboardBatchFaded = shaderBillboardBatchFaded;
             componentDistantTerrain.ShaderTransitionRingTilemap = shaderTransitionRingTilemap;
+            componentDistantTerrain.ShaderTransitionRingTilemapTextureArray = shaderTransitionRingTilemapTextureArray;
         }
     }
 }
