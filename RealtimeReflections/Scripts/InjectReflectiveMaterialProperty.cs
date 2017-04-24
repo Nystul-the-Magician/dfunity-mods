@@ -297,7 +297,7 @@ namespace RealtimeReflections
                 {
                     if ((terrain.materialTemplate)) //&&(terrain.materialTemplate.shader.name != "Daggerfall/TilemapWithReflections")) // uncommenting this makes initial location (after startup, not fast travelling) not receive correct shader - don't know why - so workaround is to force injecting materialshader even for unset material (not sure why it works, but it does)
                     {
-                        if (SystemInfo.supports2DArrayTextures)
+                        if ((SystemInfo.supports2DArrayTextures) && DaggerfallTerrain.enableTextureArrays)
                         {
                             Texture tileTextureArray = terrain.materialTemplate.GetTexture("_TileTexArr");
                             Texture tileMetallicGlossMapTextureArray = terrain.materialTemplate.GetTexture("_TileMetallicGlossMapTexArr");
