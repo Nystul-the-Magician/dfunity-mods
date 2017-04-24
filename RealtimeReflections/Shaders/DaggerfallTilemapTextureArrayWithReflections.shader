@@ -125,16 +125,15 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 			float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
 			
 			half4 metallicGloss = UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileMetallicGlossMapTexArr, uv3, ddx(uv3), ddy(uv3));
+			float roughness = (1.0 - metallicGloss.a) * 4.0f;
 			half3 refl;
 			if (IN.worldPos.y > _SeaLevelHeight + 0.01f)
-			{					
-				//refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, 1.0f)).rgb; // 4th component is blurring of reflection
-				refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, metallicGloss.a)).rgb; // 4th component is blurring of reflection
+			{
+				refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, roughness)).rgb; // 4th component is blurring of reflection
 			}
 			else
-			{
-				//refl = tex2Dlod(_ReflectionSeaTex, float4(screenUV, 0.0f, 1.5f)).rgb;
-				refl = tex2Dlod(_ReflectionSeaTex, float4(screenUV, 0.0f, metallicGloss.a)).rgb;				
+			{				
+				refl = tex2Dlod(_ReflectionSeaTex, float4(screenUV, 0.0f, roughness)).rgb;				
 			}
 
 			o.Normal = UnpackNormal (tex2D (_BumpMap, IN.uv_BumpMap));
