@@ -1261,8 +1261,7 @@ namespace DistantTerrain
                 else
                 {
                     mat = new Material(shaderTransitionRingTilemap);
-                    mat.SetTexture("_TileAtlasTex", oldMaterial.GetTexture("_TileAtlasTex"));
-                    mat.SetTexture("_TilemapTex", oldMaterial.GetTexture("_TilemapTex"));
+                    mat.SetTexture("_TileAtlasTex", oldMaterial.GetTexture("_TileAtlasTex"));                    
                     mat.SetTexture("_BumpMap", oldMaterial.GetTexture("_BumpMap"));
                     mat.SetInt("_TilesetDim", oldMaterial.GetInt("_TilesetDim"));
                     mat.SetFloat("_AtlasSize", oldMaterial.GetFloat("_AtlasSize"));
@@ -1297,7 +1296,7 @@ namespace DistantTerrain
                 mat.SetInt("_PlayerPosX", this.playerGPS.CurrentMapPixel.X);
                 mat.SetInt("_PlayerPosY", this.playerGPS.CurrentMapPixel.Y);
 
-                mat.SetInt("_TerrainDistance", streamingWorld.TerrainDistance); // - 1); // -1... allow the outer ring of of detailed terrain to intersect with far terrain (to prevent some holes)
+                mat.SetInt("_TerrainDistance", oldMaterial.GetInt("_TerrainDistance")); // - 1); // -1... allow the outer ring of of detailed terrain to intersect with far terrain (to prevent some holes)
 
                 Vector3 vecWaterHeight = new Vector3(0.0f, (ImprovedTerrainSampler.scaledOceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
                 Vector3 vecWaterHeightTransformed = worldTerrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
@@ -1310,8 +1309,8 @@ namespace DistantTerrain
                 setMaterialFogParameters(ref mat);
 
                 //terrainMaterial.SetFloat("_BlendFactor", blendFactor);
-                mat.SetFloat("_BlendStart", blendStart);
-                mat.SetFloat("_BlendEnd", blendEnd);
+                mat.SetFloat("_BlendStart", oldMaterial.GetFloat("_BlendStart"));
+                mat.SetFloat("_BlendEnd", oldMaterial.GetFloat("_BlendEnd"));
 
                 mat.SetInt("_UseSeaReflectionTex", oldMaterial.GetInt("_UseSeaReflectionTex"));
 
