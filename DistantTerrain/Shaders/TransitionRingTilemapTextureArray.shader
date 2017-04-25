@@ -193,7 +193,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 			float blendWeightX = lerp(_blendWeightFarTerrainLeft, _blendWeightFarTerrainRight, IN.uv_MainTex.x);
 			float blendWeightY = lerp(_blendWeightFarTerrainTop, _blendWeightFarTerrainBottom, IN.uv_MainTex.y);
 			float blendWeightCombined = 1.0f - max(blendWeightX, blendWeightY);
-			/*
+			
 			#if defined(ENABLE_WATER_REFLECTIONS)
 			if (_UseSeaReflectionTex)
 			{
@@ -207,7 +207,6 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 				float3 worldNormal = normalize(WorldNormalVector(IN, o.Normal));
 
 				float reflAmount;
-				/*
 				const float3 upVec = float3(0.0f, 1.0f, 0.0f);
 				if (dot(worldNormal, upVec) > 0.99f)
 				{
@@ -217,22 +216,11 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 				{
 					reflAmount = 0.0f;
 				}
-				*/
-				reflAmount = metallicGloss.r;
-
-				if (reflAmount > 0.25f)
-				{
-					//refl = tex2D(_SeaReflectionTex, screenUV).rgb;
-
-					c2.rgb = c2.rgb * (1.0f - reflAmount) + reflAmount * refl.rgb;
-					//c2.rgb = 0.5f * c2.rgb + 0.5f * refl.rgb;
-					blendWeightCombined = 1.0f;
-				}
 
 				c2.rgb = c2.rgb * (1.0f - reflAmount) + reflAmount * refl.rgb;
 			}
 			#endif
-			*/
+			
 			c.rgb = lerp(c.rgb, c2.rgb, blendWeightCombined);
 
 			o.Albedo = c.rgb;
