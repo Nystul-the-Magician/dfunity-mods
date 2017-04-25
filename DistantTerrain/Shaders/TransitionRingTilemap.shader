@@ -145,23 +145,26 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemap" {
 			#if defined(ENABLE_WATER_REFLECTIONS)
 			if (_UseSeaReflectionTex)
 			{
-				//float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
+				float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
+				//float3 refl = tex2D(_SeaReflectionTex, screenUV).rgb;
+				float3 refl = tex2Dlod(_SeaReflectionTex, float4(screenUV, 0.0f, 1.0f)).rgb;
 
-				//fixed3 normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
-				//float3 worldNormal = normalize(WorldNormalVector(IN, normal));
+				float reflAmount;
 
-				//float reflAmount;
+				o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
+				float3 worldNormal = normalize(WorldNormalVector(IN, o.Normal));
 
-				//reflAmount = tex2D(_TileAtlasReflectiveTex, uv).r; //tex2Dgrad(_TileAtlasReflectiveTex, uv, ddx(uvr), ddy(uvr));
-
-				//if (reflAmount > 0.25f)
-				//{
-					//float3 refl = tex2D(_SeaReflectionTex, screenUV).rgb;
-
-					//c2.rgb = c2.rgb * (1.0f - reflAmount) + reflAmount * refl.rgb;
-					//c2.rgb = 0.5f * c2.rgb + 0.5f * refl.rgb;
-					//blendWeightCombined = 1.0f;
-				//}				
+				const float3 upVec = float3(0.0f, 1.0f, 0.0f);
+				if (dot(worldNormal, upVec) > 0.99f)
+				{
+					reflAmount = tex2Dgrad(_TileAtlasReflectiveTex, uv, ddx(uvr), ddy(uvr)).r;
+				}
+				else
+				{
+					reflAmount = 0.0f;
+				}
+				
+				c2.rgb = c2.rgb * (1.0f - reflAmount) + reflAmount * refl.rgb;			
 			}
 			#endif
 
