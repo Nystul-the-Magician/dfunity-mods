@@ -397,6 +397,7 @@ namespace RealtimeReflections
             tex.Apply();
             renderer.material.mainTexture = tex;
             renderer.material.color = Color.green;
+            renderer.shadowCastingMode = ShadowCastingMode.Off;
             renderer.enabled = true; // if this is set to false OnWillRenderObject() in MirrorReflection.cs will not work (workaround would be to change OnWillRenderObject() to Update()
 
             mirrorRefl = reflectionPlaneBottom.AddComponent<MirrorReflection>();
@@ -420,6 +421,7 @@ namespace RealtimeReflections
             texSeaLevel.Apply();
             rendererSeaLevel.material.mainTexture = texSeaLevel;
             rendererSeaLevel.material.color = Color.green;
+            rendererSeaLevel.shadowCastingMode = ShadowCastingMode.Off;
             rendererSeaLevel.enabled = true; // if this is set to false OnWillRenderObject() in MirrorReflection.cs will not work (workaround would be to change OnWillRenderObject() to Update()
 
             mirrorReflSeaLevel = reflectionPlaneSeaLevel.AddComponent<MirrorReflection>();
