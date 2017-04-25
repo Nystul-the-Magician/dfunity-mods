@@ -149,8 +149,8 @@ half4 getColorByTextureAtlasIndex(Input IN, uniform sampler2D textureAtlas, int 
 
 half4 getColorFromTerrain(Input IN, float2 uvTex, int texDim, int tilesetDim, int index)
 {
-	const float limitAngleDirtTexture = 12.5f * PI / 180.0f; // tile will get dirt texture assigned if angles definied by surface normal and up-vector is larger than this value (and not larger than limitAngleStoneTexture)
-	const float limitAngleStoneTexture = 20.5f * PI / 180.0f; // tile will get stone texture assigned if angles definied by surface normal and up-vector is larger than this value
+	const float limitAngleDirtTexture = 30.5f * PI / 180.0f; // tile will get dirt texture assigned if angles definied by surface normal and up-vector is larger than this value (and not larger than limitAngleStoneTexture)
+	const float limitAngleStoneTexture = 45.5f * PI / 180.0f; // tile will get stone texture assigned if angles definied by surface normal and up-vector is larger than this value
 
 	half4 c;
 	half4 c_g; // color value from grass texture
@@ -162,26 +162,37 @@ half4 getColorFromTerrain(Input IN, float2 uvTex, int texDim, int tilesetDim, in
 	float weightStone = 0.0f;
 
 	// there are several possibilities to get the tile surface normal...
-	// float3 surfaceNormal = normalize(cross(ddx(IN.worldPos.xyz), ddy(IN.worldPos.xyz))); // approximate it from worldPosition with derivations			
+	float3 surfaceNormal = normalize(cross(ddx(IN.worldPos.xyz), -ddy(IN.worldPos.xyz))); // approximate it from worldPosition with derivations			
 	// float3 surfaceNormal = normalize(o.Normal); // interpolated vertex normal
 	// float3 surfaceNormal = IN.worldNormal; // interpolated vertex normal (by input parameter)
-	// float3 surfaceNormal = WorldNormalVector(IN, o.Normal); // don't know what the difference is (googled it - was mentioned that it does not get interpolated but i can't confirm this)
+	//float3 surfaceNormal = WorldNormalVector(IN, o.Normal); // don't know what the difference is (googled it - was mentioned that it does not get interpolated but i can't confirm this)
 	// float3 surfaceNormal = 0.95f*(IN.worldNormal)+0.05f*normalize(cross(ddx(IN.worldPos.xyz), ddy(IN.worldPos.xyz))); // linear interpolation of interpolated vertex normal and approximated normal
 
+	//float3 surfaceNormal = IN.worldNormal;
 	const float3 upVec = float3(0.0f, 1.0f, 0.0f);
-	float dotResult = dot(normalize(IN.worldNormal), upVec);
+	float dotResult = dot(normalize(surfaceNormal), upVec);
+	float angle = abs(acos(dotResult));
 
-	if (acos(dotResult) < limitAngleDirtTexture) // between angles 0 to limitAngleDirtTexture interpolate between grass and dirt texture
+	if (angle < limitAngleDirtTexture) // between angles 0 to limitAngleDirtTexture interpolate between grass and dirt texture
 	{
-		weightGrass = 1.0f - acos(dotResult) / limitAngleDirtTexture;
-		weightDirt = acos(dotResult) / limitAngleDirtTexture;
+		weightGrass = clamp((limitAngleDirtTexture - angle) / (limitAngleDirtTexture), 0.0f, 1.0f); //PI * 0.5f - angle / limitAngleDirtTexture;
+		weightDirt = 1.0f - weightGrass;
 		weightStone = 0.0f;
 	}
-	else // between angles limitAngleDirtTexture to limitAngleStoneTexture interpolate between dirt and stone texture (limitAngleStoneTexture to 90 degrees -> also stone texture)
+	else if (angle < limitAngleStoneTexture) // between angles limitAngleDirtTexture to limitAngleStoneTexture interpolate between dirt and stone texture (limitAngleStoneTexture to 90 degrees -> also stone texture)
 	{
 		weightGrass = 0.0f;
-		weightDirt = 1.0f - min(1.0f, (acos(dotResult) - limitAngleDirtTexture) / limitAngleStoneTexture);
-		weightStone = min(1.0f, (acos(dotResult) - limitAngleDirtTexture) / limitAngleStoneTexture);
+		weightDirt = clamp(((limitAngleStoneTexture - limitAngleDirtTexture) - (angle - limitAngleDirtTexture)) / (limitAngleStoneTexture - limitAngleDirtTexture), 0.0f, 1.0f);
+		weightStone = 1.0f - weightDirt;
+
+		//weightDirt = 1.0f - min(1.0f, (angle - limitAngleDirtTexture) / limitAngleStoneTexture);
+		//weightStone = min(1.0f, (angle - limitAngleDirtTexture) / limitAngleStoneTexture);
+	}
+	else
+	{
+		weightGrass = 0.0f;
+		weightDirt = 0.0f;
+		weightStone = 1.0f;
 	}
 
 	if ((index==223)||(IN.worldPos.y < _WaterHeightTransformed)) // water (either by tile index or by tile world position)
