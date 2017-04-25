@@ -85,7 +85,7 @@ Shader "Daggerfall/RealtimeReflections/TilemapWithReflections" {
 			half3 refl;
 			if (IN.worldPos.y > _SeaLevelHeight + 0.01f)
 			{					
-				refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, 1.0f)).rgb; // 4th component is blurring of reflection				
+				refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, 1.0f)).rgb;			
 			}
 			else
 			{
