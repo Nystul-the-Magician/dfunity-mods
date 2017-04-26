@@ -128,8 +128,8 @@ half4 getColorByTextureAtlasIndex(Input IN, uniform sampler2D textureAtlas, int 
 	float dist = max(abs(IN.worldPos.x - _WorldSpaceCameraPos.x), abs(IN.worldPos.z - _WorldSpaceCameraPos.z));
 	dist = floor(dist*distanceAttenuation);
 
-	int xpos = (uint)index % tilesetDim;
-	int ypos = (uint)index / tilesetDim;
+	int xpos = index % tilesetDim;
+	int ypos = index / tilesetDim;
 	float2 uv = float2(xpos, ypos) / tilesetDim;
 
 	// Offset to fragment position inside tile

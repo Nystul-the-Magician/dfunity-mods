@@ -53,7 +53,7 @@ namespace DistantTerrain
             enableImprovedTerrain = settings.GetBool("ImprovedTerrain", "enable");
             indicateLocations = settings.GetBool("ImprovedTerrain", "indicateLocations");
 
-            shaderDistantTerrainTilemap = mod.GetAsset<Shader>("Shaders/DaggerfallDistantTerrainTilemap.shader");
+            shaderDistantTerrainTilemap = mod.GetAsset<Shader>("Shaders/DistantTerrainTilemap.shader");
             shaderBillboardBatchFaded = mod.GetAsset<Shader>("Shaders/DaggerfallBillboardBatchFaded.shader");
             shaderTransitionRingTilemap = mod.GetAsset<Shader>("Shaders/TransitionRingTilemap.shader");
             shaderTransitionRingTilemapTextureArray = mod.GetAsset<Shader>("Shaders/TransitionRingTilemapTextureArray.shader");

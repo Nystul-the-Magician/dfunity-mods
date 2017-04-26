@@ -57,7 +57,7 @@ namespace RealtimeReflections
             roughnessMultiplier = settings.GetFloat("ReflectionParameters", "roughnessMultiplier");
 
             shaderTilemapWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapWithReflections.shader");
-            shaderTilemapWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapTextureArrayWithReflections.shader");
+            shaderTilemapTextureArrayWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapTextureArrayWithReflections.shader");
             shaderCreateLookupReflectionTextureCoordinates = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureCoordinates.shader");
             shaderCreateLookupReflectionTextureIndex = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureIndex.shader");
             shaderDeferredPlanarReflections = mod.GetAsset<Shader>("Shaders/DeferredPlanarReflections.shader");
