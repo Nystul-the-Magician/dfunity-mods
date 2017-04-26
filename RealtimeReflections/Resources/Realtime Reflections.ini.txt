@@ -1,0 +1,25 @@
+[Internal]
+SettingsVersion = 1.0
+
+;reflection texture for floor reflections beneath the player
+[FloorReflectionTexture]
+;sane values for width and height are values with power of two between 128 - 2048
+;warning no sanity checks in code are done at the moment
+width = 512
+height = 512
+
+;reflection texture for reflections on next lower level or sea
+[LowerLevelReflectionTexture]
+;sane values for width and height are values with power of two between 128 - 2048
+;warning no sanity checks in code are done at the moment
+width = 512
+height = 512
+
+;parameters that affect reflection properties
+[ReflectionParameters]
+;roughness multiplier can be used to compensate for different reflection texture resolutions
+;it is used in the calculation for mip map level selection, higher values will result in more
+;roughness (less smoothness) because of mip map level selection of higher levels
+;to get approximately the same roughness for double the reflection texture resolution you have
+;to double this value
+roughnessMultiplier = 4.0
