@@ -258,7 +258,7 @@ namespace RealtimeReflections
                         UnityStandardAssets.ImageEffects.GlobalFog scriptGlobalFog = go.AddComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
                         UnityStandardAssets.ImageEffects.GlobalFog globalFogMainCamera = Camera.main.gameObject.GetComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
                         scriptGlobalFog.distanceFog = globalFogMainCamera.distanceFog;
-                        scriptGlobalFog.excludeFarPixels = globalFogMainCamera.excludeFarPixels; // false
+                        scriptGlobalFog.excludeFarPixels = true; // skybox + sun will show up in reflections (otherwise no sun reflection)
                         scriptGlobalFog.useRadialDistance = globalFogMainCamera.useRadialDistance;
                         scriptGlobalFog.heightFog = globalFogMainCamera.heightFog;
                         scriptGlobalFog.height = globalFogMainCamera.height;
