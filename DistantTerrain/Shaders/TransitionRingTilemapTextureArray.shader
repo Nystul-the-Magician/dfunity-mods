@@ -90,15 +90,6 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 			UNITY_DECLARE_TEX2DARRAY(_TileMetallicGlossMapTexArr);
 		#endif
 
-
-		#if defined(SHADER_API_D3D11) || defined(SHADER_API_XBOXONE) || defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE)
-			#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) tex.SampleGrad (sampler##tex,coord,dx,dy)
-		#else
-			#if defined(UNITY_COMPILER_HLSL2GLSL) || defined(SHADER_TARGET_SURFACE_ANALYSIS)
-			#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) texCUBEgrad(tex,coord,dx,dy)
-			#endif
-		#endif
-
 		#pragma target 3.5
 		#pragma surface surf Standard noforwardadd finalcolor:fcolor alpha:fade keepalpha
 		#pragma glsl
@@ -172,33 +163,34 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 			// mip map level is selected manually dependent on fragment's distance from camera	
 			dist = distance(IN.worldPos.xyz, _WorldSpaceCameraPos.xyz);
 			
-			half4 c2;
+			float mipMapLevel;
 			if (dist < 10.0f)
-				c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 0);
+				mipMapLevel = 0.0;
 			else if (dist < 25.0f)
-				c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 1);
+				mipMapLevel = 1.0;
 			else if (dist < 50.0f)
-				c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 2);
+				mipMapLevel = 2.0;
 			else if (dist < 125.0f)
-				c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 3);
+				mipMapLevel = 3.0;
 			else if (dist < 250.0f)
-				c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 4);
+				mipMapLevel = 4.0;
 			else if (dist < 500.0f)
-				c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 5);
+				mipMapLevel = 5.0;
 			else if (dist < 1000.0f)
-				c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 6);
+				mipMapLevel = 6.0;
 			else if (dist < 10000.0f)
-				c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 7);
+				mipMapLevel = 7.0;
 			else
-				c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 8);
+				mipMapLevel = 8.0;
 
+			half4 c2 = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, mipMapLevel);
 
 			float blendWeightX = lerp(_blendWeightFarTerrainLeft, _blendWeightFarTerrainRight, IN.uv_MainTex.x);
 			float blendWeightY = lerp(_blendWeightFarTerrainTop, _blendWeightFarTerrainBottom, IN.uv_MainTex.y);
 			float blendWeightCombined = 1.0f - max(blendWeightX, blendWeightY);
 			
 			#ifdef _NORMALMAP
-				o.Normal = UnpackNormal(UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileNormalMapTexArr, uv3, ddx(uv3), ddy(uv3)));				
+				o.Normal = UnpackNormal(UNITY_SAMPLE_TEX2DARRAY_LOD(_TileNormalMapTexArr, uv3, mipMapLevel));
 			#endif
 			//float3 worldNormal = normalize(WorldNormalVector(IN, o.Normal));
 			
@@ -207,7 +199,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 			{
 				float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
 
-				half4 metallicGloss = UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileMetallicGlossMapTexArr, uv3, ddx(uv3), ddy(uv3));
+				half4 metallicGloss = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileMetallicGlossMapTexArr, uv3, mipMapLevel);
 				float roughness = (1.0 - metallicGloss.a) * 4.0f;
 				half3 refl = tex2Dlod(_SeaReflectionTex, float4(screenUV, 0.0f, roughness)).rgb;
 

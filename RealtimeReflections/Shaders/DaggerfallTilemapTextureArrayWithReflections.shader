@@ -54,14 +54,6 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 		int _MaxIndex;
 		float _SeaLevelHeight;
 
-		#if defined(SHADER_API_D3D11) || defined(SHADER_API_XBOXONE) || defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE)
-		#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) tex.SampleGrad (sampler##tex,coord,dx,dy)
-		#else
-		#if defined(UNITY_COMPILER_HLSL2GLSL) || defined(SHADER_TARGET_SURFACE_ANALYSIS)
-		#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) texCUBEgrad(tex,coord,dx,dy)
-		#endif
-		#endif
-
 		struct Input
 		{
 			float2 uv_MainTex;
@@ -107,29 +99,30 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 			// mip map level is selected manually dependent on fragment's distance from camera
 			float dist = distance(IN.worldPos.xyz, _WorldSpaceCameraPos.xyz);
 			
-			half4 c;
+			float mipMapLevel;
 			if (dist < 10.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 0);
+				mipMapLevel = 0.0;
 			else if (dist < 25.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 1);
-			else if (dist < 150.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 2);
+				mipMapLevel = 1.0;
+			else if (dist < 50.0f)
+				mipMapLevel = 2.0;
+			else if (dist < 125.0f)
+				mipMapLevel = 3.0;
+			else if (dist < 250.0f)
+				mipMapLevel = 4.0;
 			else if (dist < 500.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 3);
-			else if (dist < 750.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 4);
-			else if (dist < 2500.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 5);
-			else if (dist < 5000.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 6);
+				mipMapLevel = 5.0;
+			else if (dist < 1000.0f)
+				mipMapLevel = 6.0;
 			else if (dist < 10000.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 7);
+				mipMapLevel = 7.0;
 			else
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 8);
+				mipMapLevel = 8.0;
+			half4 c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, mipMapLevel);
 
 			float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
 			
-			half4 metallicGloss = UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileMetallicGlossMapTexArr, uv3, ddx(uv3), ddy(uv3));
+			half4 metallicGloss = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileMetallicGlossMapTexArr, uv3, mipMapLevel);
 			float roughness = (1.0 - metallicGloss.a) * 4.0f;
 			half3 refl;
 			if (IN.worldPos.y > _SeaLevelHeight + 0.01f)
@@ -142,7 +135,7 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 			}
 
 			#ifdef _NORMALMAP
-				o.Normal = UnpackNormal(UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileNormalMapTexArr, uv3, ddx(uv3), ddy(uv3)));
+				o.Normal = UnpackNormal(UNITY_SAMPLE_TEX2DARRAY_LOD(_TileNormalMapTexArr, uv3, mipMapLevel));
 			#endif			
 			//float3 worldNormal = normalize(WorldNormalVector(IN, o.Normal));
 
