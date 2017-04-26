@@ -19,11 +19,11 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 
 		// These params are used for our shader
 		_TileTexArr("Tile Texture Array", 2DArray) = "" {}
+		_TileNormalMapTexArr("Tileset NormalMap Texture Array (RGBA)", 2DArray) = "" {}
 		_TileMetallicGlossMapTexArr ("Tileset MetallicGlossMap Texture Array (RGBA)", 2DArray) = "" {}
 		_TilemapTex("Tilemap (R)", 2D) = "red" {}
 		_ReflectionGroundTex("Reflection Texture Ground Reflection", 2D) = "black" {}
 		_ReflectionSeaTex("Reflection Texture Sea Reflection", 2D) = "black" {}		
-		_BumpMap("Normal Map", 2D) = "bump" {}
 		_TilemapDim("Tilemap Dimension (in tiles)", Int) = 128
 		_MaxIndex("Max Tileset Index", Int) = 255
 		_SeaLevelHeight("sea level height", Float) = 0.0
@@ -33,28 +33,34 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 		LOD 200
 		
 		CGPROGRAM
-		#pragma target 3.0
+		#pragma target 3.5
 		#pragma surface surf Standard
 		#pragma glsl
 
+		#pragma multi_compile __ _NORMALMAP
+
 		UNITY_DECLARE_TEX2DARRAY(_TileTexArr);
+
+		#ifdef _NORMALMAP
+			UNITY_DECLARE_TEX2DARRAY(_TileNormalMapTexArr);
+		#endif
+
 		UNITY_DECLARE_TEX2DARRAY(_TileMetallicGlossMapTexArr);
 			
 		sampler2D _TilemapTex;
-		sampler2D _BumpMap;
 		sampler2D _ReflectionGroundTex;
 		sampler2D _ReflectionSeaTex;
 		int _TilemapDim;
 		int _MaxIndex;
 		float _SeaLevelHeight;
 
-#if defined(SHADER_API_D3D11) || defined(SHADER_API_XBOXONE) || defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE)
-#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) tex.SampleGrad (sampler##tex,coord,dx,dy)
-#else
-#if defined(UNITY_COMPILER_HLSL2GLSL) || defined(SHADER_TARGET_SURFACE_ANALYSIS)
-#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) texCUBEgrad(tex,coord,dx,dy)
-#endif
-#endif
+		#if defined(SHADER_API_D3D11) || defined(SHADER_API_XBOXONE) || defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE)
+		#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) tex.SampleGrad (sampler##tex,coord,dx,dy)
+		#else
+		#if defined(UNITY_COMPILER_HLSL2GLSL) || defined(SHADER_TARGET_SURFACE_ANALYSIS)
+		#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) texCUBEgrad(tex,coord,dx,dy)
+		#endif
+		#endif
 
 		struct Input
 		{
@@ -100,6 +106,7 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 
 			// since there is currently no UNITY_SAMPLE_TEX2DARRAY_GRAD function in unity, this is used as workaround
 			// mip map level is selected manually dependent on fragment's distance from camera
+			
 			float dist = distance(IN.worldPos.xyz, _WorldSpaceCameraPos.xyz);
 			
 			half4 c;
@@ -107,15 +114,15 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 0);
 			else if (dist < 25.0f)
 				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 1);
-			else if (dist < 50.0f)
+			else if (dist < 150.0f)
 				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 2);
-			else if (dist < 125.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 3);
-			else if (dist < 250.0f)
-				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 4);
 			else if (dist < 500.0f)
+				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 3);
+			else if (dist < 750.0f)
+				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 4);
+			else if (dist < 2500.0f)
 				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 5);
-			else if (dist < 1000.0f)
+			else if (dist < 5000.0f)
 				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 6);
 			else if (dist < 10000.0f)
 				c = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileTexArr, uv3, 7);
@@ -136,24 +143,27 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 				refl = tex2Dlod(_ReflectionSeaTex, float4(screenUV, 0.0f, roughness)).rgb;				
 			}
 
-			o.Normal = UnpackNormal (tex2D (_BumpMap, IN.uv_BumpMap));
-			float3 worldNormal = normalize(WorldNormalVector (IN, o.Normal));
+			#ifdef _NORMALMAP
+				o.Normal = UnpackNormal(UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileNormalMapTexArr, uv3, ddx(uv3), ddy(uv3)));
+			#endif			
+			//float3 worldNormal = normalize(WorldNormalVector(IN, o.Normal));
 
-			float reflAmount;
-			const float3 upVec = float3(0.0f, 1.0f, 0.0f);
-			if (dot(worldNormal, upVec) > 0.99f)
-			{
-				reflAmount = metallicGloss.r;
-			}
-			else
-			{
-				reflAmount = 0.0f;
-			}
+			//float reflAmount;
+			//const float3 upVec = float3(0.0f, 1.0f, 0.0f);
+			//if (dot(worldNormal, upVec) > 0.99f)
+			//{
+			//	reflAmount = metallicGloss.r;
+			//}
+			//else
+			//{
+			//	reflAmount = 0.0f;
+			//}
+
+			float reflAmount = metallicGloss.r;
 
 			c.rgb = c.rgb * (1.0f - reflAmount) + reflAmount * refl.rgb;
 			o.Albedo = c.rgb;
 			o.Alpha = c.a;
-			o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
 			o.Metallic = 0.0f;
 		}
 		ENDCG

@@ -19,6 +19,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 		[HideInInspector] _SplatTex0("Layer 0 (R)", 2D) = "white" {}
 		
 		_TileTexArr("Tile Texture Array", 2DArray) = "" {}
+		_TileNormalMapTexArr("Tileset NormalMap Texture Array (RGBA)", 2DArray) = "" {}
 		_TileMetallicGlossMapTexArr("Tileset MetallicGlossMap Texture Array (RGBA)", 2DArray) = "" {}
 		_TileAtlasTexDesert ("Tileset Atlas Desert (RGB)", 2D) = "white" {}
 		_TileAtlasTexWoodland ("Tileset Atlas Woodland (RGB)", 2D) = "white" {}
@@ -30,7 +31,6 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 		_FarTerrainTilemapDim("Tilemap Dimension (in tiles)", Int) = 1000
 		//_TileAtlasTex ("Tileset Atlas (RGB)", 2D) = "white" {}
 		_TilemapTex("Tilemap (R)", 2D) = "red" {}
-		_BumpMap("Normal Map", 2D) = "bump" {}
 		_TilesetDim("Tileset Dimension (in tiles)", Int) = 16
 		_TilemapDim("Tilemap Dimension (in tiles)", Int) = 128
 		_MaxIndex("Max Tileset Index", Int) = 255
@@ -81,24 +81,29 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 
 		// only used in transition ring tilemap shader, so not in FarTerrainCommon.cginc
 		UNITY_DECLARE_TEX2DARRAY(_TileTexArr);
-#if defined(ENABLE_WATER_REFLECTIONS)
-		UNITY_DECLARE_TEX2DARRAY(_TileMetallicGlossMapTexArr);
-#endif
+
+		#ifdef _NORMALMAP
+			UNITY_DECLARE_TEX2DARRAY(_TileNormalMapTexArr);
+		#endif
+
+		#if defined(ENABLE_WATER_REFLECTIONS)
+			UNITY_DECLARE_TEX2DARRAY(_TileMetallicGlossMapTexArr);
+		#endif
 
 
-#if defined(SHADER_API_D3D11) || defined(SHADER_API_XBOXONE) || defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE)
-	#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) tex.SampleGrad (sampler##tex,coord,dx,dy)
-#else
-	#if defined(UNITY_COMPILER_HLSL2GLSL) || defined(SHADER_TARGET_SURFACE_ANALYSIS)
-	#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) texCUBEgrad(tex,coord,dx,dy)
-	#endif
-#endif
+		#if defined(SHADER_API_D3D11) || defined(SHADER_API_XBOXONE) || defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE)
+			#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) tex.SampleGrad (sampler##tex,coord,dx,dy)
+		#else
+			#if defined(UNITY_COMPILER_HLSL2GLSL) || defined(SHADER_TARGET_SURFACE_ANALYSIS)
+			#define UNITY_SAMPLE_TEX2DARRAY_GRAD(tex,coord,dx,dy) texCUBEgrad(tex,coord,dx,dy)
+			#endif
+		#endif
 
-		#pragma target 3.0
+		#pragma target 3.5
 		#pragma surface surf Standard noforwardadd finalcolor:fcolor alpha:fade keepalpha
 		#pragma glsl
 
-		#pragma multi_compile __ ENABLE_WATER_REFLECTIONS
+		#pragma multi_compile __ ENABLE_WATER_REFLECTIONS _NORMALMAP
 
 		void surf (Input IN, inout SurfaceOutputStandard o)
 		{
@@ -194,6 +199,11 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 			float blendWeightY = lerp(_blendWeightFarTerrainTop, _blendWeightFarTerrainBottom, IN.uv_MainTex.y);
 			float blendWeightCombined = 1.0f - max(blendWeightX, blendWeightY);
 			
+			#ifdef _NORMALMAP
+				o.Normal = UnpackNormal(UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileNormalMapTexArr, uv3, ddx(uv3), ddy(uv3)));				
+			#endif
+			//float3 worldNormal = normalize(WorldNormalVector(IN, o.Normal));
+			
 			#if defined(ENABLE_WATER_REFLECTIONS)
 			if (_UseSeaReflectionTex)
 			{
@@ -203,20 +213,18 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 				float roughness = (1.0 - metallicGloss.a) * 4.0f;
 				half3 refl = tex2Dlod(_SeaReflectionTex, float4(screenUV, 0.0f, roughness)).rgb;
 
-				o.Normal = UnpackNormal(tex2D(_BumpMap, IN.uv_BumpMap));
-				float3 worldNormal = normalize(WorldNormalVector(IN, o.Normal));
+				//float reflAmount;
+				//const float3 upVec = float3(0.0f, 1.0f, 0.0f);
+				//if (dot(worldNormal, upVec) > 0.99f)
+				//{
+				//	reflAmount = metallicGloss.r;
+				//}
+				//else
+				//{
+				//	reflAmount = 0.0f;
+				//}
 
-				float reflAmount;
-				const float3 upVec = float3(0.0f, 1.0f, 0.0f);
-				if (dot(worldNormal, upVec) > 0.99f)
-				{
-					reflAmount = metallicGloss.r;
-				}
-				else
-				{
-					reflAmount = 0.0f;
-				}
-
+				float reflAmount = metallicGloss.r;
 				c2.rgb = c2.rgb * (1.0f - reflAmount) + reflAmount * refl.rgb;
 			}
 			#endif

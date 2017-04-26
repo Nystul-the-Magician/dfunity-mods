@@ -1256,6 +1256,11 @@ namespace DistantTerrain
                 {
                     mat = new Material(shaderTransitionRingTilemapTextureArray);
                     mat.SetTexture("_TileTexArr", oldMaterial.GetTexture("_TileTexArr"));
+                    mat.SetTexture("_TileNormalMapTexArr", oldMaterial.GetTexture("_TileNormalMapTexArr"));
+                    if (oldMaterial.IsKeywordEnabled("_NORMALMAP"))
+                        mat.EnableKeyword("_NORMALMAP");
+                    else
+                        mat.DisableKeyword("_NORMALMAP");
                     mat.SetTexture("_TileMetallicGlossMapTexArr", oldMaterial.GetTexture("_TileMetallicGlossMapTexArr"));
                 }
                 else
@@ -1429,6 +1434,11 @@ namespace DistantTerrain
             {
                 newMaterial = new Material(shaderTransitionRingTilemapTextureArray);
                 newMaterial.SetTexture("_TileTexArr", oldMaterial.GetTexture("_TileTexArr"));
+                newMaterial.SetTexture("_TileNormalMapTexArr", oldMaterial.GetTexture("_TileNormalMapTexArr"));
+                if (oldMaterial.IsKeywordEnabled("_NORMALMAP"))
+                    newMaterial.EnableKeyword("_NORMALMAP");
+                else
+                    newMaterial.DisableKeyword("_NORMALMAP");
                 newMaterial.SetTexture("_TileMetallicGlossMapTexArr", oldMaterial.GetTexture("_TileMetallicGlossMapTexArr"));
             }
             else

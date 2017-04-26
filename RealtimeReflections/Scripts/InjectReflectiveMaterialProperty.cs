@@ -300,6 +300,7 @@ namespace RealtimeReflections
                         if ((SystemInfo.supports2DArrayTextures) && DaggerfallTerrain.enableTextureArrays)
                         {
                             Texture tileTextureArray = terrain.materialTemplate.GetTexture("_TileTexArr");
+                            Texture tileNormalMapTextureArray = terrain.materialTemplate.GetTexture("_TileNormalMapTexArr");
                             Texture tileMetallicGlossMapTextureArray = terrain.materialTemplate.GetTexture("_TileMetallicGlossMapTexArr");
 
                             Texture tileMapTexture = terrain.materialTemplate.GetTexture("_TilemapTex");
@@ -308,6 +309,11 @@ namespace RealtimeReflections
                             Material newMat = new Material(componentUpdateReflectionTextures.ShaderTilemapTextureArrayWithReflections);
 
                             newMat.SetTexture("_TileTexArr", tileTextureArray);
+                            newMat.SetTexture("_TileNormalMapTexArr", tileNormalMapTextureArray);
+                            if (terrain.materialTemplate.IsKeywordEnabled("_NORMALMAP"))
+                                newMat.EnableKeyword("_NORMALMAP");
+                            else
+                                newMat.DisableKeyword("_NORMALMAP");
                             newMat.SetTexture("_TileMetallicGlossMapTexArr", tileMetallicGlossMapTextureArray);
                             newMat.SetTexture("_TilemapTex", tileMapTexture);
                             newMat.SetInt("_TilemapDim", tileMapDim);
