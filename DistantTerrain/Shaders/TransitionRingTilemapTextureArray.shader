@@ -168,10 +168,8 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 			float3 uv3 = float3(uv, ((uint)index) / 4); // compute correct texture array index from index
 
 			//half4 c2 = UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileTexArr, uv3, ddx(uv3), ddy(uv3)); // (see https://forum.unity3d.com/threads/texture2d-array-mipmap-troubles.416799/)
-
-			// since there is currently no UNITY_SAMPLE_TEX2DARRAY_GRAD function in unity, this is used as workaround
-			// mip map level is selected manually dependent on fragment's distance from camera
-			
+			// since there is currently a bug with seams when using the UNITY_SAMPLE_TEX2DARRAY_GRAD function in unity, this is used as workaround
+			// mip map level is selected manually dependent on fragment's distance from camera	
 			dist = distance(IN.worldPos.xyz, _WorldSpaceCameraPos.xyz);
 			
 			half4 c2;
@@ -212,17 +210,6 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 				half4 metallicGloss = UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileMetallicGlossMapTexArr, uv3, ddx(uv3), ddy(uv3));
 				float roughness = (1.0 - metallicGloss.a) * 4.0f;
 				half3 refl = tex2Dlod(_SeaReflectionTex, float4(screenUV, 0.0f, roughness)).rgb;
-
-				//float reflAmount;
-				//const float3 upVec = float3(0.0f, 1.0f, 0.0f);
-				//if (dot(worldNormal, upVec) > 0.99f)
-				//{
-				//	reflAmount = metallicGloss.r;
-				//}
-				//else
-				//{
-				//	reflAmount = 0.0f;
-				//}
 
 				float reflAmount = metallicGloss.r;
 				c2.rgb = c2.rgb * (1.0f - reflAmount) + reflAmount * refl.rgb;

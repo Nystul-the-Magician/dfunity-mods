@@ -103,10 +103,8 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 			float3 uv3 = float3(uv, ((uint)index)/4); // compute correct texture array index from index
 			
 			//half4 c = UNITY_SAMPLE_TEX2DARRAY_GRAD(_TileTexArr, uv3, ddx(uv3), ddy(uv3)); // (see https://forum.unity3d.com/threads/texture2d-array-mipmap-troubles.416799/)
-
-			// since there is currently no UNITY_SAMPLE_TEX2DARRAY_GRAD function in unity, this is used as workaround
+			// since there is currently a bug with seams when using the UNITY_SAMPLE_TEX2DARRAY_GRAD function in unity, this is used as workaround
 			// mip map level is selected manually dependent on fragment's distance from camera
-			
 			float dist = distance(IN.worldPos.xyz, _WorldSpaceCameraPos.xyz);
 			
 			half4 c;
@@ -148,23 +146,11 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 			#endif			
 			//float3 worldNormal = normalize(WorldNormalVector(IN, o.Normal));
 
-			//float reflAmount;
-			//const float3 upVec = float3(0.0f, 1.0f, 0.0f);
-			//if (dot(worldNormal, upVec) > 0.99f)
-			//{
-			//	reflAmount = metallicGloss.r;
-			//}
-			//else
-			//{
-			//	reflAmount = 0.0f;
-			//}
-
 			float reflAmount = metallicGloss.r;
 
 			c.rgb = c.rgb * (1.0f - reflAmount) + reflAmount * refl.rgb;
 			o.Albedo = c.rgb;
 			o.Alpha = c.a;
-			o.Metallic = 0.0f;
 		}
 		ENDCG
 	} 
