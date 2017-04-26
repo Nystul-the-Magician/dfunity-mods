@@ -1252,7 +1252,7 @@ namespace DistantTerrain
                 Terrain terrain = terrainTransitionRingArray[i].terrainDesc.terrainObject.GetComponent<Terrain>();
                 Material oldMaterial = terrain.materialTemplate;
                 Material mat;
-                if ((SystemInfo.supports2DArrayTextures) && DaggerfallTerrain.enableTextureArrays)
+                if ((SystemInfo.supports2DArrayTextures) && DaggerfallUnity.Settings.EnableTextureArrays)
                 {
                     mat = new Material(shaderTransitionRingTilemapTextureArray);
                     mat.SetTexture("_TileTexArr", oldMaterial.GetTexture("_TileTexArr"));
@@ -1327,7 +1327,7 @@ namespace DistantTerrain
                     {
                         mat.EnableKeyword("ENABLE_WATER_REFLECTIONS");
                         mat.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
-                        if (!(SystemInfo.supports2DArrayTextures) || !DaggerfallTerrain.enableTextureArrays)
+                        if (!(SystemInfo.supports2DArrayTextures) || !DaggerfallUnity.Settings.EnableTextureArrays)
                         {
                             if (tileAtlasReflectiveTexture != null)
                             {
@@ -1430,7 +1430,7 @@ namespace DistantTerrain
             Terrain terrain = transitionTerrainDesc.terrainDesc.terrainObject.GetComponent<Terrain>();
             Material oldMaterial = terrain.materialTemplate;
             Material newMaterial;
-            if ((SystemInfo.supports2DArrayTextures) && DaggerfallTerrain.enableTextureArrays)
+            if ((SystemInfo.supports2DArrayTextures) && DaggerfallUnity.Settings.EnableTextureArrays)
             {
                 newMaterial = new Material(shaderTransitionRingTilemapTextureArray);
                 newMaterial.SetTexture("_TileTexArr", oldMaterial.GetTexture("_TileTexArr"));
@@ -1514,7 +1514,7 @@ namespace DistantTerrain
                 {
                     newMaterial.EnableKeyword("ENABLE_WATER_REFLECTIONS");
                     newMaterial.SetTexture("_SeaReflectionTex", reflectionSeaTexture);
-                    if (!(SystemInfo.supports2DArrayTextures) || !DaggerfallTerrain.enableTextureArrays)
+                    if (!(SystemInfo.supports2DArrayTextures) || !DaggerfallUnity.Settings.EnableTextureArrays)
                     {
                         if (tileAtlasReflectiveTexture != null)
                         {
