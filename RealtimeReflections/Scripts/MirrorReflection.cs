@@ -114,8 +114,8 @@ namespace RealtimeReflections
 		    // plane. This way we clip everything below/above it for free.
 		    Vector4 clipPlane = CameraSpacePlane( reflectionCamera, pos, normal, 1.0f );
 		    //Matrix4x4 projection = cam.projectionMatrix;
-		    Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
-		    reflectionCamera.projectionMatrix = projection;
+		    //Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
+		    //reflectionCamera.projectionMatrix = projection; // do not set oblique projection matrix since it will fuck up fog in reflections - disabling this step seems to do not any harm ;)
 
             reflectionCamera.cullingMask = ~(1 << 4) & LayerMask.NameToLayer("Everything"); //m_ReflectLayers.value; // never render water layer
 		    reflectionCamera.targetTexture = m_ReflectionTexture;
