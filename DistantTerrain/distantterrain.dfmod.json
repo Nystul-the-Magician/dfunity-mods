@@ -1,9 +1,9 @@
 {
     "ModTitle": "Distant Terrain",
-    "ModVersion": "2.1.0",
+    "ModVersion": "2.2.0",
     "ModAuthor": "Nystul",
     "ContactInfo": "http://forums.dfworkshop.net",
-    "DFUnity_Verion": "0.4.12",
+    "DFUnity_Version": "",
     "ModDescription": "adds distant terrain and increases view distance",
     "GUID": "9632a2ad-2ea0-46b6-b9b1-a4dafcca8a9a",
     "Files": [
