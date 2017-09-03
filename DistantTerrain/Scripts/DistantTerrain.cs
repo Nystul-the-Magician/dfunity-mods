@@ -640,29 +640,36 @@ namespace DistantTerrain
             {
                 GameObject goStackedNearCamera = new GameObject("stackedNearCamera");
                 stackedNearCamera = goStackedNearCamera.AddComponent<Camera>();
-                stackedNearCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
-                stackedNearCamera.nearClipPlane = 980.0f;
-                stackedNearCamera.farClipPlane = 15000.0f;
-                stackedNearCamera.fieldOfView = Camera.main.fieldOfView;
-                stackedNearCamera.renderingPath = Camera.main.renderingPath;
                 stackedNearCamera.gameObject.AddComponent<CloneCameraRotationFromMainCamera>();
                 stackedNearCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
                 stackedNearCamera.transform.SetParent(this.transform);
+
             }
+            // important that camera properties are propagated every time SetupGameObjects() is called,
+            // otherwise things like fov won't be propagated correctly since first call of functions
+            // happens when the main camera still has default values (that get changed later)
+            stackedNearCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
+            stackedNearCamera.nearClipPlane = 980.0f;
+            stackedNearCamera.farClipPlane = 15000.0f;
+            stackedNearCamera.fieldOfView = Camera.main.fieldOfView;
+            stackedNearCamera.renderingPath = Camera.main.renderingPath;
 
             if (!stackedCamera)
             {
                 GameObject goStackedCamera = new GameObject("stackedCamera");
                 stackedCamera = goStackedCamera.AddComponent<Camera>();
-                stackedCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
-                stackedCamera.nearClipPlane = 980.0f;
-                stackedCamera.farClipPlane = 300000.0f;
-                stackedCamera.fieldOfView = Camera.main.fieldOfView;
-                stackedCamera.renderingPath = Camera.main.renderingPath;
                 stackedCamera.gameObject.AddComponent<CloneCameraRotationFromMainCamera>();
                 stackedCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
                 stackedCamera.transform.SetParent(this.transform);
             }
+            // important that camera properties are propagated every time SetupGameObjects() is called,
+            // otherwise things like fov won't be propagated correctly since first call of functions
+            // happens when the main camera still has default values (that get changed later)
+            stackedCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
+            stackedCamera.nearClipPlane = 980.0f;
+            stackedCamera.farClipPlane = 300000.0f;
+            stackedCamera.fieldOfView = Camera.main.fieldOfView;
+            stackedCamera.renderingPath = Camera.main.renderingPath;
 
             if (!renderTextureSky)
             {
@@ -688,6 +695,10 @@ namespace DistantTerrain
                 cameraRenderSkyboxToTexture.farClipPlane = stackedCamera.farClipPlane;
                 cameraRenderSkyboxToTexture.fieldOfView = stackedCamera.fieldOfView;
             }
+            // important that camera properties are propagated every time SetupGameObjects() is called,
+            // otherwise things like fov won't be propagated correctly since first call of functions
+            // happens when the main camera still has default values (that get changed later)
+            cameraRenderSkyboxToTexture.fieldOfView = Camera.main.fieldOfView;
         }
 
         void SetUpCameras()
