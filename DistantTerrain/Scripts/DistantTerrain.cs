@@ -376,15 +376,10 @@ namespace DistantTerrain
             if (toggle)
             {
                 isActiveEnhancedSkyMod = true;
-                if (GameObject.Find("RealtimeReflections") != null)
-                {
-                    isActiveReflectionsMod = true;
-                }
             }
             else
             {
                 isActiveEnhancedSkyMod = false;
-                isActiveReflectionsMod = false;
             }
 
             justToggledEnhancedSky = true;
@@ -556,17 +551,16 @@ namespace DistantTerrain
                 dfUnity.TerrainSampler = new ImprovedTerrainSampler();
             }
 
-            if (GameObject.Find("RealtimeReflections") != null)
-            {
-                isActiveReflectionsMod = true;            
-            }
-
             //if (GameObject.Find("EnhancedSkyController") != null)
-            string[] modTitles = ModManager.Instance.GetAllModTitles();
+            ModInfo[] modInfos = ModManager.Instance.GetAllModInfo();
 
-            foreach (string title in modTitles)
+            foreach (ModInfo modInfo in modInfos)
             {
-                if (title == "Enhanced Sky")
+                if (modInfo.ModTitle == "Realtime Reflections" && ModManager.Instance.GetMod(modInfo.ModTitle).Enabled)
+                {
+                    isActiveReflectionsMod = true;
+                }
+                if (modInfo.ModTitle == "Enhanced Sky" && ModManager.Instance.GetMod(modInfo.ModTitle).Enabled)
                 {
                     isActiveEnhancedSkyMod = true;
                 }
