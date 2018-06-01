@@ -310,7 +310,7 @@ namespace DistantTerrain
                 {
                     GameObject go = currentWeatherManager.gameObject;
                     string objectPathInHierarchy = GetGameObjectPath(go);
-                    if (objectPathInHierarchy == "/Exterior/WeatherManager")
+                    if (objectPathInHierarchy == "/WeatherManager")
                     {
                         weatherManager = currentWeatherManager;
                         break;
@@ -390,7 +390,7 @@ namespace DistantTerrain
             justToggledEnhancedSky = true;
         }
 
-        void updateSeaReflectionTextureReference()
+        void UpdateSeaReflectionTextureReference()
         {
             if (GameObject.Find("RealtimeReflections") != null)
             {
@@ -424,18 +424,37 @@ namespace DistantTerrain
                 terrain.materialTemplate.SetInt("_PlayerPosY", this.playerGPS.CurrentMapPixel.Y);
 
                 //Debug.Log("update from floating origin event");
-                updatePositionWorldTerrain(ref worldTerrainGameObject, offset);
+                UpdatePositionWorldTerrain(ref worldTerrainGameObject, offset);
+
+                UpdateTransitionRingPosition(offset);
             }
         }
 
         void InitFarTerrain()
         {
+            if (enableTerrainTransition)
+            {
+                // Streaming world terrain distance
+                int terrainDistance = DaggerfallUnity.Settings.TerrainDistance;
+                // Reduce terrain distance by 1 if distant terrain enabled
+                terrainDistance = Mathf.Clamp(terrainDistance - 1, 1, 4);
+                GameManager.Instance.StreamingWorld.TerrainDistance = terrainDistance;
+
+                // reserve terrain objects for transition ring (2 x long sides (with 2 extra terrains for corner terrains) + 2 x normal sides)            
+                numberOfTerrainBlocksInTransitionRingArray = 2 * (streamingWorld.TerrainDistance * 2 + 1 + 2) + 2 * (streamingWorld.TerrainDistance * 2 + 1);
+                terrainTransitionRingArray = new TransitionTerrainDesc[numberOfTerrainBlocksInTransitionRingArray];
+                for (int i = 0; i < numberOfTerrainBlocksInTransitionRingArray; i++)
+                {
+                    terrainTransitionRingArray[i] = new TransitionTerrainDesc();
+                }
+            }
+
             if (enableImprovedTerrain)
             {
                 InitImprovedWorldTerrain();
             }
 
-            generateWorldTerrain();
+            GenerateWorldTerrain();
 
             GameObject goExterior = null;
 
@@ -532,15 +551,6 @@ namespace DistantTerrain
 
         void Start()
         {
-            if (enableTerrainTransition)
-            {
-                // Streaming world terrain distance
-                int terrainDistance = DaggerfallUnity.Settings.TerrainDistance;
-                // Reduce terrain distance by 1 if distant terrain enabled
-                terrainDistance = Mathf.Clamp(terrainDistance - 1, 1, 4);
-                GameManager.Instance.StreamingWorld.TerrainDistance = terrainDistance;
-            }
-
             if (enableImprovedTerrain)
             {
                 dfUnity.TerrainSampler = new ImprovedTerrainSampler();
@@ -573,14 +583,6 @@ namespace DistantTerrain
                     return;
 
                 SetupGameObjects(); // it should be possible to eliminated this line without any impact: please verify!
-            }
-
-            // reserve terrain objects for transition ring (2 x long sides (with 2 extra terrains for corner terrains) + 2 x normal sides)            
-            numberOfTerrainBlocksInTransitionRingArray = 2 * (streamingWorld.TerrainDistance * 2 + 1 + 2) + 2 * (streamingWorld.TerrainDistance * 2 + 1);            
-            terrainTransitionRingArray = new TransitionTerrainDesc[numberOfTerrainBlocksInTransitionRingArray];
-            for (int i = 0; i < numberOfTerrainBlocksInTransitionRingArray; i++)
-            {
-                terrainTransitionRingArray[i] = new TransitionTerrainDesc();
             }
         }
 
@@ -618,7 +620,7 @@ namespace DistantTerrain
         {
             SetUpCameras();
 
-            updateSeaReflectionTextureReference();
+            UpdateSeaReflectionTextureReference();
         }
 
         void SetupGameObjects()
@@ -829,7 +831,7 @@ namespace DistantTerrain
 
                     if (terrainTransitionRingUpdateSeasonalTextures)
                     {
-                        updateSeasonalTexturesTerrainTransitionRing();
+                        UpdateSeasonalTexturesTerrainTransitionRing();
                     }
                     if (terrainTransitionRingUpdateMaterialProperties)
                     {
@@ -860,7 +862,7 @@ namespace DistantTerrain
                 terrain.materialTemplate.SetInt("_PlayerPosY", this.playerGPS.CurrentMapPixel.Y);
 
                 Vector3 offset = new Vector3(0.0f, 0.0f, 0.0f);
-                updatePositionWorldTerrain(ref worldTerrainGameObject, offset);
+                UpdatePositionWorldTerrain(ref worldTerrainGameObject, offset);
 
                 bool doSeasonalTexturesUpdate = shouldUpdateSeasonalTextures();
 
@@ -880,7 +882,7 @@ namespace DistantTerrain
                     terrainTransitionRingUpdateSeasonalTextures = true;
                 }
 
-                updateSeaReflectionTextureReference();
+                UpdateSeaReflectionTextureReference();
 
                 Resources.UnloadUnusedAssets();
 
@@ -965,7 +967,7 @@ namespace DistantTerrain
             }
         }
 
-        private void updatePositionWorldTerrain(ref GameObject terrainGameObject, Vector3 offset)
+        private void UpdatePositionWorldTerrain(ref GameObject terrainGameObject, Vector3 offset)
         {
             // world scale computed as in StreamingWorld.cs and DaggerfallTerrain.cs scripts
             float scale = MapsFile.WorldMapTerrainDim * MeshReader.GlobalScale;
@@ -1042,13 +1044,13 @@ namespace DistantTerrain
                 }
             }
 
-            updateSeaReflectionTextureReference();
+            UpdateSeaReflectionTextureReference();
 
             //MapPixelX = playerGPS.CurrentMapPixel.X;
             //MapPixelY = playerGPS.CurrentMapPixel.Y;
         }
 
-        private void generateWorldTerrain()
+        private void GenerateWorldTerrain()
         {
             // Create Unity Terrain game object
             GameObject terrainGameObject = Terrain.CreateTerrainGameObject(null);
@@ -1128,7 +1130,7 @@ namespace DistantTerrain
 
             // update world terrain position - do this before terrainGameObject.transform invocation, so that object2world matrix is updated with correct values
             Vector3 offset = new Vector3(0.0f, 0.0f, 0.0f);
-            updatePositionWorldTerrain(ref terrainGameObject, offset);
+            UpdatePositionWorldTerrain(ref terrainGameObject, offset);
 
             textureAtlasDesertSummer = dfUnity.MaterialReader.TextureReader.GetTerrainTilesetTexture(2).albedoMap;
             textureAtlasDesertSummer.filterMode = FilterMode.Point;
@@ -1206,7 +1208,7 @@ namespace DistantTerrain
             if ((isActiveReflectionsMod) && (enableSeaReflections))
             {
 
-                updateSeaReflectionTextureReference();
+                UpdateSeaReflectionTextureReference();
 
                 if (reflectionSeaTexture != null)
                 {
@@ -1225,7 +1227,7 @@ namespace DistantTerrain
             worldTerrainGameObject = terrainGameObject;
         }
 
-        private void updateSeasonalTexturesTerrainTransitionRingBlock(int i)
+        private void UpdateSeasonalTexturesTerrainTransitionRingBlock(int i)
         {
             if (terrainTransitionRingArray[i].terrainDesc.terrainObject)
             {
@@ -1242,7 +1244,7 @@ namespace DistantTerrain
             }
         }
 
-        private void updateSeasonalTexturesTerrainTransitionRing()
+        private void UpdateSeasonalTexturesTerrainTransitionRing()
         {
             if (terrainTransitionRingUpdateSeasonalTextures)
             {
@@ -1250,7 +1252,7 @@ namespace DistantTerrain
                     return;
                 for (int i = 0; i < terrainTransitionRingArray.Length; i++)
                 {
-                    updateSeasonalTexturesTerrainTransitionRingBlock(i);
+                    UpdateSeasonalTexturesTerrainTransitionRingBlock(i);
                 }
                 terrainTransitionRingUpdateSeasonalTextures = false;
             }
@@ -1332,7 +1334,7 @@ namespace DistantTerrain
 
                 if ((isActiveReflectionsMod) && (enableSeaReflections))
                 {
-                    updateSeaReflectionTextureReference();
+                    UpdateSeaReflectionTextureReference();
 
                     if (reflectionSeaTexture != null)
                     {
@@ -1519,7 +1521,7 @@ namespace DistantTerrain
 
             if ((isActiveReflectionsMod) && (enableSeaReflections))
             {
-                updateSeaReflectionTextureReference();
+                UpdateSeaReflectionTextureReference();
 
                 if (reflectionSeaTexture != null)
                 {
@@ -1590,7 +1592,7 @@ namespace DistantTerrain
             int xdif = mapPixelX - streamingWorld.LocalPlayerGPS.CurrentMapPixel.X;
             int ydif = mapPixelY - streamingWorld.LocalPlayerGPS.CurrentMapPixel.Y;
             //Debug.Log(String.Format("world-compensation: x:{0}, y: {1}, z: {2}", streamingWorld.WorldCompensation.x, streamingWorld.WorldCompensation.y, streamingWorld.WorldCompensation.z));
-            Vector3 localPosition = new Vector3(xdif * scale, 0, -ydif * scale); // +streamingWorld.WorldCompensation;
+            Vector3 localPosition = new Vector3(xdif * scale, 0, -ydif * scale); // + streamingWorld.WorldCompensation;
             terrainTransitionRingArray[terrainIndex].terrainDesc.terrainObject.transform.localPosition = localPosition;
             
             // if block was not reused - it does not exist - so create unity terrain object - otherwise position update will be enough
@@ -1604,6 +1606,11 @@ namespace DistantTerrain
                 terrainTransitionRingArray[terrainIndex].terrainDesc.terrainObject.SetActive(true);
                 terrainTransitionRingArray[terrainIndex].terrainDesc.billboardBatchObject.SetActive(true);
             }
+        }
+
+        private void UpdateTransitionRingPosition(Vector3 offset)
+        {
+            gameobjectTerrainTransitionRing.transform.localPosition += new Vector3(0.0f, offset.y, 0.0f);
         }
 
         private TransitionRingBorderDesc getTransitionRingBorderDesc(int x, int y, int distanceTransitionRingFromCenterX, int distanceTransitionRingFromCenterY)
@@ -1704,7 +1711,6 @@ namespace DistantTerrain
             {
                 if (terrainTransitionRingArray[i].terrainDesc.active)
                 {
-
                     if (terrainTransitionRingArray[i].terrainDesc.updateData)
                     {
                         PlaceTerrainOfTransitionRing(i);
