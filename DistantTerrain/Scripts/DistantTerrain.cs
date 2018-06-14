@@ -16,6 +16,7 @@ using DaggerfallConnect.Utility;
 using DaggerfallWorkshop;
 using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Utility;
+using DaggerfallWorkshop.Game.Serialization;
 using DaggerfallWorkshop.Game.Utility.ModSupport;
 
 namespace DistantTerrain
@@ -117,6 +118,7 @@ namespace DistantTerrain
 
         bool isActiveReflectionsMod = false;
         bool isActiveEnhancedSkyMod = false;
+        bool isActiveMountainsAndHillsMod = false;
 
         bool justToggledEnhancedSky = false;
 
@@ -352,6 +354,7 @@ namespace DistantTerrain
             PlayerEnterExit.OnTransitionExterior += TransitionToExterior;
             PlayerEnterExit.OnTransitionDungeonExterior += TransitionToExterior;
 
+            SaveLoadManager.OnLoad += OnLoadEvent;
         }
 
         void OnDisable()
@@ -365,6 +368,7 @@ namespace DistantTerrain
             PlayerEnterExit.OnTransitionExterior -= TransitionToExterior;
             PlayerEnterExit.OnTransitionDungeonExterior -= TransitionToExterior;
 
+            SaveLoadManager.OnLoad -= OnLoadEvent;
         }
 
         public void EnhancedSkyToggle(bool toggle)
@@ -541,22 +545,19 @@ namespace DistantTerrain
 
             terrainMaterial.mainTexture = textureTerrainInfoTileMap;
 
-            generateTerrainTransitionRing();
+            if (enableTerrainTransition)
+            {
+                GenerateTerrainTransitionRing();
+            }
         }
 
         void Start()
         {
-            if (enableImprovedTerrain)
-            {
-                dfUnity.TerrainSampler = new ImprovedTerrainSampler();
-            }
-
-            //if (GameObject.Find("EnhancedSkyController") != null)
             ModInfo[] modInfos = ModManager.Instance.GetAllModInfo();
 
             foreach (ModInfo modInfo in modInfos)
             {
-                if (modInfo.ModTitle == "Realtime Reflections" && ModManager.Instance.GetMod(modInfo.ModTitle).Enabled)
+                if ((modInfo.ModTitle == "Realtime Reflections" && ModManager.Instance.GetMod(modInfo.ModTitle).Enabled) || (GameObject.Find("RealtimeReflections") != null)) // or right hand side is for detecting debug_ prefab when debugging
                 {
                     isActiveReflectionsMod = true;
                 }
@@ -564,6 +565,18 @@ namespace DistantTerrain
                 {
                     isActiveEnhancedSkyMod = true;
                 }
+                if (modInfo.ModTitle == "Mountains And Hills" && ModManager.Instance.GetMod(modInfo.ModTitle).Enabled)
+                {
+                    isActiveMountainsAndHillsMod = true;
+                }
+            }
+
+            if (isActiveMountainsAndHillsMod)
+                enableImprovedTerrain = false;
+
+            if (enableImprovedTerrain)
+            {
+                dfUnity.TerrainSampler = new ImprovedTerrainSampler();
             }
 
             SetUpCameras();
@@ -615,6 +628,11 @@ namespace DistantTerrain
             SetUpCameras();
 
             UpdateSeaReflectionTextureReference();
+        }
+
+        void OnLoadEvent(SaveData_v1 saveData)
+        {
+            SetUpCameras();
         }
 
         void SetupGameObjects()
@@ -805,7 +823,7 @@ namespace DistantTerrain
                     if (!terrainTransitionRingUpdateRunning) // if at the moment no terrain transition ring update is still in progress
                     {
                         // update terrain transition ring in this Update() iteration if no terrain transition ring update is still in progress - otherwise postprone
-                        generateTerrainTransitionRing(); // update
+                        GenerateTerrainTransitionRing(); // update
                         updateTerrainTransitionRing = false; // mark as updated
                     }
                 }
@@ -1067,19 +1085,38 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < worldMapWidth; x++)
                 {
-                    // get height data for this map pixel from world map and scale it to approximately match StreamingWorld's terrain heights
-                    float sampleHeight = Convert.ToSingle(dfUnity.ContentReader.WoodsFileReader.GetHeightMapValue(x, y));
-
-                    sampleHeight *= (ImprovedWorldTerrain.computeHeightMultiplier(x, y) * ImprovedTerrainSampler.baseHeightScale + ImprovedTerrainSampler.noiseMapScale);
-                    
-                    // make ocean elevation the lower limit
-                    if (sampleHeight < ImprovedTerrainSampler.scaledOceanElevation)
+                    if (enableImprovedTerrain)
                     {
-                        sampleHeight = ImprovedTerrainSampler.scaledOceanElevation;
-                    }
+                        // get height data for this map pixel from world map and scale it to approximately match StreamingWorld's terrain heights
+                        float sampleHeight = Convert.ToSingle(dfUnity.ContentReader.WoodsFileReader.GetHeightMapValue(x, y));
 
-                    // normalize with TerrainHelper.maxTerrainHeight
-                    worldHeights[worldMapHeight - 1 - y, x] = Mathf.Clamp01(sampleHeight / ImprovedTerrainSampler.maxTerrainHeight);
+                        sampleHeight *= (ImprovedWorldTerrain.computeHeightMultiplier(x, y) * ImprovedTerrainSampler.baseHeightScale + ImprovedTerrainSampler.noiseMapScale);
+
+                        // make ocean elevation the lower limit
+                        if (sampleHeight < ImprovedTerrainSampler.scaledOceanElevation)
+                        {
+                            sampleHeight = ImprovedTerrainSampler.scaledOceanElevation;
+                        }
+
+                        // normalize with TerrainHelper.maxTerrainHeight
+                        worldHeights[worldMapHeight - 1 - y, x] = Mathf.Clamp01(sampleHeight / ImprovedTerrainSampler.maxTerrainHeight);
+                    }
+                    else
+                    {
+                        // get height data for this map pixel from world map and scale it to approximately match StreamingWorld's terrain heights
+                        float sampleHeight = Convert.ToSingle(dfUnity.ContentReader.WoodsFileReader.GetHeightMapValue(x, y));
+
+                        sampleHeight *= (8.0f + 4.0f);
+
+                        // make ocean elevation the lower limit
+                        if (sampleHeight < dfUnity.TerrainSampler.OceanElevation)
+                        {
+                            sampleHeight = dfUnity.TerrainSampler.OceanElevation;
+                        }
+
+                        // normalize with TerrainHelper.maxTerrainHeight
+                        worldHeights[worldMapHeight - 1 - y, x] = Mathf.Clamp01(sampleHeight / dfUnity.TerrainSampler.MaxTerrainHeight);
+                    }
                 }
             }
 
@@ -1102,7 +1139,7 @@ namespace DistantTerrain
                 float terrainSize = ((MapsFile.WorldMapTerrainDim * MeshReader.GlobalScale) * (heightmapResolution - 1.0f));
 
 
-                terrainData.size = new Vector3(terrainSize, ImprovedTerrainSampler.maxTerrainHeight, terrainSize);
+                terrainData.size = new Vector3(terrainSize, dfUnity.TerrainSampler.MaxTerrainHeight, terrainSize);
 
                 //terrainData.size = new Vector3(terrainSize, TerrainHelper.maxTerrainHeight * TerrainScale * worldMapResolution, terrainSize);
                 terrainData.SetDetailResolution(worldMapResolution, 16);
@@ -1119,7 +1156,7 @@ namespace DistantTerrain
 
             // Promote heights
             Vector3 size = terrain.terrainData.size;
-            terrain.terrainData.size = new Vector3(size.x, ImprovedTerrainSampler.maxTerrainHeight * streamingWorld.TerrainScale, size.z);
+            terrain.terrainData.size = new Vector3(size.x, dfUnity.TerrainSampler.MaxTerrainHeight * streamingWorld.TerrainScale, size.z);
             terrain.terrainData.SetHeights(0, 0, worldHeights);
 
 
@@ -1186,7 +1223,7 @@ namespace DistantTerrain
                 terrainMaterial.SetInt("_TerrainDistance", streamingWorld.TerrainDistance-1); // compensate for terrain transition ring being not present
             }
 
-            Vector3 vecWaterHeight = new Vector3(0.0f, (ImprovedTerrainSampler.scaledOceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
+            Vector3 vecWaterHeight = new Vector3(0.0f, (dfUnity.TerrainSampler.OceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
             Vector3 vecWaterHeightTransformed = terrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
             terrainMaterial.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraTranslationY);
 
@@ -1542,7 +1579,7 @@ namespace DistantTerrain
             terrainDesc.terrainObject.name = streamingWorld.GetTerrainName(dfTerrain.MapPixelX, dfTerrain.MapPixelY);
         }
 
-        private bool CreateTerrain(int mapPixelX, int mapPixelY, int indexTerrain)
+        private bool CreateTerrainTransitionRing(int mapPixelX, int mapPixelY, int indexTerrain)
         {
             // Do nothing if out of range
             if (mapPixelX < MapsFile.MinMapPixelX || mapPixelX >= MapsFile.MaxMapPixelX ||
@@ -1748,7 +1785,7 @@ namespace DistantTerrain
             transitionRingAllBlocksReady = true;
         }
 
-        private void generateTerrainTransitionRing()
+        private void GenerateTerrainTransitionRing()
         {
             if (!enableTerrainTransition)
                 return;
@@ -1758,7 +1795,7 @@ namespace DistantTerrain
                 gameobjectTerrainTransitionRing = new GameObject("TerrainTransitionRing");
                 gameobjectTerrainTransitionRing.transform.SetParent(GameManager.Instance.ExteriorParent.transform);
             }
-            //// this is not perfect I know - but since events can get in asynchronous and may trigger an update and thus an invocation to generateTerrainTransitionRing() it is important that no update is currently performed
+            //// this is not perfect I know - but since events can get in asynchronous and may trigger an update and thus an invocation to GenerateTerrainTransitionRing() it is important that no update is currently performed
             //while (transitionRingAllBlocksReady == true)
             //{
 
@@ -1855,11 +1892,11 @@ namespace DistantTerrain
                             terrainIndex++;
                             if (terrainIndex >= terrainTransitionRingArray.Length)
                             {
-                                throw new Exception("generateTerrainTransitionRing: Could not find free terrain block. This should not happen!");
+                                throw new Exception("GenerateTerrainTransitionRing: Could not find free terrain block. This should not happen!");
                             }
                         }
 
-                        bool successCreate = CreateTerrain(mapPixelX, mapPixelY, terrainIndex);
+                        bool successCreate = CreateTerrainTransitionRing(mapPixelX, mapPixelY, terrainIndex);
                         if (successCreate)
                         {
                             terrainTransitionRingArray[terrainIndex].transitionRingBorderDesc = getTransitionRingBorderDesc(x, y, distanceTransitionRingFromCenterX, distanceTransitionRingFromCenterY);
