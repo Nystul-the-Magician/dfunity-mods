@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 //RealtimeReflections for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
@@ -76,7 +78,7 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
             v2f o;
 			//UNITY_INITIALIZE_OUTPUT(v2f, o);
 
-            o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+            o.pos = UnityObjectToClipPos(v.vertex);
             o.uv = v.texcoord.xy;
             o.uv2 = v.texcoord.xy;
 						

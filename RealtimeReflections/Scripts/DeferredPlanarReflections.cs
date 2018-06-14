@@ -234,7 +234,7 @@ namespace RealtimeReflections
                     ((1.0f - P[2]) / P[0]),
                     ((1.0f + P[6]) / P[5]));
 
-            RenderTextureFormat intermediateFormat = camera_.hdr ? RenderTextureFormat.ARGBHalf : RenderTextureFormat.ARGB32;
+            RenderTextureFormat intermediateFormat = camera_.allowHDR ? RenderTextureFormat.ARGBHalf : RenderTextureFormat.ARGB32;
      
             Matrix4x4 cameraToWorldMatrix = GetComponent<Camera>().worldToCameraMatrix.inverse;
             material.SetVector("_ProjInfo", projInfo); // used for unprojection
