@@ -857,6 +857,7 @@ namespace DistantTerrain
 
                 Vector3 offset = new Vector3(0.0f, 0.0f, 0.0f);
                 UpdatePositionWorldTerrain(ref worldTerrainGameObject, offset);
+                UpdateTransitionRingPosition(offset);
 
                 bool doSeasonalTexturesUpdate = shouldUpdateSeasonalTextures();
 
@@ -1604,7 +1605,7 @@ namespace DistantTerrain
 
         private void UpdateTransitionRingPosition(Vector3 offset)
         {
-            gameobjectTerrainTransitionRing.transform.localPosition += new Vector3(0.0f, offset.y, 0.0f);
+            gameobjectTerrainTransitionRing.transform.localPosition = new Vector3(gameobjectTerrainTransitionRing.transform.localPosition.x, extraTranslationY + streamingWorld.WorldCompensation.y, gameobjectTerrainTransitionRing.transform.localPosition.z);
         }
 
         private TransitionRingBorderDesc getTransitionRingBorderDesc(int x, int y, int distanceTransitionRingFromCenterX, int distanceTransitionRingFromCenterY)
