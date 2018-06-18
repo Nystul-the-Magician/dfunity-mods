@@ -276,12 +276,6 @@ namespace DistantTerrain
         {
             dfUnity = DaggerfallUnity.Instance;
 
-            //ImprovedTerrainSampler improvedTerrainSampler = DaggerfallUnity.Instance.TerrainSampler as ImprovedTerrainSampler;
-            //if (improvedTerrainSampler == null)
-            //{
-            //    DaggerfallUnity.LogMessage("DistantTerrain: TerrainSampler instance is not of type ImprovedTerrainSampler (use ITerrainSampler terrainSampler = new ImprovedTerrainSampler() in DaggerfallUnity.cs)", true);
-            //}
-
             if (!streamingWorld)
                 streamingWorld = GameObject.Find("StreamingWorld").GetComponent<StreamingWorld>();
             if (!streamingWorld)
@@ -1085,38 +1079,19 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < worldMapWidth; x++)
                 {
-                    if (enableImprovedTerrain)
+                    // get height data for this map pixel from world map and scale it to approximately match StreamingWorld's terrain heights
+                    float sampleHeight = Convert.ToSingle(dfUnity.ContentReader.WoodsFileReader.GetHeightMapValue(x, y));
+
+                    sampleHeight *= dfUnity.TerrainSampler.TerrainHeightScale(x,y);
+
+                    // make ocean elevation the lower limit
+                    if (sampleHeight < dfUnity.TerrainSampler.OceanElevation)
                     {
-                        // get height data for this map pixel from world map and scale it to approximately match StreamingWorld's terrain heights
-                        float sampleHeight = Convert.ToSingle(dfUnity.ContentReader.WoodsFileReader.GetHeightMapValue(x, y));
-
-                        sampleHeight *= (ImprovedWorldTerrain.computeHeightMultiplier(x, y) * ImprovedTerrainSampler.baseHeightScale + ImprovedTerrainSampler.noiseMapScale);
-
-                        // make ocean elevation the lower limit
-                        if (sampleHeight < ImprovedTerrainSampler.scaledOceanElevation)
-                        {
-                            sampleHeight = ImprovedTerrainSampler.scaledOceanElevation;
-                        }
-
-                        // normalize with TerrainHelper.maxTerrainHeight
-                        worldHeights[worldMapHeight - 1 - y, x] = Mathf.Clamp01(sampleHeight / ImprovedTerrainSampler.maxTerrainHeight);
+                        sampleHeight = dfUnity.TerrainSampler.OceanElevation;
                     }
-                    else
-                    {
-                        // get height data for this map pixel from world map and scale it to approximately match StreamingWorld's terrain heights
-                        float sampleHeight = Convert.ToSingle(dfUnity.ContentReader.WoodsFileReader.GetHeightMapValue(x, y));
 
-                        sampleHeight *= (8.0f + 4.0f);
-
-                        // make ocean elevation the lower limit
-                        if (sampleHeight < dfUnity.TerrainSampler.OceanElevation)
-                        {
-                            sampleHeight = dfUnity.TerrainSampler.OceanElevation;
-                        }
-
-                        // normalize with TerrainHelper.maxTerrainHeight
-                        worldHeights[worldMapHeight - 1 - y, x] = Mathf.Clamp01(sampleHeight / dfUnity.TerrainSampler.MaxTerrainHeight);
-                    }
+                    // normalize with TerrainHelper.maxTerrainHeight
+                    worldHeights[worldMapHeight - 1 - y, x] = Mathf.Clamp01(sampleHeight / dfUnity.TerrainSampler.MaxTerrainHeight);
                 }
             }
 
@@ -1348,7 +1323,7 @@ namespace DistantTerrain
 
                 mat.SetInt("_TerrainDistance", oldMaterial.GetInt("_TerrainDistance")); // - 1); // -1... allow the outer ring of of detailed terrain to intersect with far terrain (to prevent some holes)
 
-                Vector3 vecWaterHeight = new Vector3(0.0f, (ImprovedTerrainSampler.scaledOceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
+                Vector3 vecWaterHeight = new Vector3(0.0f, (dfUnity.TerrainSampler.OceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
                 Vector3 vecWaterHeightTransformed = worldTerrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
                 mat.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraTranslationY);
 
@@ -1526,7 +1501,7 @@ namespace DistantTerrain
 
             newMaterial.SetInt("_TerrainDistance", streamingWorld.TerrainDistance); // - 1); // -1... allow the outer ring of of detailed terrain to intersect with far terrain (to prevent some holes)
 
-            Vector3 vecWaterHeight = new Vector3(0.0f, (ImprovedTerrainSampler.scaledOceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
+            Vector3 vecWaterHeight = new Vector3(0.0f, (dfUnity.TerrainSampler.OceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
             Vector3 vecWaterHeightTransformed = worldTerrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
             newMaterial.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraTranslationY);
 

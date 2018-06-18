@@ -44,6 +44,11 @@ namespace DistantTerrain
             BeachElevation = scaledBeachElevation;
         }
 
+        public override float TerrainHeightScale(int x, int y)
+        {
+            return ImprovedWorldTerrain.computeHeightMultiplier(x, y) * ImprovedTerrainSampler.baseHeightScale + ImprovedTerrainSampler.noiseMapScale;
+        }        
+
         public override void GenerateSamples(ref MapPixelData mapPixel)
         {
             DaggerfallUnity dfUnity = DaggerfallUnity.Instance;
