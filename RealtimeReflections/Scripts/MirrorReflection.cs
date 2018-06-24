@@ -20,8 +20,9 @@ namespace RealtimeReflections
         public float m_ClipPlaneOffset = 0.05f; //0.0f; //0.07f;
  
 	    public LayerMask m_ReflectLayers = -1;
- 
-	    private Hashtable m_ReflectionCameras = new Hashtable(); // Camera -> Camera table
+        //public float[] layerCullDistances = new float[32];
+
+        private Hashtable m_ReflectionCameras = new Hashtable(); // Camera -> Camera table
  
 	    public RenderTexture m_ReflectionTexture = null;
 	    private int m_OldReflectionTextureWidth = 0;
@@ -117,7 +118,8 @@ namespace RealtimeReflections
 		    //Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
 		    //reflectionCamera.projectionMatrix = projection; // do not set oblique projection matrix since it will fuck up fog in reflections - disabling this step seems to do not any harm ;)
 
-            reflectionCamera.cullingMask = ~(1 << 4) & LayerMask.NameToLayer("Everything"); //m_ReflectLayers.value; // never render water layer
+            reflectionCamera.cullingMask = ~(1 << 4) & m_ReflectLayers.value; //LayerMask.NameToLayer("Everything"); //m_ReflectLayers.value; // never render water layer
+            //reflectionCamera.layerCullDistances = layerCullDistances;
 		    reflectionCamera.targetTexture = m_ReflectionTexture;
 
             UnityEngine.Rendering.ShadowCastingMode oldShadowCastingMode = rend.shadowCastingMode;

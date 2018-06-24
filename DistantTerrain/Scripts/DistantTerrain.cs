@@ -555,7 +555,7 @@ namespace DistantTerrain
                 {
                     isActiveReflectionsMod = true;
                 }
-                if (modInfo.ModTitle == "Enhanced Sky" && ModManager.Instance.GetMod(modInfo.ModTitle).Enabled)
+                if ((modInfo.ModTitle == "Enhanced Sky" && ModManager.Instance.GetMod(modInfo.ModTitle).Enabled)  || (GameObject.Find("EnhancedSkyController") != null)) // or right hand side is for detecting debug_ prefab when debugging
                 {
                     isActiveEnhancedSkyMod = true;
                 }

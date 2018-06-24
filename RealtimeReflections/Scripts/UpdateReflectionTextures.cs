@@ -435,11 +435,21 @@ namespace RealtimeReflections
             {
                 mirrorRefl.m_ReflectLayers.value = (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("WorldTerrain"));
                 mirrorReflSeaLevel.m_ReflectLayers = (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("WorldTerrain"));
+
+                //mirrorRefl.layerCullDistances[LayerMask.NameToLayer("Default")] = 15000;
+                //mirrorRefl.layerCullDistances[LayerMask.NameToLayer("WorldTerrain")] = 200000;
+
+                //mirrorReflSeaLevel.layerCullDistances[LayerMask.NameToLayer("Default")] = 0;
+                //mirrorReflSeaLevel.layerCullDistances[LayerMask.NameToLayer("WorldTerrain")] = 200000;
+
             }
             else
             {
                 mirrorRefl.m_ReflectLayers.value = 1 << LayerMask.NameToLayer("Default");
                 mirrorReflSeaLevel.m_ReflectLayers = 1 << LayerMask.NameToLayer("Default");
+
+                //mirrorRefl.layerCullDistances[LayerMask.NameToLayer("Default")] = 15000;
+                //mirrorReflSeaLevel.layerCullDistances[LayerMask.NameToLayer("Default")] = 0;
             }
 
             useDeferredReflections = (GameManager.Instance.MainCamera.renderingPath == RenderingPath.DeferredShading);
