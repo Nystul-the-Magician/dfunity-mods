@@ -118,7 +118,7 @@ namespace RealtimeReflections
 		    //Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
 		    //reflectionCamera.projectionMatrix = projection; // do not set oblique projection matrix since it will fuck up fog in reflections - disabling this step seems to do not any harm ;)
 
-            reflectionCamera.cullingMask = ~(1 << 4) & m_ReflectLayers.value; //LayerMask.NameToLayer("Everything"); //m_ReflectLayers.value; // never render water layer
+            reflectionCamera.cullingMask = ~(1 << 4) & LayerMask.NameToLayer("Everything"); //m_ReflectLayers.value; // never render water layer
             //reflectionCamera.layerCullDistances = layerCullDistances;
 		    reflectionCamera.targetTexture = m_ReflectionTexture;
 
