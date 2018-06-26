@@ -14,7 +14,7 @@ using System;
 namespace EnhancedSky
 {
     public class MoonController : MonoBehaviour
-    {
+    {      
         public GameObject masser;
         public GameObject secunda;
         public GameObject masserStarMask;
@@ -39,17 +39,38 @@ namespace EnhancedSky
         DaggerfallUnity DfUnity     { get { return DaggerfallUnity.Instance ;} }
         SkyManager SkyMan           { get { return SkyManager.instance; } }
 
-     
-        public enum MoonPhases
+        public struct MoonPhases
         {
-            New,
-            OneWax,
-            HalfWax,
-            ThreeWax,
-            Full,
-            ThreeWane,
-            HalfWane,
-            OneWane,
+            public const int
+
+                New = 0,
+                OneWax = 1,
+                HalfWax = 2,
+                ThreeWax = 3,
+                Full = 4,
+                ThreeWane = 5,
+                HalfWane = 6,
+                OneWane = 7;
+        }
+
+        public struct MoonPhase
+        {
+            private int value;
+
+            private MoonPhase(int value)
+            {
+                this.value = value;
+            }
+
+            public static implicit operator MoonPhase(int value)
+            {
+                return new MoonPhase(value);
+            }
+
+            public static implicit operator int(MoonPhase record)
+            {
+                return record.value;
+            }
         }
 
         List<string> masserTextureLookup = new List<string>()
@@ -77,10 +98,9 @@ namespace EnhancedSky
             "secunda_one_wan",
         };
 
-        public MoonPhases MasserPhase = MoonPhases.Full;
-        public MoonPhases SecundaPhase = MoonPhases.Full;
-
-
+        public MoonPhase MasserPhase = MoonPhases.Full;
+        public MoonPhase SecundaPhase = MoonPhases.Full;
+        
         void OnDisable()
         {
             StopAllCoroutines();
@@ -156,13 +176,11 @@ namespace EnhancedSky
         }
 
         
-        public void SetPhase(MoonPhases masserPhase, MoonPhases secundaPhase)
+        public void SetPhase(MoonPhase masserPhase, MoonPhase secundaPhase)
         {
-            if (Enum.IsDefined(typeof(MoonPhases), masserPhase))
-                this.MasserPhase = masserPhase;
+            this.MasserPhase = masserPhase;
 
-            if (Enum.IsDefined(typeof(MoonPhases), secundaPhase))
-                this.SecundaPhase = secundaPhase;
+            this.SecundaPhase = secundaPhase;
 
             if(MasserPhase != MoonPhases.New)
             {
@@ -196,7 +214,7 @@ namespace EnhancedSky
         /// <summary>
         /// Looks up file name for moon texture and returns texture
         /// </summary>
-        private Texture2D GetTexture(MoonPhases phase, List<string> textureLookup)
+        private Texture2D GetTexture(MoonPhase phase, List<string> textureLookup)
         {
             Texture2D moonText = null;
             if(textureLookup == null)
@@ -233,7 +251,7 @@ namespace EnhancedSky
         /// <summary>
         /// Finds the current phase for either Masser or Secunda, and sets the correct texture using GetTexture
         /// </summary>
-        private MoonPhases GetLunarPhase(ref MoonPhases moonPhase, int day, bool isMasser = true)
+        private MoonPhase GetLunarPhase(ref MoonPhase moonPhase, int day, bool isMasser = true)
         {
             List<string> textureLookup = null;
             Renderer moonRend;
@@ -258,7 +276,7 @@ namespace EnhancedSky
             }
 
             int moonRatio = day % 32;               //what moon phase the day falls in
-            MoonPhases tempPhase = MoonPhases.Full;
+            MoonPhase tempPhase = MoonPhases.Full;
 
             if (moonRatio == 0)//Full moon
             {
@@ -353,7 +371,7 @@ namespace EnhancedSky
                 GetRefrences();
 
             Vector3 scale = Vector3.zero;
-            if (SkyMan.SkyObjectSizeSetting == SkyObjectSize.Normal)
+            if (SkyMan.SkyObjectSizeSetting == SkyObjectSizes.Normal)
             {
                 scale = new Vector3(PresetContainer.MOONSCALENORMAL, PresetContainer.MOONSCALENORMAL, PresetContainer.MOONSCALENORMAL);
                 masser.transform.localScale = scale;
@@ -369,7 +387,7 @@ namespace EnhancedSky
 
 
         }
-
+        
     }
-
+    
 }

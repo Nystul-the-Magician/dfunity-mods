@@ -35,12 +35,35 @@ using DaggerfallConnect.Utility;
  * 
  * Tested w/ Daggerfall tools for Unity v. 1.4.45 (WIP)
  */
+
 namespace EnhancedSky
 {
-    public enum SkyObjectSize
+    public struct SkyObjectSize
     {
-        Normal,
-        Large,
+        private int value;
+
+        private SkyObjectSize(int value)
+        {
+            this.value = value;
+        }
+
+        public static implicit operator SkyObjectSize(int value)
+        {
+            return new SkyObjectSize(value);
+        }
+
+        public static implicit operator int(SkyObjectSize record)
+        {
+            return record.value;
+        }
+    }
+
+    public struct SkyObjectSizes
+    {
+        public const int
+
+            Normal = 0,
+            Large = 1;
     }
 
     public class SkyManager : MonoBehaviour
@@ -58,8 +81,10 @@ namespace EnhancedSky
         private Material _secundaMat;
         private Material _starsMat;
         private Material _skyObjMat;
-        private Shader _depthMaskShader;
-        private Shader _UnlitAlphaFadeShader;
+
+        private Shader _depthMaskShader = null;
+        private Shader _UnlitAlphaFadeShader = null;
+
         public int cloudQuality = 400;
         public int cloudSeed = -1;
         public bool EnhancedSkyCurrentToggle = false;
@@ -80,14 +105,26 @@ namespace EnhancedSky
         DaggerfallUnity DfUnity         { get { return DaggerfallUnity.Instance;} }
         DaggerfallDateTime TimeScript   { get { return DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime; } }
 
-        
-        public Material SkyObjMat       { get { return (_skyObjMat != null) ? _skyObjMat : Resources.Load("SkyObjMat") as Material; } private set {_skyObjMat = value ;} }
-        public Material SkyMat          { get { return (_skyMat) ? _skyMat : _skyMat = Resources.Load("Sky") as Material; } private set { _skyMat = value ;} }
-        public Material CloudMat        { get { return (_cloudMat) ? _cloudMat : _cloudMat = GetInstanceMaterial(); } private set { _cloudMat = value; } }
-        public Material MasserMat       { get { return (_masserMat) ? _masserMat : _masserMat = GetInstanceMaterial(); } private set { _masserMat = value; } }
-        public Material SecundaMat      { get { return (_secundaMat) ? _secundaMat : _secundaMat = GetInstanceMaterial(); } private set { _secundaMat = value; } }
-        public Material StarsMat        { get; private set; }
-        public Material StarMaskMat     { get; private set; }
+        public Shader DepthMaskShader
+        {
+            get { return _depthMaskShader; }
+            set { _depthMaskShader = value; }
+        }
+        public Shader UnlitAlphaFadeShader
+        {
+            get { return _UnlitAlphaFadeShader; }
+            set { _UnlitAlphaFadeShader = value; }
+        }
+
+        public Material SkyObjMat       { get { return (_skyObjMat != null) ? _skyObjMat : Resources.Load("SkyObjMat") as Material; } set {_skyObjMat = value ;} }
+        public Material SkyMat          { get { return (_skyMat) ? _skyMat : _skyMat = Resources.Load("Sky") as Material; } set { _skyMat = value ;} }
+        public Material CloudMat        { get { return (_cloudMat) ? _cloudMat : _cloudMat = GetInstanceMaterial(); } set { _cloudMat = value; } }
+        public Material MasserMat       { get { return (_masserMat) ? _masserMat : _masserMat = GetInstanceMaterial(); } set { _masserMat = value; } }
+        public Material SecundaMat      { get { return (_secundaMat) ? _secundaMat : _secundaMat = GetInstanceMaterial(); } set { _secundaMat = value; } }
+        public Material StarsMat        { get; set; }
+        public Material StarMaskMat     { get; set; }
+
+        public GameObject ContainerPrefab { get { return (_containerPrefab); } set { _containerPrefab = value; } }
 
         public SkyObjectSize SkyObjectSizeSetting { get; set; }
         public CloudGenerator CloudGen  { get { return (_cloudGen != null) ? _cloudGen : _cloudGen = this.GetComponent<CloudGenerator>(); } }
@@ -249,7 +286,7 @@ namespace EnhancedSky
           
             GetRefrences();
             //Register Console Commands
-            EnhancedSkyConsoleCommands.RegisterCommands();
+            //EnhancedSkyConsoleCommands.RegisterCommands();
 
             
             //if (DaggerfallUnity.Instance.IsReady)
@@ -300,24 +337,11 @@ namespace EnhancedSky
         {
             try
             {
-                if (!_depthMaskShader)
-                    _depthMaskShader = Resources.Load("DepthMask") as Shader;
-                if (!_UnlitAlphaFadeShader)
-                    _UnlitAlphaFadeShader = Resources.Load("UnlitAlphaWithFade") as Shader;
-                if (!StarMaskMat)
-                    StarMaskMat = new Material(_depthMaskShader);
-                if (!_skyObjMat)
-                    _skyObjMat = new Material(_UnlitAlphaFadeShader);
-                if (!StarsMat)
-                    StarsMat = Instantiate(Resources.Load("Stars")) as Material;
-                if (!SkyMat)
-                    SkyMat = Instantiate(Resources.Load("Sky")) as Material;
                 if (!_cloudGen)
                     _cloudGen = this.GetComponent<CloudGenerator>();
-                if(!_cloudGen)
+                if (!_cloudGen)
                     _cloudGen = gameObject.AddComponent<CloudGenerator>();
-                if (!_containerPrefab)
-                    _containerPrefab = Resources.Load("EnhancedSkyContainer", typeof(GameObject)) as GameObject;
+
                 if (!dfallSky)
                     dfallSky = GameManager.Instance.SkyRig.gameObject;
                 if (!playerEE)
@@ -326,8 +350,6 @@ namespace EnhancedSky
                     exteriorParent = GameManager.Instance.ExteriorParent;
                 if (!weatherMan)
                     weatherMan = GameManager.Instance.WeatherManager;
-
-
             }
             catch
             {
@@ -391,7 +413,7 @@ namespace EnhancedSky
                 return;
             }
 
-            if(size == SkyObjectSize.Normal)
+            if(size == SkyObjectSizes.Normal)
                 SkyMat.SetFloat("_SunSize", PresetContainer.SUNSIZENORMAL);
             else
                 SkyMat.SetFloat("_SunSize", PresetContainer.SUNSIZELARGE);

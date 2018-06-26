@@ -123,7 +123,7 @@ namespace EnhancedSky
                     Debug.Log("ESKY: Ambient Controller couldnt find Sun Flare");
                     return;
                 }
-                if (SkyMan.SkyObjectSizeSetting == SkyObjectSize.Normal)
+                if (SkyMan.SkyObjectSizeSetting == SkyObjectSizes.Normal)
                     SunFlare.brightness = PresetContainer.SUNFLARESIZENORMAL;
                 else
                     SunFlare.brightness = PresetContainer.SUNFLARESIZELARGE;

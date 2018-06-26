@@ -7,7 +7,7 @@ namespace EnhancedSky
     [CustomEditor(typeof(SkyManager))]
     public class SkyManagerEditor : Editor
     {
-        SkyObjectSize skyObjectSizeSelected = SkyObjectSize.Normal;
+        SkyObjectSize skyObjectSizeSelected = SkyObjectSizes.Normal;
         
         public override void OnInspectorGUI()
         {
@@ -59,10 +59,7 @@ namespace EnhancedSky
 
 
                     Debug.Log("Is Overcast: " + skyMan.weatherMan.IsOvercast);
-                }
-                    
-
-                skyObjectSizeSelected = (SkyObjectSize)EditorGUILayout.EnumPopup("Sky Object Size", skyObjectSizeSelected);
+                }                   
 
                 if (GUILayout.Button("Update Setting"))
                 {

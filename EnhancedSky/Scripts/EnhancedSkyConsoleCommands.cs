@@ -8,7 +8,7 @@ namespace EnhancedSky
 {
     public static class EnhancedSkyConsoleCommands
     {
-        
+        /*
         public static void RegisterCommands()
         {
             try
@@ -270,10 +270,10 @@ namespace EnhancedSky
                    return Wenzil.Console.Commands.HelpCommand.Execute(SetMoonPhases.name);
 
                }
-               else if(!Enum.IsDefined(typeof(MoonController.MoonPhases), masserPhase) || !Enum.IsDefined(typeof(MoonController.MoonPhases), secundaPhase))
-               {
-                   return Wenzil.Console.Commands.HelpCommand.Execute(SetMoonPhases.name);
-               }
+               //else if(!Enum.IsDefined(typeof(MoonController.MoonPhases), masserPhase) || !Enum.IsDefined(typeof(MoonController.MoonPhases), secundaPhase))
+               //{
+               //    return Wenzil.Console.Commands.HelpCommand.Execute(SetMoonPhases.name);
+               //}
                else
                {
                    moon.SetPhase((MoonController.MoonPhases)masserPhase, (MoonController.MoonPhases)secundaPhase);
@@ -288,7 +288,7 @@ namespace EnhancedSky
 
 
        }
-        
+        */
 
        
     }
