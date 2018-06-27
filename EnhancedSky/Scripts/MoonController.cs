@@ -11,10 +11,15 @@ using DaggerfallWorkshop;
 using DaggerfallWorkshop.Utility;
 using System;
 
+using DaggerfallWorkshop.Game.Utility.ModSupport;
+
 namespace EnhancedSky
 {
     public class MoonController : MonoBehaviour
-    {      
+    {
+        //private Mod modSelf;
+        //public Mod ModSelf { get { return (modSelf); } set { modSelf = value; } }
+
         public GameObject masser;
         public GameObject secunda;
         public GameObject masserStarMask;
@@ -228,14 +233,21 @@ namespace EnhancedSky
                 Debug.LogError("Texture value is null or empty");
                 return moonText;
             }
-            moonText = Resources.Load(textVal) as Texture2D;
 
-            if(moonText == null)
+            if (SkyMan.ModSelf != null)
+                moonText = SkyMan.ModSelf.GetAsset<Texture2D>(textVal) as Texture2D;
+            else
+                moonText = Resources.Load(textVal) as Texture2D;
+
+            if (moonText == null)
             {
                 Debug.Log("failed to load moon texture for: " + phase.ToString());
                 try
                 {
-                moonText = Resources.Load(textureLookup[4]) as Texture2D;             //try to load full as default
+                    if (SkyMan.ModSelf != null)
+                        moonText = SkyMan.ModSelf.GetAsset<Texture2D>(textureLookup[4]) as Texture2D;             //try to load full as default
+                    else
+                        moonText = Resources.Load(textureLookup[4]) as Texture2D;             //try to load full as default
                 }
                 catch(Exception ex)
                 {
@@ -345,6 +357,12 @@ namespace EnhancedSky
                     masserStarMask = masser.transform.Find("StarBlock").gameObject;
                 if (!secundaStarMask)
                     secundaStarMask = secunda.transform.Find("StarBlock").gameObject;
+
+                if (masser == null)
+                    Debug.Log("failed to find masser");
+                else
+                    Debug.Log("found masser");
+
                 _masserRend = masser.GetComponent<Renderer>();
                 _secundaRend = secunda.GetComponent<Renderer>();
                 _masserRend.material = MasserMat;

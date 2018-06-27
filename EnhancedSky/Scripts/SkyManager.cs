@@ -17,6 +17,8 @@ using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Utility;
 using DaggerfallConnect.Utility;
 
+using DaggerfallWorkshop.Game.Utility.ModSupport;
+
 
 
 /* Setup instructions:
@@ -70,10 +72,12 @@ namespace EnhancedSky
     {
 
 
-        #region Fields
+        #region Fields       
         public const int DAYINSECONDS = 86400;
         public const int OFFSET = 21600;
         public const int TIMEINSIDELIMIT = 1;
+
+        private Mod modSelf = null;
 
         private Material _skyMat;
         private Material _cloudMat;
@@ -81,9 +85,6 @@ namespace EnhancedSky
         private Material _secundaMat;
         private Material _starsMat;
         private Material _skyObjMat;
-
-        private Shader _depthMaskShader = null;
-        private Shader _UnlitAlphaFadeShader = null;
 
         public int cloudQuality = 400;
         public int cloudSeed = -1;
@@ -98,23 +99,14 @@ namespace EnhancedSky
         System.Diagnostics.Stopwatch _stopWatch;
         CloudGenerator  _cloudGen;
         GameObject      _container;
-        GameObject      _containerPrefab;
+        Object      _containerPrefab;
         #endregion
 
         #region Properties
+        public Mod ModSelf { get { return (modSelf); } set { modSelf = value; } }
+
         DaggerfallUnity DfUnity         { get { return DaggerfallUnity.Instance;} }
         DaggerfallDateTime TimeScript   { get { return DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime; } }
-
-        public Shader DepthMaskShader
-        {
-            get { return _depthMaskShader; }
-            set { _depthMaskShader = value; }
-        }
-        public Shader UnlitAlphaFadeShader
-        {
-            get { return _UnlitAlphaFadeShader; }
-            set { _UnlitAlphaFadeShader = value; }
-        }
 
         public Material SkyObjMat       { get { return (_skyObjMat != null) ? _skyObjMat : Resources.Load("SkyObjMat") as Material; } set {_skyObjMat = value ;} }
         public Material SkyMat          { get { return (_skyMat) ? _skyMat : _skyMat = Resources.Load("Sky") as Material; } set { _skyMat = value ;} }
@@ -124,7 +116,7 @@ namespace EnhancedSky
         public Material StarsMat        { get; set; }
         public Material StarMaskMat     { get; set; }
 
-        public GameObject ContainerPrefab { get { return (_containerPrefab); } set { _containerPrefab = value; } }
+        public Object ContainerPrefab { get { return (_containerPrefab); } set { _containerPrefab = value; } }
 
         public SkyObjectSize SkyObjectSizeSetting { get; set; }
         public CloudGenerator CloudGen  { get { return (_cloudGen != null) ? _cloudGen : _cloudGen = this.GetComponent<CloudGenerator>(); } }
@@ -149,7 +141,7 @@ namespace EnhancedSky
                     _instance = GameObject.FindObjectOfType<SkyManager>();
                 return _instance;
             }
-            private set { _instance = value; }
+            set { _instance = value; }
         }
         #endregion
 
@@ -215,13 +207,6 @@ namespace EnhancedSky
                         RenderSettings.skybox = SkyMat;
                     else
                         throw new System.NullReferenceException();
-                    if (_containerPrefab)
-                    {
-                        _container = Instantiate(_containerPrefab);
-                        _container.transform.SetParent(exteriorParent.transform, true);
-                    }
-                    else
-                        throw new System.NullReferenceException();
 
                     dfallSky.SetActive(false);
                     SkyObjectSizeChange(SkyObjectSizeSetting);
@@ -275,6 +260,7 @@ namespace EnhancedSky
             StreamingWorld.OnTeleportToCoordinates      += EnhancedSkyUpdate;
             WeatherManager.OnWeatherChange += WeatherManagerSkyEventsHandler;
 
+            ToggleEnhancedSky(true);
         }
 
 
@@ -318,10 +304,7 @@ namespace EnhancedSky
             Destroy(_skyObjMat);
             Destroy(StarMaskMat);
             Destroy(MasserMat);
-            Destroy(SecundaMat);
-            Resources.UnloadAsset(_depthMaskShader);
-            Resources.UnloadAsset(_UnlitAlphaFadeShader);
-            
+            Destroy(SecundaMat);      
 
             StopAllCoroutines();
             if (_instance == this)
@@ -340,7 +323,7 @@ namespace EnhancedSky
                 if (!_cloudGen)
                     _cloudGen = this.GetComponent<CloudGenerator>();
                 if (!_cloudGen)
-                    _cloudGen = gameObject.AddComponent<CloudGenerator>();
+                    _cloudGen = this.gameObject.AddComponent<CloudGenerator>();
 
                 if (!dfallSky)
                     dfallSky = GameManager.Instance.SkyRig.gameObject;
@@ -356,8 +339,7 @@ namespace EnhancedSky
                 DaggerfallUnity.LogMessage("Error in SkyManager.GetRefrences()", true);
                 return false;
             }
-            if (dfallSky && playerEE && exteriorParent && weatherMan && _cloudGen && _containerPrefab && _depthMaskShader && _UnlitAlphaFadeShader 
-                && StarMaskMat && _skyObjMat && StarsMat && SkyMat)
+            if (dfallSky && playerEE && exteriorParent && weatherMan && _cloudGen && _containerPrefab && StarMaskMat && _skyObjMat && StarsMat && SkyMat)
                 return true;
             else
                 return false;
@@ -391,7 +373,7 @@ namespace EnhancedSky
 
         
         public void ToggleEnhancedSky(bool toggle)
-        {
+        {           
             if(!GetRefrences() && toggle)
             {
                 DaggerfallUnity.LogMessage("Skymanager missing refrences, can't enable");
@@ -400,7 +382,6 @@ namespace EnhancedSky
             }
             EnhancedSkyCurrentToggle = toggle;
             ToggleSkyObjects(toggle);
-            
         }
 
     

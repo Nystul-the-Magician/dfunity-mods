@@ -55,8 +55,6 @@ namespace EnhancedSky
         void Start()
         {
             this.StartCoroutine(CreateTexture(SkyMan.IsOvercast, null));
-
-
         }
 
         void OnDestroy()
