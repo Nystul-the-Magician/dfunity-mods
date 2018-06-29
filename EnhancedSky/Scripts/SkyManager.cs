@@ -136,9 +136,14 @@ namespace EnhancedSky
 
         public static SkyManager instance
         {
-            get { 
-                if(_instance == null)
+            get {
+                if (_instance == null)
+                {
+                    Debug.Log("SkyManager instance is null");
                     _instance = GameObject.FindObjectOfType<SkyManager>();
+                }
+                else
+                    Debug.Log("SkyManager instance is set");
                 return _instance;
             }
             set { _instance = value; }
@@ -251,6 +256,39 @@ namespace EnhancedSky
             {
                 Destroy(this.gameObject);
             }
+
+            /*
+            PresetContainer presetContainer = this.gameObject.GetComponent<PresetContainer>(); //this.gameObject.AddComponent<PresetContainer>();
+
+            Gradient gradient = new Gradient();
+            GradientAlphaKey[] gak = {
+                new GradientAlphaKey(55.0f/255.0f, 0.0f),
+                new GradientAlphaKey(75.0f/255.0f, 0.21f),
+                new GradientAlphaKey(255.0f/255.0f, 0.31f),
+                new GradientAlphaKey(255.0f/255.0f, 0.69f),
+                new GradientAlphaKey(75.0f/255.0f, 0.79f),
+                new GradientAlphaKey(75.0f/255.0f, 1.0f)
+            };
+            string[] colorsAsHex = { "#3C3C3C", "#727272", "#A8553E", "#DAD6D6", "#D6D6D6", "#C5BFBF", "#A8553E", "#3C3C3C" };
+            Color[] colors = new Color[colorsAsHex.Length];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                UnityEngine.ColorUtility.TryParseHtmlString(colorsAsHex[i], out colors[i]);
+            }
+            GradientColorKey[] gck = {
+                new GradientColorKey(colors[0], 0.0f),
+                new GradientColorKey(colors[1], 0.159f),
+                new GradientColorKey(colors[2], 0.244f),
+                new GradientColorKey(colors[3], 0.318f),
+                new GradientColorKey(colors[4], 0.5f),
+                new GradientColorKey(colors[5], 0.694f),
+                new GradientColorKey(colors[6], 0.762f),
+                new GradientColorKey(colors[7], 0.835f)
+            };
+            gradient.alphaKeys = gak;
+            gradient.colorKeys = gck;
+            presetContainer.colorBase = gradient;
+            */
             _stopWatch = new System.Diagnostics.Stopwatch();
 
             PlayerEnterExit.OnTransitionInterior        += InteriorTransitionEvent; //interior transition
@@ -260,13 +298,24 @@ namespace EnhancedSky
             StreamingWorld.OnTeleportToCoordinates      += EnhancedSkyUpdate;
             WeatherManager.OnWeatherChange += WeatherManagerSkyEventsHandler;
 
-            ToggleEnhancedSky(true);
+            //ToggleEnhancedSky(true);
         }
 
 
         // Use this for initialization
         void Start()
         {
+            /*
+            GameObject container = GameManager.Instance.ExteriorParent.transform.Find("NewEnhancedSkyContainer(Clone)").gameObject;
+            container.AddComponent<MoonController>();
+            container.AddComponent<AmbientFogLightController>();
+
+            container.transform.Find("SkyCam").gameObject.AddComponent<SkyCam>();
+            container.transform.Find("Stars").Find("StarParticles").gameObject.AddComponent<StarController>();
+            container.transform.Find("Rotator").gameObject.AddComponent<RotationScript>();
+            container.transform.Find("cloudPrefab").gameObject.AddComponent<Cloud>();
+            */
+
             DuskTime = DaggerfallDateTime.DuskHour * 3600;     
             DawnTime = DaggerfallDateTime.DawnHour * 3600;
           
@@ -298,13 +347,7 @@ namespace EnhancedSky
             PlayerEnterExit.OnTransitionExterior        -= ExteriorTransitionEvent; //exterior transition
             PlayerEnterExit.OnTransitionDungeonExterior -= ExteriorTransitionEvent; //dungeon exterior transition
             StreamingWorld.OnTeleportToCoordinates      -= EnhancedSkyUpdate;
-            WeatherManager.OnWeatherChange -= WeatherManagerSkyEventsHandler;
-
-            Destroy(StarsMat);
-            Destroy(_skyObjMat);
-            Destroy(StarMaskMat);
-            Destroy(MasserMat);
-            Destroy(SecundaMat);      
+            WeatherManager.OnWeatherChange -= WeatherManagerSkyEventsHandler;   
 
             StopAllCoroutines();
             if (_instance == this)
@@ -386,7 +429,7 @@ namespace EnhancedSky
 
     
         public void SkyObjectSizeChange(SkyObjectSize size)
-        {
+        {/*
             SkyObjectSizeSetting = size;
             if(!EnhancedSkyCurrentToggle || SkyMat == null)
             {
@@ -401,12 +444,12 @@ namespace EnhancedSky
             
             
             if (updateSkySettingsEvent != null)
-                updateSkySettingsEvent();
+                updateSkySettingsEvent();*/
         }
 
 
         public void SetCloudTextureResolution(int resolution)
-        {
+        {/*
             if(resolution < PresetContainer.MINCLOUDDIMENSION)
                 resolution = PresetContainer.MINCLOUDDIMENSION;
             else if(resolution > PresetContainer.MAXCLOUDDIMENSION)
@@ -414,12 +457,8 @@ namespace EnhancedSky
             else
                 cloudQuality = resolution;
             if (updateSkySettingsEvent != null)
-                updateSkySettingsEvent();
+                updateSkySettingsEvent();*/
         }
-
-
-
-
 
         #endregion
 

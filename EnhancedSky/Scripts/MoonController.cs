@@ -17,9 +17,6 @@ namespace EnhancedSky
 {
     public class MoonController : MonoBehaviour
     {
-        //private Mod modSelf;
-        //public Mod ModSelf { get { return (modSelf); } set { modSelf = value; } }
-
         public GameObject masser;
         public GameObject secunda;
         public GameObject masserStarMask;

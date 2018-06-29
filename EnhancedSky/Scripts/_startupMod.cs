@@ -36,6 +36,7 @@ namespace EnhancedSky
         public static Mod mod;
         private static GameObject gameobjectEnhancedSky = null;
         private static SkyManager componentSkyManager = null;
+        private static PresetContainer componentPresetContainer = null;
         private static CloudGenerator componentCloudGenerator = null;
 
         // Settings
@@ -56,9 +57,11 @@ namespace EnhancedSky
         private static Material starsMat = null;
         private static Material starMaskMat = null;
 
+        private static Preset presetPresetContainer = null;
+
         [Invoke(StateManager.StateTypes.Start)]
         public static void InitStart(InitParams initParams)
-        {            
+        {
             // check if debug gameobject is present, if so do not initalize mod
             if (GameObject.Find("debug_EnhancedSky"))
             {
@@ -85,15 +88,15 @@ namespace EnhancedSky
             else
                 Debug.Log("loaded shaderUnlitAlphaWithFade");
 
-            prefabEnhancedSkyController = mod.GetAsset<Object>("Prefabs/Resources/NewEnhancedSkyController.prefab") as Object;
-            if (prefabEnhancedSkyController == null)
-                Debug.Log("failed to load prefabEnhancedSkyController");
-            else
-                Debug.Log("loaded prefabEnhancedSkyController");
+            //prefabEnhancedSkyController = mod.GetAsset<Object>("Prefabs/Resources/NewEnhancedSkyController.prefab") as Object;
+            //if (prefabEnhancedSkyController == null)
+            //    Debug.Log("failed to load prefabEnhancedSkyController");
+            //else
+            //    Debug.Log("loaded prefabEnhancedSkyController");
 
             starsMat = mod.GetAsset<Material>("Materials/Resources/Stars") as Material;
             skyMat = mod.GetAsset<Material>("Materials/Resources/Sky") as Material;
-            containerPrefab = mod.GetAsset<Object>("Prefabs/Resources/NewPrefab.prefab") as Object;
+            containerPrefab = mod.GetAsset<Object>("Prefabs/Resources/NewEnhancedSkyContainer.prefab") as Object;
             if (containerPrefab == null)
                 Debug.Log("failed to load containerPrefab");
             else
@@ -102,7 +105,7 @@ namespace EnhancedSky
             initMod();
 
             //after finishing, set the mod's IsReady flag to true.
-            ModManager.Instance.GetMod(initParams.ModTitle).IsReady = true;           
+            ModManager.Instance.GetMod(initParams.ModTitle).IsReady = true;
         }
 
         /* 
@@ -125,7 +128,8 @@ namespace EnhancedSky
 
                 starsMat = Instantiate(Resources.Load("Stars")) as Material;
                 skyMat = Instantiate(Resources.Load("Sky")) as Material;
-                containerPrefab = Resources.Load("EnhancedSkyContainer", typeof(Object)) as Object;
+                //containerPrefab = Resources.Load("EnhancedSkyContainer", typeof(Object)) as Object;
+                //presetPresetContainer = Resources.Load("PresetContainer_preset1.preset", typeof(Preset)) as Preset;
             }
 #endif
 
@@ -135,62 +139,81 @@ namespace EnhancedSky
         public static void initMod()
         {
             Debug.Log("init of EnhancedSky standalone");
-            Debug.Log("init 0");
 
-            gameobjectEnhancedSky = Instantiate(prefabEnhancedSkyController) as GameObject;
-            /*MonoBehaviour[] scripts = gameobjectEnhancedSky.GetComponentsInChildren<SkyManager>();
-            foreach (MonoBehaviour script in scripts)
-            {
-                Debug.Log(string.Format("script name: {0}", script.name));
-            }*/
-            //gameobjectEnhancedSky.AddComponent<SkyManager>();
-            Debug.Log("init 1");
+            //gameobjectEnhancedSky = Instantiate(prefabEnhancedSkyController) as GameObject;
+            gameobjectEnhancedSky = new GameObject("EnhancedSkyController");
+
             //componentSkyManager = gameobjectEnhancedSky.GetComponent<SkyManager>() as SkyManager;
             //componentSkyManager = GameObject.Find("EnhancedSkyController(Clone)").GetComponent<SkyManager>();
-            
-            componentSkyManager = gameobjectEnhancedSky.AddComponent<SkyManager>() as SkyManager;
-            SkyManager.instance = componentSkyManager;            
 
-            if (componentSkyManager == null)
-                Debug.Log("componentSkyManager is null");
-            else
-                Debug.Log("componentSkyManager != null");
+            componentPresetContainer = gameobjectEnhancedSky.AddComponent<PresetContainer>() as PresetContainer;
+            SetPresetContainerValues(componentPresetContainer);
+
+            componentSkyManager = gameobjectEnhancedSky.AddComponent<SkyManager>() as SkyManager;
+            SkyManager.instance = componentSkyManager;                      
+
+            componentCloudGenerator = gameobjectEnhancedSky.AddComponent<CloudGenerator>() as CloudGenerator;
 
             componentSkyManager.ModSelf = mod;
 
-            Debug.Log("init 2");
             starMaskMat = new Material(shaderDepthMask);
-            Debug.Log("init 3");
             skyObjMat = new Material(shaderUnlitAlphaWithFade);
-            Debug.Log("init 4");
-            componentSkyManager.ContainerPrefab = containerPrefab;
-
-            //GameObject _container = Instantiate(containerPrefab) as GameObject;
-            //_container.transform.SetParent(GameManager.Instance.ExteriorParent.transform, true);
-
-            Debug.Log("init 5");
+            
             componentSkyManager.StarMaskMat = starMaskMat;
-            Debug.Log("init 6");
             componentSkyManager.SkyObjMat = skyObjMat;
-            Debug.Log("init 7");
             componentSkyManager.StarsMat = starsMat;
-            Debug.Log("init 8");
             componentSkyManager.SkyMat = skyMat;
-
-            Debug.Log("init 9");
-
+            
             if (containerPrefab)
             {
-                GameObject container = Instantiate(containerPrefab) as GameObject;
-                container.transform.SetParent(GameManager.Instance.ExteriorParent.transform, true);
+                //GameObject container = Instantiate(containerPrefab) as GameObject;
+                //container.transform.SetParent(GameManager.Instance.ExteriorParent.transform, true);
+
+                //container.AddComponent<MoonController>();
+                //container.AddComponent<AmbientFogLightController>();
+
+                //container.transform.Find("SkyCam").gameObject.AddComponent<SkyCam>();
+                //container.transform.Find("Stars").Find("StarParticles").gameObject.AddComponent<StarController>();
+                //container.transform.Find("Rotator").gameObject.AddComponent<RotationScript>();
+                //container.transform.Find("cloudPrefab").gameObject.AddComponent<Cloud>();
             }
             else
                 throw new System.NullReferenceException();
 
             //componentSkyManager.ToggleEnhancedSky(true);
-            Debug.Log("init 10");
             componentSkyManager.UseSunFlare = enableSunFlare;
-            Debug.Log("init 11");
+        }
+
+        private static void SetPresetContainerValues(PresetContainer presetContainer)
+        {            
+            Gradient gradient = new Gradient();
+            GradientAlphaKey[] gak = {
+                new GradientAlphaKey(55.0f/255.0f, 0.0f),
+                new GradientAlphaKey(75.0f/255.0f, 0.21f),
+                new GradientAlphaKey(255.0f/255.0f, 0.31f),
+                new GradientAlphaKey(255.0f/255.0f, 0.69f),
+                new GradientAlphaKey(75.0f/255.0f, 0.79f),
+                new GradientAlphaKey(75.0f/255.0f, 1.0f)
+            };
+            string[] colorsAsHex = { "#3C3C3C", "#727272", "#A8553E", "#DAD6D6", "#D6D6D6", "#C5BFBF", "#A8553E", "#3C3C3C" };
+            Color[] colors = new Color[colorsAsHex.Length];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                UnityEngine.ColorUtility.TryParseHtmlString(colorsAsHex[i], out colors[i]);
+            }
+            GradientColorKey[] gck = {
+                new GradientColorKey(colors[0], 0.0f),
+                new GradientColorKey(colors[1], 0.159f),
+                new GradientColorKey(colors[2], 0.244f),
+                new GradientColorKey(colors[3], 0.318f),
+                new GradientColorKey(colors[4], 0.5f),
+                new GradientColorKey(colors[5], 0.694f),
+                new GradientColorKey(colors[6], 0.762f),
+                new GradientColorKey(colors[7], 0.835f)
+            };
+            gradient.alphaKeys = gak;
+            gradient.colorKeys = gck;
+            presetContainer.colorBase = gradient;
         }
     }
 }

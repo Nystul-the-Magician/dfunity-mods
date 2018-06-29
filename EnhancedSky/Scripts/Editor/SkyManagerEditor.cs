@@ -6,7 +6,7 @@ namespace EnhancedSky
 
     [CustomEditor(typeof(SkyManager))]
     public class SkyManagerEditor : Editor
-    {
+    {/*
         SkyObjectSize skyObjectSizeSelected = SkyObjectSizes.Normal;
         
         public override void OnInspectorGUI()
@@ -70,7 +70,7 @@ namespace EnhancedSky
 
 
         }
-
+        */
 
     }
 

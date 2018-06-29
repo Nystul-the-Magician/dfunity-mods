@@ -56,13 +56,46 @@ namespace EnhancedSky
             if (_instance != null)
                 this.enabled = false;
             _instance = this;
-
         }
 
         void Destroy()
         {
             Instance = null;
         }
+
+        /*
+        void Start()
+        {
+            Gradient gradient = new Gradient(); // this.colorBase;
+            GradientAlphaKey[] gak = {
+                new GradientAlphaKey(55.0f/255.0f, 0.0f),
+                new GradientAlphaKey(75.0f/255.0f, 0.21f),
+                new GradientAlphaKey(255.0f/255.0f, 0.31f),
+                new GradientAlphaKey(255.0f/255.0f, 0.69f),
+                new GradientAlphaKey(75.0f/255.0f, 0.79f),
+                new GradientAlphaKey(75.0f/255.0f, 1.0f)
+            };
+            string[] colorsAsHex = { "#3C3C3C", "#727272", "#A8553E", "#DAD6D6", "#D6D6D6", "#C5BFBF", "#A8553E", "#3C3C3C" };
+            Color[] colors = new Color[colorsAsHex.Length];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                UnityEngine.ColorUtility.TryParseHtmlString(colorsAsHex[i], out colors[i]);
+            }
+            GradientColorKey[] gck = {
+                new GradientColorKey(colors[0], 0.0f),
+                new GradientColorKey(colors[1], 0.159f),
+                new GradientColorKey(colors[2], 0.244f),
+                new GradientColorKey(colors[3], 0.318f),
+                new GradientColorKey(colors[4], 0.5f),
+                new GradientColorKey(colors[5], 0.694f),
+                new GradientColorKey(colors[6], 0.762f),
+                new GradientColorKey(colors[7], 0.835f)
+            };
+            gradient.alphaKeys = gak;
+            gradient.colorKeys = gck;
+            this.colorBase = gradient;
+        }
+        */
 
         private static PresetContainer FindPreset()
         {
