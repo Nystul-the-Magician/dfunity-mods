@@ -95,7 +95,17 @@ namespace EnhancedSky
             //    Debug.Log("loaded prefabEnhancedSkyController");
 
             starsMat = mod.GetAsset<Material>("Materials/Resources/Stars") as Material;
+            if (starsMat == null)
+                Debug.Log("starsMat == null");
+            else
+                Debug.Log("starsMat != null");
+
             skyMat = mod.GetAsset<Material>("Materials/Resources/Sky") as Material;
+            if (skyMat == null)
+                Debug.Log("skyMat == null");
+            else
+                Debug.Log("skyMat != null");
+
             containerPrefab = mod.GetAsset<Object>("Prefabs/Resources/NewEnhancedSkyContainer.prefab") as Object;
             if (containerPrefab == null)
                 Debug.Log("failed to load containerPrefab");
@@ -124,10 +134,12 @@ namespace EnhancedSky
 #if DEBUG
             if (GameObject.Find("debug_EnhancedSky"))
             {
-                prefabEnhancedSkyController = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/EnhancedSkyController.prefab", typeof(Object));
+                //prefabEnhancedSkyController = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/EnhancedSkyController.prefab", typeof(Object));
 
-                starsMat = Instantiate(Resources.Load("Stars")) as Material;
-                skyMat = Instantiate(Resources.Load("Sky")) as Material;
+                containerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/NewEnhancedSkyContainer.prefab", typeof(Object));
+
+                starsMat = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Materials/Resources/Stars.mat", typeof(Material)) as Material;
+                skyMat = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Materials/Resources/Sky.mat", typeof(Material)) as Material;
                 //containerPrefab = Resources.Load("EnhancedSkyContainer", typeof(Object)) as Object;
                 //presetPresetContainer = Resources.Load("PresetContainer_preset1.preset", typeof(Preset)) as Preset;
             }
@@ -164,11 +176,17 @@ namespace EnhancedSky
             componentSkyManager.SkyObjMat = skyObjMat;
             componentSkyManager.StarsMat = starsMat;
             componentSkyManager.SkyMat = skyMat;
-            
+            if (componentSkyManager.SkyMat == null)
+                Debug.Log("componentSkyManager.SkyMat == null");
+            else
+                Debug.Log("componentSkyManager.SkyMat != null");
+
             if (containerPrefab)
             {
                 GameObject container = Instantiate(containerPrefab) as GameObject;
                 container.transform.SetParent(GameManager.Instance.ExteriorParent.transform, true);
+
+                componentSkyManager.Container = container;
 
                 //container.AddComponent<MoonController>();
                 //container.AddComponent<AmbientFogLightController>();
@@ -179,7 +197,7 @@ namespace EnhancedSky
                 //container.transform.Find("cloudPrefab").gameObject.AddComponent<Cloud>();
             }
             else
-                throw new System.NullReferenceException();
+                throw new System.NullReferenceException();            
 
             componentSkyManager.ToggleEnhancedSky(true);
             componentSkyManager.UseSunFlare = enableSunFlare;
@@ -247,7 +265,7 @@ namespace EnhancedSky
                 new GradientAlphaKey(255.0f/255.0f, 0.0f),
                 new GradientAlphaKey(255.0f/255.0f, 1.0f)
             };
-            colorsAsHex = new string[] { "#131313", "#040404", "#353027", "#5E6E75", "#7C8382", "#6D6D6D", "#765338", "#171717", "#131313" };
+            colorsAsHex = new string[] { "#131313", "#353027", "#5E6E75", "#7C8382", "#6D6D6D", "#765338", "#171717", "#131313" };
             colors = new Color[colorsAsHex.Length];
             for (int i = 0; i < colors.Length; i++)
             {
@@ -255,14 +273,13 @@ namespace EnhancedSky
             }
             gck = new GradientColorKey[] {
                 new GradientColorKey(colors[0], 0.0f),
-                new GradientColorKey(colors[1], 0.191f),
-                new GradientColorKey(colors[2], 0.25f),
-                new GradientColorKey(colors[3], 0.309f),
-                new GradientColorKey(colors[4], 0.5f),
-                new GradientColorKey(colors[5], 0.7f),
-                new GradientColorKey(colors[6], 0.744f),
-                new GradientColorKey(colors[7], 0.776f),
-                new GradientColorKey(colors[8], 1.0f)
+                new GradientColorKey(colors[1], 0.25f),
+                new GradientColorKey(colors[2], 0.309f),
+                new GradientColorKey(colors[3], 0.5f),
+                new GradientColorKey(colors[4], 0.7f),
+                new GradientColorKey(colors[5], 0.744f),
+                new GradientColorKey(colors[6], 0.776f),
+                new GradientColorKey(colors[7], 1.0f)
             };
             gradient.alphaKeys = gak;
             gradient.colorKeys = gck;

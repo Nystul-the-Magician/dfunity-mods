@@ -101,7 +101,6 @@ namespace EnhancedSky
         System.Diagnostics.Stopwatch _stopWatch;
         CloudGenerator  _cloudGen;
         GameObject      _container;
-        Object      _containerPrefab;
         #endregion
 
         #region Properties
@@ -110,15 +109,15 @@ namespace EnhancedSky
         DaggerfallUnity DfUnity         { get { return DaggerfallUnity.Instance;} }
         DaggerfallDateTime TimeScript   { get { return DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime; } }
 
-        public Material SkyObjMat       { get { return (_skyObjMat != null) ? _skyObjMat : Resources.Load("SkyObjMat") as Material; } set {_skyObjMat = value ;} }
-        public Material SkyMat          { get { return (_skyMat) ? _skyMat : _skyMat = Resources.Load("Sky") as Material; } set { _skyMat = value ;} }
+        public Material SkyObjMat       { get { return _skyObjMat; } set {_skyObjMat = value ;} }
+        public Material SkyMat          { get { return _skyMat; } set { _skyMat = value ;} }
         public Material CloudMat        { get { return (_cloudMat) ? _cloudMat : _cloudMat = GetInstanceMaterial(); } set { _cloudMat = value; } }
         public Material MasserMat       { get { return (_masserMat) ? _masserMat : _masserMat = GetInstanceMaterial(); } set { _masserMat = value; } }
         public Material SecundaMat      { get { return (_secundaMat) ? _secundaMat : _secundaMat = GetInstanceMaterial(); } set { _secundaMat = value; } }
         public Material StarsMat        { get; set; }
         public Material StarMaskMat     { get; set; }
 
-        public Object ContainerPrefab { get { return (_containerPrefab); } set { _containerPrefab = value; } }
+        public GameObject Container { get { return (_container); } set { _container = value; } }
 
         public SkyObjectSize SkyObjectSizeSetting { get; set; }
         public CloudGenerator CloudGen  { get { return (_cloudGen != null) ? _cloudGen : _cloudGen = this.GetComponent<CloudGenerator>(); } }
@@ -140,12 +139,7 @@ namespace EnhancedSky
         {
             get {
                 if (_instance == null)
-                {
-                    Debug.Log("SkyManager instance is null");
                     _instance = GameObject.FindObjectOfType<SkyManager>();
-                }
-                else
-                    Debug.Log("SkyManager instance is set");
                 return _instance;
             }
             set { _instance = value; }
@@ -197,16 +191,16 @@ namespace EnhancedSky
         /// <param name="toggle"></param>
         private void ToggleSkyObjects(bool toggle)
         {
-
+            Debug.Log("ToggleSkyObjects checkpoint 1");
             try
             {
-                if(!toggle && _container != null) 
+                if(!toggle) 
                 {
                     dfallSky.SetActive(true);
                     Destroy(_container);
                     
                 }
-                else if(toggle && !_container)
+                else if(toggle)
                 {
                     GetRefrences();
                     
@@ -382,7 +376,7 @@ namespace EnhancedSky
                 DaggerfallUnity.LogMessage("Error in SkyManager.GetRefrences()", true);
                 return false;
             }
-            if (dfallSky && playerEE && exteriorParent && weatherMan && _cloudGen && _containerPrefab && StarMaskMat && _skyObjMat && StarsMat && SkyMat)
+            if (dfallSky && playerEE && exteriorParent && weatherMan && _cloudGen && StarMaskMat && _skyObjMat && StarsMat && SkyMat)
                 return true;
             else
                 return false;
@@ -423,13 +417,15 @@ namespace EnhancedSky
                 return;
 
             }
+            
             EnhancedSkyCurrentToggle = toggle;
+            Debug.Log("before ToggleSkyObjects");
             ToggleSkyObjects(toggle);
         }
 
     
         public void SkyObjectSizeChange(SkyObjectSize size)
-        {/*
+        {
             SkyObjectSizeSetting = size;
             if(!EnhancedSkyCurrentToggle || SkyMat == null)
             {
@@ -444,12 +440,12 @@ namespace EnhancedSky
             
             
             if (updateSkySettingsEvent != null)
-                updateSkySettingsEvent();*/
+                updateSkySettingsEvent();
         }
 
 
         public void SetCloudTextureResolution(int resolution)
-        {/*
+        {
             if(resolution < PresetContainer.MINCLOUDDIMENSION)
                 resolution = PresetContainer.MINCLOUDDIMENSION;
             else if(resolution > PresetContainer.MAXCLOUDDIMENSION)
@@ -457,7 +453,7 @@ namespace EnhancedSky
             else
                 cloudQuality = resolution;
             if (updateSkySettingsEvent != null)
-                updateSkySettingsEvent();*/
+                updateSkySettingsEvent();
         }
 
         #endregion
