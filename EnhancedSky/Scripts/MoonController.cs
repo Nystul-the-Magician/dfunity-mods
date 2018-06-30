@@ -349,9 +349,9 @@ namespace EnhancedSky
             try
             {
                 if (!masser)
-                    masser = transform.Find("MoonMasser").gameObject;
+                    masser = transform.Find("Rotator").Find("MoonMasser").gameObject;
                 if (!secunda)
-                    secunda = transform.Find("MoonSecunda").gameObject;
+                    secunda = transform.Find("Rotator").Find("MoonSecunda").gameObject;
                 if (!masserStarMask)
                     masserStarMask = masser.transform.Find("StarBlock").gameObject;
                 if (!secundaStarMask)

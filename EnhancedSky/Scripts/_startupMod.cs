@@ -180,7 +180,7 @@ namespace EnhancedSky
             else
                 throw new System.NullReferenceException();
 
-            //componentSkyManager.ToggleEnhancedSky(true);
+            componentSkyManager.ToggleEnhancedSky(true);
             componentSkyManager.UseSunFlare = enableSunFlare;
         }
 
