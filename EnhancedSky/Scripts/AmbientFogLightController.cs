@@ -17,6 +17,7 @@ namespace EnhancedSky
         LensFlare   _sunFlare;
         Color       _skyTint = Color.clear;
         Color       _groundColor = Color.clear;
+        FlareLayer flareLayer = null;
 
         SkyManager SkyMan           { get { return SkyManager.instance;} }
         Material SkyMat             { get { return SkyManager.instance.SkyMat;}}
@@ -86,6 +87,8 @@ namespace EnhancedSky
 
             SetSkyObjectSize();
 
+            flareLayer = this.transform.Find("SkyCam").gameObject.GetComponent<FlareLayer>();
+
 
             _skyTint = PresetContainer.Instance.skyTint;
             SkyMat.SetColor("_SkyTint", _skyTint);
@@ -113,13 +116,22 @@ namespace EnhancedSky
                     return;
                 }
                 else if (!SkyMan.IsNight)
+                {
                     SunFlare.enabled = true;
+                    flareLayer.enabled = true;
+                }
                 else
+                {
                     SunFlare.enabled = false;
+                    flareLayer.enabled = false;
+                }
             }
             else
+            {
                 SunFlare.enabled = false;
-        }
+                flareLayer.enabled = false;
+            }
+            }
 
         public void SetSkyObjectSize()
         {
