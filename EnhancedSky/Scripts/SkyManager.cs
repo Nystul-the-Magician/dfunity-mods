@@ -38,8 +38,10 @@ using DaggerfallWorkshop.Game.Utility.ModSupport;
  * Tested w/ Daggerfall tools for Unity v. 1.4.45 (WIP)
  */
 
+using SkyObjectSize = System.Int32;
+
 namespace EnhancedSky
-{
+{/*
     public struct SkyObjectSize
     {
         private int value;
@@ -58,7 +60,7 @@ namespace EnhancedSky
         {
             return record.value;
         }
-    }
+    }*/
 
     public struct SkyObjectSizes
     {
@@ -304,8 +306,7 @@ namespace EnhancedSky
 
         // Use this for initialization
         void Start()
-        {
-            /*
+        {            
             GameObject container = GameManager.Instance.ExteriorParent.transform.Find("NewEnhancedSkyContainer(Clone)").gameObject;
             container.AddComponent<MoonController>();
             container.AddComponent<AmbientFogLightController>();
@@ -313,8 +314,7 @@ namespace EnhancedSky
             container.transform.Find("SkyCam").gameObject.AddComponent<SkyCam>();
             container.transform.Find("Stars").Find("StarParticles").gameObject.AddComponent<StarController>();
             container.transform.Find("Rotator").gameObject.AddComponent<RotationScript>();
-            container.transform.Find("cloudPrefab").gameObject.AddComponent<Cloud>();
-            */
+            container.transform.Find("cloudPrefab").gameObject.AddComponent<Cloud>();            
 
             DuskTime = DaggerfallDateTime.DuskHour * 3600;     
             DawnTime = DaggerfallDateTime.DawnHour * 3600;

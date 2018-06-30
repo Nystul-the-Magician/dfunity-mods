@@ -13,6 +13,8 @@ using System;
 
 using DaggerfallWorkshop.Game.Utility.ModSupport;
 
+using MoonPhase = System.Int32;
+
 namespace EnhancedSky
 {
     public class MoonController : MonoBehaviour
@@ -40,7 +42,7 @@ namespace EnhancedSky
         DaggerfallDateTime DateTime { get { return DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime; } }
         DaggerfallUnity DfUnity     { get { return DaggerfallUnity.Instance ;} }
         SkyManager SkyMan           { get { return SkyManager.instance; } }
-
+        
         public struct MoonPhases
         {
             public const int
@@ -54,7 +56,7 @@ namespace EnhancedSky
                 HalfWane = 6,
                 OneWane = 7;
         }
-
+        /* // does crash the mod - but why?
         public struct MoonPhase
         {
             private int value;
@@ -73,8 +75,8 @@ namespace EnhancedSky
             {
                 return record.value;
             }
-        }
-
+        }*/
+        
         List<string> masserTextureLookup = new List<string>()
         {
             null,
@@ -99,9 +101,9 @@ namespace EnhancedSky
             "secunda_half_wan",
             "secunda_one_wan",
         };
-
-        public MoonPhase MasserPhase = MoonPhases.Full;
-        public MoonPhase SecundaPhase = MoonPhases.Full;
+        
+        public int MasserPhase = MoonPhases.Full;
+        public int SecundaPhase = MoonPhases.Full;
         
         void OnDisable()
         {
@@ -118,7 +120,7 @@ namespace EnhancedSky
             SkyManager.updateSkyEvent += this.Init;
             SkyManager.updateSkySettingsEvent += this.SetSkyObjectSize;
         }
-
+        
 
         /// <summary>
         /// Handles fast travel events from skyman
@@ -130,7 +132,7 @@ namespace EnhancedSky
             SetSkyObjectSize();
             _updateMoonPhase = true;
         }
-
+        
         void FixedUpdate()
         {
 
@@ -176,7 +178,7 @@ namespace EnhancedSky
                 _updateMoonPhase = false;
             }
         }
-
+        
         
         public void SetPhase(MoonPhase masserPhase, MoonPhase secundaPhase)
         {
@@ -397,9 +399,7 @@ namespace EnhancedSky
                 scale = new Vector3(PresetContainer.MOONSCALELARGE, PresetContainer.MOONSCALELARGE, PresetContainer.MOONSCALELARGE);
                 masser.transform.localScale = scale;
                 secunda.transform.localScale = scale * .5f;
-            }
-
-
+            }            
 
         }
         

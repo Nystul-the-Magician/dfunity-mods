@@ -47,11 +47,7 @@
         "Assets/Game/Addons/EnhancedSky_standalone/LightFlares/Flare50mm.psd",
         "Assets/Game/Addons/EnhancedSky_standalone/LightFlares/Flare50mm.mat",
         "Assets/Game/Addons/EnhancedSky_standalone/LightFlares/Sun.flare",
-        "Assets/Untracked/ModBuilder/Enhanced Sky/enhancedsky.dfmod.json",
-        "Assets/Untracked/ModBuilder/Enhanced Sky/EnhancedSkyContainer.serialized.prefab.txt",
-        "Assets/Untracked/ModBuilder/Enhanced Sky/EnhancedSkyController.serialized.prefab.txt",
-        "Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/NewPrefab.prefab",
-        "Assets/Untracked/ModBuilder/Enhanced Sky/NewPrefab.serialized.prefab.txt",
-        "Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/NewEnhancedSkyController.prefab"
+        "Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/NewEnhancedSkyContainer.prefab",
+        "Assets/Game/Addons/EnhancedSky_standalone/enhancedsky.dfmod.json"
     ]
 }

@@ -166,8 +166,8 @@ namespace EnhancedSky
             
             if (containerPrefab)
             {
-                //GameObject container = Instantiate(containerPrefab) as GameObject;
-                //container.transform.SetParent(GameManager.Instance.ExteriorParent.transform, true);
+                GameObject container = Instantiate(containerPrefab) as GameObject;
+                container.transform.SetParent(GameManager.Instance.ExteriorParent.transform, true);
 
                 //container.AddComponent<MoonController>();
                 //container.AddComponent<AmbientFogLightController>();
