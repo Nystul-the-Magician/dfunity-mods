@@ -191,7 +191,6 @@ namespace EnhancedSky
         /// <param name="toggle"></param>
         private void ToggleSkyObjects(bool toggle)
         {
-            Debug.Log("ToggleSkyObjects checkpoint 1");
             try
             {
                 if(!toggle) 
@@ -330,9 +329,7 @@ namespace EnhancedSky
         }
 
         void OnDestroy()
-        {
-          
-            
+        {     
             ToggleSkyObjects(false);
 
             //Unsubscribe from events
