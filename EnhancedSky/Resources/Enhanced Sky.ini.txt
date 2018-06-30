@@ -4,3 +4,4 @@ SettingsVersion = 1.0
 [GeneralSettings]
 ;enable sun flare
 UseSunFlare = True
+CloudQuality = 800

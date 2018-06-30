@@ -41,6 +41,7 @@ namespace EnhancedSky
 
         // Settings
         private static bool enableSunFlare = true;
+        private static int cloudQuality = 400;
 
         private static Shader shaderDepthMask = null;
         private static Shader shaderUnlitAlphaWithFade = null;
@@ -67,7 +68,7 @@ namespace EnhancedSky
             {
                 return;
             }
-            Debug.Log("InitStart");
+
             // Get this mod
             mod = initParams.Mod;
 
@@ -76,41 +77,16 @@ namespace EnhancedSky
 
             // settings
             enableSunFlare = settings.GetBool("GeneralSettings", "UseSunFlare");
+            cloudQuality = settings.GetInt("GeneralSettings", "CloudQuality");
 
-            shaderDepthMask = mod.GetAsset<Shader>("Materials/Resources/DepthMask.shader") as Shader;
-            if (shaderDepthMask == null)
-                Debug.Log("failed to load shaderDepthMask");
-            else
-                Debug.Log("loaded shaderDepthMask");
+            shaderDepthMask = mod.GetAsset<Shader>("Materials/Resources/DepthMask.shader") as Shader;        
             shaderUnlitAlphaWithFade = mod.GetAsset<Shader>("Materials/Resources/UnlitAlphaWithFade.shader") as Shader;
-            if (shaderUnlitAlphaWithFade == null)
-                Debug.Log("failed to load shaderUnlitAlphaWithFade");
-            else
-                Debug.Log("loaded shaderUnlitAlphaWithFade");
 
-            //prefabEnhancedSkyController = mod.GetAsset<Object>("Prefabs/Resources/NewEnhancedSkyController.prefab") as Object;
-            //if (prefabEnhancedSkyController == null)
-            //    Debug.Log("failed to load prefabEnhancedSkyController");
-            //else
-            //    Debug.Log("loaded prefabEnhancedSkyController");
 
-            starsMat = mod.GetAsset<Material>("Materials/Resources/Stars") as Material;
-            if (starsMat == null)
-                Debug.Log("starsMat == null");
-            else
-                Debug.Log("starsMat != null");
-
+            starsMat = mod.GetAsset<Material>("Materials/Resources/Stars") as Material;        
             skyMat = mod.GetAsset<Material>("Materials/Resources/Sky") as Material;
-            if (skyMat == null)
-                Debug.Log("skyMat == null");
-            else
-                Debug.Log("skyMat != null");
 
             containerPrefab = mod.GetAsset<Object>("Prefabs/Resources/NewEnhancedSkyContainer.prefab") as Object;
-            if (containerPrefab == null)
-                Debug.Log("failed to load containerPrefab");
-            else
-                Debug.Log("loaded containerPrefab");
 
             initMod();
 
@@ -134,14 +110,10 @@ namespace EnhancedSky
 #if DEBUG
             if (GameObject.Find("debug_EnhancedSky"))
             {
-                //prefabEnhancedSkyController = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/EnhancedSkyController.prefab", typeof(Object));
-
                 containerPrefab = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/NewEnhancedSkyContainer.prefab", typeof(Object));
 
                 starsMat = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Materials/Resources/Stars.mat", typeof(Material)) as Material;
                 skyMat = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Materials/Resources/Sky.mat", typeof(Material)) as Material;
-                //containerPrefab = Resources.Load("EnhancedSkyContainer", typeof(Object)) as Object;
-                //presetPresetContainer = Resources.Load("PresetContainer_preset1.preset", typeof(Preset)) as Preset;
             }
 #endif
 
@@ -152,11 +124,7 @@ namespace EnhancedSky
         {
             Debug.Log("init of EnhancedSky standalone");
 
-            //gameobjectEnhancedSky = Instantiate(prefabEnhancedSkyController) as GameObject;
             gameobjectEnhancedSky = new GameObject("EnhancedSkyController");
-
-            //componentSkyManager = gameobjectEnhancedSky.GetComponent<SkyManager>() as SkyManager;
-            //componentSkyManager = GameObject.Find("EnhancedSkyController(Clone)").GetComponent<SkyManager>();
 
             componentPresetContainer = gameobjectEnhancedSky.AddComponent<PresetContainer>() as PresetContainer;
             SetPresetContainerValues(componentPresetContainer);
@@ -176,10 +144,6 @@ namespace EnhancedSky
             componentSkyManager.SkyObjMat = skyObjMat;
             componentSkyManager.StarsMat = starsMat;
             componentSkyManager.SkyMat = skyMat;
-            if (componentSkyManager.SkyMat == null)
-                Debug.Log("componentSkyManager.SkyMat == null");
-            else
-                Debug.Log("componentSkyManager.SkyMat != null");
 
             if (containerPrefab)
             {
@@ -201,6 +165,8 @@ namespace EnhancedSky
 
             componentSkyManager.ToggleEnhancedSky(true);
             componentSkyManager.UseSunFlare = enableSunFlare;
+            componentSkyManager.cloudQuality = cloudQuality;
+            componentSkyManager.SkyObjectSizeChange(0); // set normal size
         }
 
         private static void SetPresetContainerValues(PresetContainer presetContainer)
