@@ -377,12 +377,15 @@ namespace EnhancedSky
             presetContainer.moonAlphaBase.preWrapMode = WrapMode.Clamp;
             presetContainer.moonAlphaBase.postWrapMode = WrapMode.Clamp;
             presetContainer.moonAlphaBase.keys = new Keyframe[] { new Keyframe(0.0f, 0.3f), new Keyframe(0.28f, 0.0f), new Keyframe(0.8f, 0.1f), new Keyframe(1.0f, 0.3f) };
+            presetContainer.moonAlphaBase.SmoothTangents(1, 1.0f);
+            presetContainer.moonAlphaBase.SmoothTangents(2, 1.0f);
 
             // set moon alpha over curve
             presetContainer.moonAlphaOver = new AnimationCurve();
             presetContainer.moonAlphaOver.preWrapMode = WrapMode.Loop;
             presetContainer.moonAlphaOver.postWrapMode = WrapMode.Loop;
             presetContainer.moonAlphaOver.keys = new Keyframe[] { new Keyframe(0.0f, 0.045f), new Keyframe(0.29f, 0.0f), new Keyframe(1.0f, 0.045f) };
+            presetContainer.moonAlphaOver.SmoothTangents(1, 1.0f);
         }
     }
 }
