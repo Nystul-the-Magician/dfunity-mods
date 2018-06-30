@@ -376,6 +376,30 @@ namespace EnhancedSky
 
             // set atmosphere offset
             presetContainer.atmsphrOffset = 1;
+
+            // set atmosphere base curve
+            presetContainer.atmosphereBase = new AnimationCurve();
+            presetContainer.atmosphereBase.preWrapMode = WrapMode.Clamp;
+            presetContainer.atmosphereBase.postWrapMode = WrapMode.Clamp;
+            presetContainer.atmosphereBase.keys = new Keyframe[] { new Keyframe(0.0f, 0.9f), new Keyframe(0.3f, 0.1f), new Keyframe(0.65f, 0.1f), new Keyframe(1.0f, 1.0f) };
+
+            // set atmosphere over curve
+            presetContainer.atmosphereOver = new AnimationCurve();
+            presetContainer.atmosphereOver.preWrapMode = WrapMode.Loop;
+            presetContainer.atmosphereOver.postWrapMode = WrapMode.Loop;
+            presetContainer.atmosphereOver.keys = new Keyframe[] { new Keyframe(0.0f, -0.33f), new Keyframe(1.0f, -0.33f) };
+
+            // set moon alpha base curve
+            presetContainer.moonAlphaBase = new AnimationCurve();
+            presetContainer.moonAlphaBase.preWrapMode = WrapMode.Clamp;
+            presetContainer.moonAlphaBase.postWrapMode = WrapMode.Clamp;
+            presetContainer.moonAlphaBase.keys = new Keyframe[] { new Keyframe(0.0f, 0.3f), new Keyframe(0.28f, 0.0f), new Keyframe(0.8f, 0.1f), new Keyframe(1.0f, 0.3f) };
+
+            // set moon alpha over curve
+            presetContainer.moonAlphaOver = new AnimationCurve();
+            presetContainer.moonAlphaOver.preWrapMode = WrapMode.Loop;
+            presetContainer.moonAlphaOver.postWrapMode = WrapMode.Loop;
+            presetContainer.moonAlphaOver.keys = new Keyframe[] { new Keyframe(0.0f, 0.045f), new Keyframe(0.29f, 0.0f), new Keyframe(1.0f, 0.045f) };
         }
     }
 }
