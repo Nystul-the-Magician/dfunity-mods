@@ -59,10 +59,14 @@ namespace EnhancedSky
         /// <param name="isOverCast"></param>
         public void Init(bool isOverCast)
         {
-
+            Debug.Log("in AmbientFogLightController init");
             if(isOverCast)
             {
                 FogGradient = PresetContainer.Instance.fogOver;
+                if (FogGradient == null)
+                    Debug.Log("FogGradient is null (overcast)");
+                else
+                    Debug.Log("FogGradient != null (overcast)");
                 HorizonGradient = PresetContainer.Instance.colorOver;
                 AtmosphereCurve = PresetContainer.Instance.atmosphereOver;
                 SkyMat.SetFloat("_Exposure", .3f);                              //##TODO - add to presets
@@ -71,6 +75,10 @@ namespace EnhancedSky
             else
             {
                 FogGradient = PresetContainer.Instance.fogBase;
+                if (FogGradient == null)
+                    Debug.Log("FogGradient is null");
+                else
+                    Debug.Log("FogGradient != null");
                 HorizonGradient = PresetContainer.Instance.colorBase;
                 AtmosphereCurve = PresetContainer.Instance.atmosphereBase;
                 SkyMat.SetFloat("_Exposure", .5f);
@@ -88,9 +96,10 @@ namespace EnhancedSky
         void FixedUpdate()
         {
             _atmsphrOffset = PresetContainer.Instance.atmsphrOffset;
+
             //set fog color
             RenderSettings.fogColor = FogGradient.Evaluate(SkyMan.TimeRatio);
-
+            
             //set sky Material ground color & atmo. thickness
             SkyMat.SetFloat("_AtmosphereThickness", AtmosphereCurve.Evaluate(SkyMan.TimeRatio) + _atmsphrOffset); //1
             _groundColor = HorizonGradient.Evaluate(SkyMan.TimeRatio);

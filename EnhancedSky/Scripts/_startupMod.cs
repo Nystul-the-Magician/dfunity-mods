@@ -148,6 +148,7 @@ namespace EnhancedSky
 
             componentPresetContainer = gameobjectEnhancedSky.AddComponent<PresetContainer>() as PresetContainer;
             SetPresetContainerValues(componentPresetContainer);
+            PresetContainer.Instance = componentPresetContainer;
 
             componentSkyManager = gameobjectEnhancedSky.AddComponent<SkyManager>() as SkyManager;
             SkyManager.instance = componentSkyManager;                      
@@ -186,6 +187,7 @@ namespace EnhancedSky
 
         private static void SetPresetContainerValues(PresetContainer presetContainer)
         {            
+            // set color base
             Gradient gradient = new Gradient();
             GradientAlphaKey[] gak = {
                 new GradientAlphaKey(55.0f/255.0f, 0.0f),
@@ -214,6 +216,166 @@ namespace EnhancedSky
             gradient.alphaKeys = gak;
             gradient.colorKeys = gck;
             presetContainer.colorBase = gradient;
+
+            // set color over
+            gradient = new Gradient();
+            gak = new GradientAlphaKey[] {
+                new GradientAlphaKey(255.0f/255.0f, 0.0f),
+                new GradientAlphaKey(255.0f/255.0f, 1.0f)
+            };
+            colorsAsHex = new string[] { "#131313", "#656565", "#C5C1C1", "#C2C2C2", "#656565", "#131313" };
+            colors = new Color[colorsAsHex.Length];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                UnityEngine.ColorUtility.TryParseHtmlString(colorsAsHex[i], out colors[i]);
+            }
+            gck = new GradientColorKey[] {
+                new GradientColorKey(colors[0], 0.0f),
+                new GradientColorKey(colors[1], 0.203f),
+                new GradientColorKey(colors[2], 0.303f),
+                new GradientColorKey(colors[3], 0.674f),
+                new GradientColorKey(colors[4], 0.752f),
+                new GradientColorKey(colors[5], 1.0f)
+            };
+            gradient.alphaKeys = gak;
+            gradient.colorKeys = gck;
+            presetContainer.colorOver = gradient;
+
+            // set fog base
+            gradient = new Gradient();
+            gak = new GradientAlphaKey[] {
+                new GradientAlphaKey(255.0f/255.0f, 0.0f),
+                new GradientAlphaKey(255.0f/255.0f, 1.0f)
+            };
+            colorsAsHex = new string[] { "#131313", "#040404", "#353027", "#5E6E75", "#7C8382", "#6D6D6D", "#765338", "#171717", "#131313" };
+            colors = new Color[colorsAsHex.Length];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                UnityEngine.ColorUtility.TryParseHtmlString(colorsAsHex[i], out colors[i]);
+            }
+            gck = new GradientColorKey[] {
+                new GradientColorKey(colors[0], 0.0f),
+                new GradientColorKey(colors[1], 0.191f),
+                new GradientColorKey(colors[2], 0.25f),
+                new GradientColorKey(colors[3], 0.309f),
+                new GradientColorKey(colors[4], 0.5f),
+                new GradientColorKey(colors[5], 0.7f),
+                new GradientColorKey(colors[6], 0.744f),
+                new GradientColorKey(colors[7], 0.776f),
+                new GradientColorKey(colors[8], 1.0f)
+            };
+            gradient.alphaKeys = gak;
+            gradient.colorKeys = gck;
+            presetContainer.fogBase = gradient;
+
+            // set fog over
+            gradient = new Gradient();
+            gak = new GradientAlphaKey[] {
+                new GradientAlphaKey(255.0f/255.0f, 0.0f),
+                new GradientAlphaKey(255.0f/255.0f, 1.0f)
+            };
+            colorsAsHex = new string[] { "#090808", "#7C7777", "#8E9396", "#7D706C", "#151515", "#131313" };
+            colors = new Color[colorsAsHex.Length];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                UnityEngine.ColorUtility.TryParseHtmlString(colorsAsHex[i], out colors[i]);
+            }
+            gck = new GradientColorKey[] {
+                new GradientColorKey(colors[0], 0.2f),
+                new GradientColorKey(colors[1], 0.309f),
+                new GradientColorKey(colors[2], 0.5f),
+                new GradientColorKey(colors[3], 0.7f),
+                new GradientColorKey(colors[4], 0.81f),
+                new GradientColorKey(colors[5], 1.0f)
+            };
+            gradient.alphaKeys = gak;
+            gradient.colorKeys = gck;
+            presetContainer.fogOver = gradient;
+
+            // set star gradient
+            gradient = new Gradient();
+            gak = new GradientAlphaKey[] {
+                new GradientAlphaKey(255.0f/255.0f, 0.0f),
+                new GradientAlphaKey(255.0f/255.0f, 0.19f),
+                new GradientAlphaKey(0.0f/255.0f, 0.245f),
+                new GradientAlphaKey(0.0f/255.0f, 0.75f),
+                new GradientAlphaKey(255.0f/255.0f, 0.8f),
+                new GradientAlphaKey(255.0f/255.0f, 1.0f)
+            };
+            colorsAsHex = new string[] { "#FFFFFF", "#FFFFFF" };
+            colors = new Color[colorsAsHex.Length];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                UnityEngine.ColorUtility.TryParseHtmlString(colorsAsHex[i], out colors[i]);
+            }
+            gck = new GradientColorKey[] {
+                new GradientColorKey(colors[0], 0.0f),
+                new GradientColorKey(colors[1], 1.0f)
+            };
+            gradient.alphaKeys = gak;
+            gradient.colorKeys = gck;
+            presetContainer.starGradient = gradient;
+
+            // set cloud noise base
+            gradient = new Gradient();
+            gak = new GradientAlphaKey[] {
+                new GradientAlphaKey(0.0f/255.0f, 0.45f),
+                new GradientAlphaKey(217.0f/255.0f, 0.75f),
+                new GradientAlphaKey(255.0f/255.0f, 1.0f)
+            };
+            colorsAsHex = new string[] { "#000000", "#989898", "#FFFFFF" };
+            colors = new Color[colorsAsHex.Length];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                UnityEngine.ColorUtility.TryParseHtmlString(colorsAsHex[i], out colors[i]);
+            }
+            gck = new GradientColorKey[] {
+                new GradientColorKey(colors[0], 0.0f),
+                new GradientColorKey(colors[1], 0.45f),
+                new GradientColorKey(colors[2], 1.0f)
+            };
+            gradient.alphaKeys = gak;
+            gradient.colorKeys = gck;
+            presetContainer.cloudNoiseBase = gradient;
+
+            // set cloud noise over
+            gradient = new Gradient();
+            gak = new GradientAlphaKey[] {
+                new GradientAlphaKey(207.0f/255.0f, 0.0f),
+                new GradientAlphaKey(255.0f/255.0f, 1.0f)
+            };
+            colorsAsHex = new string[] { "#7C7C7C", "#FFFFFF" };
+            colors = new Color[colorsAsHex.Length];
+            for (int i = 0; i < colors.Length; i++)
+            {
+                UnityEngine.ColorUtility.TryParseHtmlString(colorsAsHex[i], out colors[i]);
+            }
+            gck = new GradientColorKey[] {
+                new GradientColorKey(colors[0], 0.0f),
+                new GradientColorKey(colors[1], 1.0f)
+            };
+            gradient.alphaKeys = gak;
+            gradient.colorKeys = gck;
+            presetContainer.cloudNoiseOver = gradient;
+
+            // set sky tint
+            string colorAsHex = "#80808000";
+            Color color;
+            UnityEngine.ColorUtility.TryParseHtmlString(colorAsHex, out color);
+            presetContainer.skyTint = color;
+
+            // set masser color
+            colorAsHex = "#AF4B4BFF";
+            UnityEngine.ColorUtility.TryParseHtmlString(colorAsHex, out color);
+            presetContainer.MasserColor = color;
+
+            // set secunda color
+            colorAsHex = "#C3C3C3FF";
+            UnityEngine.ColorUtility.TryParseHtmlString(colorAsHex, out color);
+            presetContainer.SecundaColor = color;
+
+            // set atmosphere offset
+            presetContainer.atmsphrOffset = 1;
         }
     }
 }

@@ -49,7 +49,7 @@ namespace EnhancedSky
 
         public float atmsphrOffset = .5f;
 
-        public static PresetContainer Instance { get { return (_instance != null) ? _instance : _instance = FindPreset(); } private set { _instance = value;} }
+        public static PresetContainer Instance { get { return (_instance != null) ? _instance : _instance = FindPreset(); } set { _instance = value;} }
 
         void Awake()
         {
