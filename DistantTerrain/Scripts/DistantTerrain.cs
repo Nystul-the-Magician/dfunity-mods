@@ -1,4 +1,4 @@
-﻿//Distant Terrain Mod for Daggerfall-Unity
+//Distant Terrain Mod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -829,12 +829,6 @@ namespace DistantTerrain
                         terrainTransitionRingUpdateSeasonalTextures = true;
                     }
 
-                    if (!terrainTransitionRingUpdateRunning) // if at the moment no terrain transition ring update is still in progress
-                    {
-                        terrainTransitionRingUpdateMaterialProperties = true;
-                    }
-
-
                     if (terrainTransitionRingUpdateSeasonalTextures)
                     {
                         UpdateSeasonalTexturesTerrainTransitionRing();
@@ -892,8 +886,6 @@ namespace DistantTerrain
                 UpdateSeaReflectionTextureReference();
 
                 Resources.UnloadUnusedAssets();
-
-                //System.GC.Collect();
             }
         }
 
@@ -1266,7 +1258,7 @@ namespace DistantTerrain
         }
 
         private void updateMaterialShaderPropertiesTerrainTransitionRingBlock(int i)
-        {
+        {            
             if (terrainTransitionRingArray[i].terrainDesc.terrainObject)
             {
                 Terrain terrain = terrainTransitionRingArray[i].terrainDesc.terrainObject.GetComponent<Terrain>();
@@ -1372,7 +1364,7 @@ namespace DistantTerrain
         }
 
         private void updateMaterialShaderPropertiesTerrainTransitionRing()
-        {
+        {            
             if (terrainTransitionRingUpdateMaterialProperties)
             {
                 if (!transitionRingAllBlocksReady)
@@ -1882,6 +1874,8 @@ namespace DistantTerrain
                 }
             }
             StartCoroutine(UpdateTerrainsTransitionRing());
+
+            terrainTransitionRingUpdateMaterialProperties = true;
         }
 
         #endregion
