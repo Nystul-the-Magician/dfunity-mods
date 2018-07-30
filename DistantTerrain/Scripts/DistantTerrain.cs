@@ -863,7 +863,11 @@ namespace DistantTerrain
 
                 Vector3 offset = new Vector3(0.0f, 0.0f, 0.0f);
                 UpdatePositionWorldTerrain(ref worldTerrainGameObject, offset);
-                UpdateTransitionRingPosition(offset);
+
+                if (enableTerrainTransition)
+                {
+                    UpdateTransitionRingPosition(offset);
+                }
 
                 bool doSeasonalTexturesUpdate = shouldUpdateSeasonalTextures();
 
