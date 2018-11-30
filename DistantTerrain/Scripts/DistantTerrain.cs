@@ -1038,6 +1038,9 @@ namespace DistantTerrain
                     {
                         for (int i = 0; i < terrainTransitionRingArray.Length; i++)
                         {
+                            if (terrainTransitionRingArray[i].terrainDesc.terrainObject == null)
+                                continue;
+
                             Terrain terrain = terrainTransitionRingArray[i].terrainDesc.terrainObject.GetComponent<Terrain>();
                             Material material = terrain.materialTemplate;
                             material.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraTranslationY);
@@ -1440,7 +1443,19 @@ namespace DistantTerrain
 
             // Promote data to live terrain
             dfTerrain.UpdateClimateMaterial();
-            dfTerrain.PromoteTerrainData();
+
+            // important to put call to dfTerrain.PromoteTerrainData into a try-catch block
+            // (since it raises PromoteTerrainEvent and another mod that consumes the event
+            // could throw an exception (e.g. RealGrass) causing havoc otherwise)
+            // see https://forums.dfworkshop.net/viewtopic.php?f=20&t=1554&p=17765#p17765
+            try
+            {
+                dfTerrain.PromoteTerrainData();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("exception after raising PromoteTerrainEvent in dfTerrain.PromoteTerrainData : " + e.Message);
+            }
 
             // inject transition ring shader
             Terrain terrain = transitionTerrainDesc.terrainDesc.terrainObject.GetComponent<Terrain>();
