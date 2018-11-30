@@ -1628,7 +1628,7 @@ namespace DistantTerrain
 
         private void UpdateTransitionRingPosition(Vector3 offset)
         {
-            gameobjectTerrainTransitionRing.transform.localPosition = new Vector3(gameobjectTerrainTransitionRing.transform.localPosition.x, extraTranslationY + streamingWorld.WorldCompensation.y, gameobjectTerrainTransitionRing.transform.localPosition.z);
+            gameobjectTerrainTransitionRing.transform.localPosition = new Vector3(gameobjectTerrainTransitionRing.transform.localPosition.x, /*extraTranslationY +*/ streamingWorld.WorldCompensation.y, gameobjectTerrainTransitionRing.transform.localPosition.z);
         }
 
         private TransitionRingBorderDesc getTransitionRingBorderDesc(int x, int y, int distanceTransitionRingFromCenterX, int distanceTransitionRingFromCenterY)

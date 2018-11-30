@@ -1,4 +1,4 @@
-﻿//Distant Terrain Mod for Daggerfall-Unity
+//Distant Terrain Mod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -23,8 +23,18 @@ namespace DistantTerrain
     {
         // Scale factors for this sampler implementation
         public const float baseHeightScale = 8f;
-        public const float noiseMapScale = 4f; //6f; //4f;
-        public const float extraNoiseScale = 3f; //10f; //3f;
+        public const float noiseMapScale = 6f; //4f;
+        public const float extraNoiseScaleClimateOcean = 0.0f;
+        public const float extraNoiseScaleClimateDesert = 3f;
+        public const float extraNoiseScaleClimateDesert2 = 13f;
+        public const float extraNoiseScaleClimateMountain = 28f;
+        public const float extraNoiseScaleClimateRainforest = 9f;
+        public const float extraNoiseScaleClimateSwamp = 11f;
+        public const float extraNoiseScaleClimateSubtropical = 15f;
+        public const float extraNoiseScaleClimateMountainWoods = 21f;
+        public const float extraNoiseScaleClimateWoodlands = 6f;
+        public const float extraNoiseScaleClimateHauntedWoodlands = 7f;
+        //public const float extraNoiseScale = 3f; //10f; //3f;
         public const float scaledOceanElevation = 3.4f * baseHeightScale;
         public const float scaledBeachElevation = 5.0f * baseHeightScale;
 
@@ -120,6 +130,48 @@ namespace DistantTerrain
                     int noisey = (MapsFile.MaxMapPixelY - mapPixel.mapPixelY) * (HeightmapDimension - 1) + y;
                     float lowFreq = TerrainHelper.GetNoise(noisex, noisey, 0.3f, 0.5f, 0.5f, 1);
                     float highFreq = TerrainHelper.GetNoise(noisex, noisey, 0.9f, 0.5f, 0.5f, 1);
+
+                    // small terrain features' height should depend on climate of map pixel
+                    int worldClimate = DaggerfallUnity.Instance.ContentReader.MapFileReader.GetClimateIndex(mx, my);
+                    float extraNoiseScale = 3f;
+                    switch (worldClimate)
+                    {
+                        case (int)MapsFile.Climates.Ocean:
+                            extraNoiseScale = extraNoiseScaleClimateOcean;
+                            break;
+                        case (int)MapsFile.Climates.Desert:
+                            extraNoiseScale = extraNoiseScaleClimateDesert;
+                            break;
+                        case (int)MapsFile.Climates.Desert2:
+                            extraNoiseScale = extraNoiseScaleClimateDesert2;
+                            break;
+                        case (int)MapsFile.Climates.Mountain:
+                            extraNoiseScale = extraNoiseScaleClimateMountain;
+                            break;
+                        case (int)MapsFile.Climates.Rainforest:
+                            extraNoiseScale = extraNoiseScaleClimateRainforest;
+                            break;
+                        case (int)MapsFile.Climates.Swamp:
+                            extraNoiseScale = extraNoiseScaleClimateSwamp;
+                            break;
+                        case (int)MapsFile.Climates.Subtropical:
+                            extraNoiseScale = extraNoiseScaleClimateSubtropical;
+                            break;
+                        case (int)MapsFile.Climates.MountainWoods:
+                            extraNoiseScale = extraNoiseScaleClimateMountainWoods;
+                            break;
+                        case (int)MapsFile.Climates.Woodlands:
+                            extraNoiseScale = extraNoiseScaleClimateWoodlands;
+                            break;
+                        case (int)MapsFile.Climates.HauntedWoodlands:
+                            extraNoiseScale = extraNoiseScaleClimateHauntedWoodlands;
+                            break;
+                    }
+
+                    // prevent seams between different climate map pixels
+                    if (x <= 0 || y <= 0 || x >= dim-1 || y >= dim-1)
+                        extraNoiseScale = 3f;
+
                     scaledHeight += (lowFreq * highFreq) * extraNoiseScale;
 
                     // Clamp lower values to ocean elevation
