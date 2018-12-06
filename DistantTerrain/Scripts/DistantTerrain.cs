@@ -69,6 +69,7 @@ namespace DistantTerrain
         public RenderTexture reflectionSeaTexture = null;
 
         private float extraTranslationY = -10.0f;
+        private float extraWaterTranslationY = -30.0f;
 
         /// <summary>
         /// extra translation property is the amount of y-bias of the FarTerrain geometry (needed to prevent precision rendering issues at the transition from terrain transition ring and far terrain geometry))
@@ -1030,7 +1031,7 @@ namespace DistantTerrain
                 // update water height (thanks Lypyl!!!):
                 Vector3 vecWaterHeight = new Vector3(0.0f, (DaggerfallUnity.Instance.TerrainSampler.OceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
                 Vector3 vecWaterHeightTransformed = worldTerrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
-                terrainMaterial.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraTranslationY);
+                terrainMaterial.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraWaterTranslationY);
             
                 if (gameobjectTerrainTransitionRing != null)
                 {
@@ -1043,7 +1044,7 @@ namespace DistantTerrain
 
                             Terrain terrain = terrainTransitionRingArray[i].terrainDesc.terrainObject.GetComponent<Terrain>();
                             Material material = terrain.materialTemplate;
-                            material.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraTranslationY);
+                            material.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraWaterTranslationY);
                             terrain.materialTemplate = material;
                         }
                     }
@@ -1199,7 +1200,7 @@ namespace DistantTerrain
 
             Vector3 vecWaterHeight = new Vector3(0.0f, (dfUnity.TerrainSampler.OceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
             Vector3 vecWaterHeightTransformed = terrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
-            terrainMaterial.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraTranslationY);
+            terrainMaterial.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraWaterTranslationY);
 
             terrainMaterial.SetTexture("_SkyTex", renderTextureSky);
 
@@ -1324,7 +1325,7 @@ namespace DistantTerrain
 
                 Vector3 vecWaterHeight = new Vector3(0.0f, (dfUnity.TerrainSampler.OceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
                 Vector3 vecWaterHeightTransformed = worldTerrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
-                mat.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraTranslationY);
+                mat.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraWaterTranslationY);
 
                 mat.SetTexture("_SkyTex", oldMaterial.GetTexture("_SkyTex"));
 
@@ -1514,7 +1515,7 @@ namespace DistantTerrain
 
             Vector3 vecWaterHeight = new Vector3(0.0f, (dfUnity.TerrainSampler.OceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
             Vector3 vecWaterHeightTransformed = worldTerrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
-            newMaterial.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraTranslationY);
+            newMaterial.SetFloat("_WaterHeightTransformed", vecWaterHeightTransformed.y - extraWaterTranslationY);
 
             newMaterial.SetTexture("_SkyTex", renderTextureSky);
 
