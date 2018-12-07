@@ -69,7 +69,7 @@ namespace DistantTerrain
         public RenderTexture reflectionSeaTexture = null;
 
         private float extraTranslationY = -10.0f;
-        private float extraWaterTranslationY = -30.0f;
+        private float extraWaterTranslationY = -35.25f;
 
         /// <summary>
         /// extra translation property is the amount of y-bias of the FarTerrain geometry (needed to prevent precision rendering issues at the transition from terrain transition ring and far terrain geometry))

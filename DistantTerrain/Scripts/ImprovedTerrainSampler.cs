@@ -42,12 +42,12 @@ namespace DistantTerrain
         public const float extraNoiseScaleClimateDesert = 7f;
         public const float extraNoiseScaleClimateDesert2 = 19f;
         public const float extraNoiseScaleClimateMountain = 62f;
-        public const float extraNoiseScaleClimateRainforest = 12f;
-        public const float extraNoiseScaleClimateSwamp = 14f;
-        public const float extraNoiseScaleClimateSubtropical = 21f;
-        public const float extraNoiseScaleClimateMountainWoods = 28f;
-        public const float extraNoiseScaleClimateWoodlands = 16f;
-        public const float extraNoiseScaleClimateHauntedWoodlands = 19f;
+        public const float extraNoiseScaleClimateRainforest = 16f;
+        public const float extraNoiseScaleClimateSwamp = 9f;
+        public const float extraNoiseScaleClimateSubtropical = 17f;
+        public const float extraNoiseScaleClimateMountainWoods = 32f;
+        public const float extraNoiseScaleClimateWoodlands = 24f;
+        public const float extraNoiseScaleClimateHauntedWoodlands = 22f;
         //public const float extraNoiseScale = 3f; //10f; //3f;
         public const float scaledOceanElevation = 3.4f * baseHeightScale;
         public const float scaledBeachElevation = 5.0f * baseHeightScale;
@@ -89,6 +89,10 @@ namespace DistantTerrain
             // Read neighbouring height samples for this map pixel
             int mx = mapPixel.mapPixelX;
             int my = mapPixel.mapPixelY;
+
+            // Seed random with terrain key
+            UnityEngine.Random.InitState(TerrainHelper.MakeTerrainKey(mx, my));
+
             byte[,] shm = dfUnity.ContentReader.WoodsFileReader.GetHeightMapValuesRange(mx - 2, my - 2, 4);
             byte[,] lhm = dfUnity.ContentReader.WoodsFileReader.GetLargeHeightMapValuesRange(mx - 1, my, 3);
 
@@ -112,9 +116,30 @@ namespace DistantTerrain
                     int mapPixelX = Math.Max(0, Math.Min(mx + x - 1, WoodsFile.mapWidthValue));
                     int mapPixelY = Math.Max(0, Math.Min(my + y - 1, WoodsFile.mapHeightValue));
 
-                    noiseMapScaleClimate[x, y] = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);                             
+                    noiseMapScaleClimate[x, y] = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
+
+                    //// test neighborhood for water noise map scales and dilate if so (prevent cliffs)
+                    //bool waterInNeighborhood = false;
+                    //for (int iy = Mathf.Max(0, my - 1); iy <= Mathf.Min(WoodsFile.mapHeightValue - 1, my + 1); iy++)
+                    //{
+                    //    for (int ix = Mathf.Max(0, mx - 1); ix <= Mathf.Min(WoodsFile.mapWidthValue - 1, mx + 1); ix++)
+                    //    {
+                    //        if (mx != ix || my != iy)
+                    //        {
+                    //            int worldClimate = DaggerfallUnity.Instance.ContentReader.MapFileReader.GetClimateIndex(ix, iy);
+                    //            if (worldClimate == (int)MapsFile.Climates.Ocean)
+                    //            {
+                    //                waterInNeighborhood = true;
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                    //if (waterInNeighborhood == true)
+                    //{
+                    //    noiseMapScaleClimate[x, y] = noiseMapScaleClimateOcean;
+                    //}
                 }
-            }
+            }            
 
             int dimClimateMultiplier = 4;
             float[,] climateMultiplierValue = new float[dimClimateMultiplier, dimClimateMultiplier];
@@ -171,62 +196,6 @@ namespace DistantTerrain
                     float fracy = (float)(y - iy * div) / div;
                     float scaledHeight = 0;
 
-                    // height of noise mask over terrain features should depend on climate of map pixel
-                    float noiseMapScale = defaultNoiseMapScale;
-                    // small terrain features' height should depend on climate of map pixel
-                    float extraNoiseScale = defaultExtraNoiseScale;
-                    int worldClimate = DaggerfallUnity.Instance.ContentReader.MapFileReader.GetClimateIndex(mx, my);
-
-                    switch (worldClimate)
-                    {
-                        case (int)MapsFile.Climates.Ocean:
-                            //noiseMapScale = noiseMapScaleClimateOcean;
-                            extraNoiseScale = extraNoiseScaleClimateOcean;
-                            break;
-                        case (int)MapsFile.Climates.Desert:
-                            //noiseMapScale = noiseMapScaleClimateDesert;
-                            extraNoiseScale = extraNoiseScaleClimateDesert;
-                            break;
-                        case (int)MapsFile.Climates.Desert2:
-                            //noiseMapScale = noiseMapScaleClimateDesert2;
-                            extraNoiseScale = extraNoiseScaleClimateDesert2;
-                            break;
-                        case (int)MapsFile.Climates.Mountain:
-                            //noiseMapScale = noiseMapScaleClimateMountain;
-                            extraNoiseScale = extraNoiseScaleClimateMountain;
-                            break;
-                        case (int)MapsFile.Climates.Rainforest:
-                            //noiseMapScale = noiseMapScaleClimateRainforest;
-                            extraNoiseScale = extraNoiseScaleClimateRainforest;
-                            break;
-                        case (int)MapsFile.Climates.Swamp:
-                            //noiseMapScale = noiseMapScaleClimateSwamp;
-                            extraNoiseScale = extraNoiseScaleClimateSwamp;
-                            break;
-                        case (int)MapsFile.Climates.Subtropical:
-                            //noiseMapScale = noiseMapScaleClimateSubtropical;
-                            extraNoiseScale = extraNoiseScaleClimateSubtropical;
-                            break;
-                        case (int)MapsFile.Climates.MountainWoods:
-                            //noiseMapScale = noiseMapScaleClimateMountainWoods;
-                            extraNoiseScale = extraNoiseScaleClimateMountainWoods;
-                            break;
-                        case (int)MapsFile.Climates.Woodlands:
-                            //noiseMapScale = noiseMapScaleClimateWoodlands;
-                            extraNoiseScale = extraNoiseScaleClimateWoodlands;
-                            break;
-                        case (int)MapsFile.Climates.HauntedWoodlands:
-                            //noiseMapScale = noiseMapScaleClimateHauntedWoodlands;
-                            extraNoiseScale = extraNoiseScaleClimateHauntedWoodlands;
-                            break;
-                    }
-
-                    // prevent seams between different climate map pixels
-                    if (x <= 0 || y <= 0 || x >= dim - 1 || y >= dim - 1)
-                    {
-                        //noiseMapScale = defaultNoiseMapScale;
-                        extraNoiseScale = defaultExtraNoiseScale;
-                    }
                     // Bicubic sample small height map for base terrain elevation
                     x1 = TerrainHelper.CubicInterpolator(shm[0, 3] * multiplierValue[0, 3], shm[1, 3] * multiplierValue[1, 3], shm[2, 3] * multiplierValue[2, 3], shm[3, 3] * multiplierValue[3, 3], sfracx);
                     x2 = TerrainHelper.CubicInterpolator(shm[0, 2] * multiplierValue[0, 2], shm[1, 2] * multiplierValue[1, 2], shm[2, 2] * multiplierValue[2, 2], shm[3, 2] * multiplierValue[3, 2], sfracx);
@@ -245,26 +214,38 @@ namespace DistantTerrain
                     x3 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 2], lhm[ix + 1, iy + 2], lhm[ix + 2, iy + 2], lhm[ix + 3, iy + 2], fracx);
                     x4 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 3], lhm[ix + 1, iy + 3], lhm[ix + 2, iy + 3], lhm[ix + 3, iy + 3], fracx);
                     noiseHeight = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, fracy);
-                    
+
                     //x1 = TerrainHelper.CubicInterpolator(climateMultiplierValue[0, 3], climateMultiplierValue[1, 3], climateMultiplierValue[2, 3], climateMultiplierValue[3, 3], sfracx);
                     //x2 = TerrainHelper.CubicInterpolator(climateMultiplierValue[0, 2], climateMultiplierValue[1, 2], climateMultiplierValue[2, 2], climateMultiplierValue[3, 2], sfracx);
                     //x3 = TerrainHelper.CubicInterpolator(climateMultiplierValue[0, 1], climateMultiplierValue[1, 1], climateMultiplierValue[2, 1], climateMultiplierValue[3, 1], sfracx);
                     //x4 = TerrainHelper.CubicInterpolator(climateMultiplierValue[0, 0], climateMultiplierValue[1, 0], climateMultiplierValue[2, 0], climateMultiplierValue[3, 0], sfracx);
                     //float climateMultiplier = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
                     float climateMultiplier = TerrainHelper.BilinearInterpolator(climateMultiplierValue[0, 3], climateMultiplierValue[0, 0], climateMultiplierValue[3, 3], climateMultiplierValue[3, 0], sfracx, sfracy);
+                    if (scaledHeight <= scaledOceanElevation)
+                        climateMultiplier = 1.0f;
+
+                    scaledHeight += noiseHeight * climateMultiplier; // * noiseMapScale;
 
                     //float climateMultiplierX1 = TerrainHelper.CubicInterpolator(climateMultiplierValue[ix, iy + 0], climateMultiplierValue[ix + 1, iy + 0], climateMultiplierValue[ix + 2, iy + 0], climateMultiplierValue[ix + 3, iy + 0], sfracx);
                     //float climateMultiplierX2 = TerrainHelper.CubicInterpolator(climateMultiplierValue[ix, iy + 1], climateMultiplierValue[ix + 1, iy + 1], climateMultiplierValue[ix + 2, iy + 1], climateMultiplierValue[ix + 3, iy + 1], sfracx);
                     //float climateMultiplierX3 = TerrainHelper.CubicInterpolator(climateMultiplierValue[ix, iy + 2], climateMultiplierValue[ix + 1, iy + 2], climateMultiplierValue[ix + 2, iy + 2], climateMultiplierValue[ix + 3, iy + 2], sfracx);
                     //float climateMultiplierX4 = TerrainHelper.CubicInterpolator(climateMultiplierValue[ix, iy + 3], climateMultiplierValue[ix + 1, iy + 3], climateMultiplierValue[ix + 2, iy + 3], climateMultiplierValue[ix + 3, iy + 3], sfracx);
                     //float climateMultiplier = TerrainHelper.CubicInterpolator(climateMultiplierX1, climateMultiplierX2, climateMultiplierX3, climateMultiplierX4, sfracy);
-                    scaledHeight += noiseHeight * climateMultiplier; // * noiseMapScale;
+                    
 
                     // Additional noise mask for small terrain features at ground level
+                    // small terrain features' height scale should depend on climate of map pixel
+                    float extraNoiseScale = GetExtraNoiseScaleBasedOnClimate(mx, my);
+                    // prevent seams between different climate map pixels
+                    if (x <= 0 || y <= 0 || x >= dim - 1 || y >= dim - 1)
+                    {
+                        //noiseMapScale = defaultNoiseMapScale;
+                        extraNoiseScale = defaultExtraNoiseScale;
+                    }
                     int noisex = mapPixel.mapPixelX * (HeightmapDimension - 1) + x;
                     int noisey = (MapsFile.MaxMapPixelY - mapPixel.mapPixelY) * (HeightmapDimension - 1) + y;
                     float lowFreq = TerrainHelper.GetNoise(noisex, noisey, 0.3f, 0.5f, 0.5f, 1);
-                    float highFreq = TerrainHelper.GetNoise(noisex, noisey, 0.9f, 0.5f, 0.5f, 1);
+                    float highFreq = TerrainHelper.GetNoise(noisex, noisey, 0.9f, 0.5f, 0.5f, 1);                    
                     scaledHeight += (lowFreq * highFreq) * extraNoiseScale;
 
                     // Clamp lower values to ocean elevation
@@ -327,6 +308,48 @@ namespace DistantTerrain
                     break;
             }
             return noiseMapScaleClimate;
+        }
+
+        private float GetExtraNoiseScaleBasedOnClimate(int mapPixelX, int mapPixelY)
+        {
+            // small terrain features' height should depend on climate of map pixel
+            float extraNoiseScale = defaultExtraNoiseScale;
+            int worldClimate = DaggerfallUnity.Instance.ContentReader.MapFileReader.GetClimateIndex(mapPixelX, mapPixelY);
+
+            switch (worldClimate)
+            {
+                case (int)MapsFile.Climates.Ocean:
+                    extraNoiseScale = extraNoiseScaleClimateOcean;
+                    break;
+                case (int)MapsFile.Climates.Desert:
+                    extraNoiseScale = extraNoiseScaleClimateDesert;
+                    break;
+                case (int)MapsFile.Climates.Desert2:
+                    extraNoiseScale = extraNoiseScaleClimateDesert2;
+                    break;
+                case (int)MapsFile.Climates.Mountain:
+                    extraNoiseScale = extraNoiseScaleClimateMountain;
+                    break;
+                case (int)MapsFile.Climates.Rainforest:
+                    extraNoiseScale = extraNoiseScaleClimateRainforest;
+                    break;
+                case (int)MapsFile.Climates.Swamp:
+                    extraNoiseScale = extraNoiseScaleClimateSwamp;
+                    break;
+                case (int)MapsFile.Climates.Subtropical:
+                    extraNoiseScale = extraNoiseScaleClimateSubtropical;
+                    break;
+                case (int)MapsFile.Climates.MountainWoods:                    
+                    extraNoiseScale = extraNoiseScaleClimateMountainWoods;
+                    break;
+                case (int)MapsFile.Climates.Woodlands:                    
+                    extraNoiseScale = extraNoiseScaleClimateWoodlands;
+                    break;
+                case (int)MapsFile.Climates.HauntedWoodlands:                    
+                    extraNoiseScale = extraNoiseScaleClimateHauntedWoodlands;
+                    break;
+            }
+            return extraNoiseScale;
         }
     }
 }

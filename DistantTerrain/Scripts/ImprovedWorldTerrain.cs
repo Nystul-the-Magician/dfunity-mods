@@ -43,17 +43,17 @@ namespace DistantTerrain
         public const float maxHeightsExaggerationMultiplier = 25.0f; // this directly affects maxTerrainHeight in TerrainHelper.cs: maxTerrainHeight should be maxHeightsExaggerationMultiplier * baseHeightScale * 128 + noiseMapScale * 128 + extraNoiseScale
 
         // additional height noise based on climate        
-        public const float additionalHeightClimateOcean = 0.0f;
-        public const float additionalHeightClimateDesert = 0.05f;
-        public const float additionalHeightClimateDesert2 = 0.4f;
-        public const float additionalHeightClimateMountain = 0.625f; //1.9f;
-        public const float additionalHeightClimateRainforest = 0.3f;
-        public const float additionalHeightClimateSwamp = 0.1f;
-        public const float additionalHeightClimateSubtropical = 0.15f;
-        public const float additionalHeightClimateMountainWoods = 0.55f;
-        public const float additionalHeightClimateWoodlands = 0.45f;
-        public const float additionalHeightClimateHauntedWoodlands = 0.2f;
-        public const float maxAdditionalHeightNoiseClimate = additionalHeightClimateMountain; // must match the highest additionalHeight of all climates above
+        public const float additionalHeightNoiseClimateOcean = 0.0f;
+        public const float additionalHeightNoiseClimateDesert = 0.05f;
+        public const float additionalHeightNoiseClimateDesert2 = 0.25f;
+        public const float additionalHeightNoiseClimateMountain = 0.55f;
+        public const float additionalHeightNoiseClimateRainforest = 0.27f;
+        public const float additionalHeightNoiseClimateSwamp = 0.1f;
+        public const float additionalHeightNoiseClimateSubtropical = 0.15f;
+        public const float additionalHeightNoiseClimateMountainWoods = 0.55f;
+        public const float additionalHeightNoiseClimateWoodlands = 0.45f;
+        public const float additionalHeightNoiseClimateHauntedWoodlands = 0.25f;
+        public const float maxAdditionalHeightNoiseClimate = additionalHeightNoiseClimateMountain; // must match the highest additionalHeight of all climates above
 
         // 2D distance transform image - squared distance to water pixels of the world map
         private static float[] mapDistanceSquaredFromWater = null;
@@ -188,34 +188,34 @@ namespace DistantTerrain
             switch (worldClimate)
             {
                 case (int)MapsFile.Climates.Ocean:
-                    additionalHeightBasedOnClimate = additionalHeightClimateOcean;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateOcean;
                     break;
                 case (int)MapsFile.Climates.Desert:
-                    additionalHeightBasedOnClimate = additionalHeightClimateDesert;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateDesert;
                     break;
                 case (int)MapsFile.Climates.Desert2:
-                    additionalHeightBasedOnClimate = additionalHeightClimateDesert2;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateDesert2;
                     break;
                 case (int)MapsFile.Climates.Mountain:
-                    additionalHeightBasedOnClimate = additionalHeightClimateMountain;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateMountain;
                     break;
                 case (int)MapsFile.Climates.Rainforest:
-                    additionalHeightBasedOnClimate = additionalHeightClimateRainforest;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateRainforest;
                     break;
                 case (int)MapsFile.Climates.Swamp:
-                    additionalHeightBasedOnClimate = additionalHeightClimateSwamp;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateSwamp;
                     break;
                 case (int)MapsFile.Climates.Subtropical:
-                    additionalHeightBasedOnClimate = additionalHeightClimateSubtropical;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateSubtropical;
                     break;
                 case (int)MapsFile.Climates.MountainWoods:
-                    additionalHeightBasedOnClimate = additionalHeightClimateMountainWoods;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateMountainWoods;
                     break;
                 case (int)MapsFile.Climates.Woodlands:
-                    additionalHeightBasedOnClimate = additionalHeightClimateWoodlands;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateWoodlands;
                     break;
                 case (int)MapsFile.Climates.HauntedWoodlands:
-                    additionalHeightBasedOnClimate = additionalHeightClimateHauntedWoodlands;
+                    additionalHeightBasedOnClimate = additionalHeightNoiseClimateHauntedWoodlands;
                     break;
             }
             return additionalHeightBasedOnClimate;
@@ -392,7 +392,10 @@ namespace DistantTerrain
                             float multiplierLocation = (distanceFromLocation * extraExaggerationFactorLocationDistance + 1.0f); // terrain distant from location gets extra exaggeration
                             if (distanceFromWater < minDistanceFromWaterForExtraExaggeration) // except if it is near water
                                 multiplierLocation = 1.0f;
-                            
+
+                            // Seed random with terrain key
+                            UnityEngine.Random.InitState(TerrainHelper.MakeTerrainKey(x, y));
+
                             float additionalHeightBasedOnClimate = GetAdditionalHeightBasedOnClimate(x, y);
                             mapMultipliers[y * width + x] = (Math.Min(maxHeightsExaggerationMultiplier, UnityEngine.Random.Range(0.0f, additionalHeightBasedOnClimate) + multiplierLocation * Math.Max(1.0f, distanceFromWater * exaggerationFactorWaterDistance)));
                         }
