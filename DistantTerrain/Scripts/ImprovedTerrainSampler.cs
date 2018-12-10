@@ -57,7 +57,7 @@ namespace DistantTerrain
 
         public override int Version
         {
-            get { return 1; }
+            get { return 2; }
         }
 
         public ImprovedTerrainSampler()
@@ -108,72 +108,42 @@ namespace DistantTerrain
                 }
             }
 
-            float[,] noiseMapScaleClimate = new float[3, 3];
-            for (int y = 0; y < 3; y++)
+            float[,] waterMap2 = new float[4, 4];
+            for (int y = 0; y < 4; y++)
             {
-                for (int x = 0; x < 3; x++)
+                for (int x = 0; x < 4; x++)
+                {
+                    if (shm[x, y] <= 2)
+                        waterMap2[x, y] = 0.0f;
+                    else
+                        waterMap2[x, y] = 1.0f;
+                }
+            }
+
+            float[,] climateMap = new float[4, 4];
+            for (int y = 0; y < 4; y++)
+            {
+                for (int x = 0; x < 4; x++)
                 {
                     int mapPixelX = Math.Max(0, Math.Min(mx + x - 1, WoodsFile.mapWidthValue));
                     int mapPixelY = Math.Max(0, Math.Min(my + y - 1, WoodsFile.mapHeightValue));
-
-                    noiseMapScaleClimate[x, y] = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
-
-                    //// test neighborhood for water noise map scales and dilate if so (prevent cliffs)
-                    //bool waterInNeighborhood = false;
-                    //for (int iy = Mathf.Max(0, my - 1); iy <= Mathf.Min(WoodsFile.mapHeightValue - 1, my + 1); iy++)
-                    //{
-                    //    for (int ix = Mathf.Max(0, mx - 1); ix <= Mathf.Min(WoodsFile.mapWidthValue - 1, mx + 1); ix++)
-                    //    {
-                    //        if (mx != ix || my != iy)
-                    //        {
-                    //            int worldClimate = DaggerfallUnity.Instance.ContentReader.MapFileReader.GetClimateIndex(ix, iy);
-                    //            if (worldClimate == (int)MapsFile.Climates.Ocean)
-                    //            {
-                    //                waterInNeighborhood = true;
-                    //            }
-                    //        }
-                    //    }
-                    //}
-                    //if (waterInNeighborhood == true)
-                    //{
-                    //    noiseMapScaleClimate[x, y] = noiseMapScaleClimateOcean;
-                    //}
-                }
-            }            
-
-            int dimClimateMultiplier = 4;
-            float[,] climateMultiplierValue = new float[dimClimateMultiplier, dimClimateMultiplier];
-            for (int y = 0; y < dimClimateMultiplier; y++)
-            {
-                for (int x = 0; x < dimClimateMultiplier; x++)
-                {
-                    int sample1X = x / (dimClimateMultiplier / 2);
-                    int sample1Y = y / (dimClimateMultiplier / 2);
-                    int sample2X = sample1X + 1;
-                    int sample2Y = sample1Y + 1;
-
-                    float amountX = Math.Abs((float)(dimClimateMultiplier / 2) - x);
-                    if (dimClimateMultiplier % 2 == 0)
-                        amountX = Math.Max(amountX, Math.Abs((float)(dimClimateMultiplier / 2) - (x + 1f)));
-                    float w1x = amountX / (float)(dimClimateMultiplier);
-                    if (x >= dimClimateMultiplier / 2)
-                        w1x = 1f - w1x;
-                    float w2x = 1.0f - w1x;
-
-                    float amountY = Math.Abs((float)(dimClimateMultiplier / 2) - y);
-                    if (dimClimateMultiplier % 2 == 0)
-                        amountY = Math.Max(amountY, Math.Abs((float)(dimClimateMultiplier / 2) - (y + 1f)));
-                    float w1y = amountY / (float)(dimClimateMultiplier);
-                    if (y >= dimClimateMultiplier / 2)
-                        w1y = 1f - w1y;
-                    float w2y = 1.0f - w1y;
-
-                    climateMultiplierValue[x, y] = noiseMapScaleClimate[sample1X, sample1Y] * w1x * w1y +
-                                                   noiseMapScaleClimate[sample2X, sample1Y] * w2x * w1y +
-                                                   noiseMapScaleClimate[sample1X, sample2Y] * w1x * w2y +
-                                                   noiseMapScaleClimate[sample2X, sample2Y] * w2x * w2y;
+                    climateMap[x, y] = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
                 }
             }
+
+
+            //float[,] noiseMapScaleClimate = new float[3, 3];
+            //for (int y = 0; y < 3; y++)
+            //{
+            //    for (int x = 0; x < 3; x++)
+            //    {
+            //        int mapPixelX = Math.Max(0, Math.Min(mx + x - 1, WoodsFile.mapWidthValue));
+            //        int mapPixelY = Math.Max(0, Math.Min(my + y - 1, WoodsFile.mapHeightValue));
+
+            //        noiseMapScaleClimate[x, y] = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
+            //    }
+            //}
+            
 
             // Extract height samples for all chunks
             float averageHeight = 0;
@@ -205,41 +175,33 @@ namespace DistantTerrain
                     scaledHeight += baseHeight * baseHeightScale;
 
                     // Bicubic sample large height map for noise mask over terrain features
-                    //x1 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 0] * climateMultiplierValue[0, 0], lhm[ix + 1, iy + 0] * climateMultiplierValue[1, 0], lhm[ix + 2, iy + 0] * climateMultiplierValue[2, 0], lhm[ix + 3, iy + 0] * climateMultiplierValue[3, 0], fracx);
-                    //x2 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 1] * climateMultiplierValue[0, 1], lhm[ix + 1, iy + 1] * climateMultiplierValue[1, 1], lhm[ix + 2, iy + 1] * climateMultiplierValue[2, 1], lhm[ix + 3, iy + 1] * climateMultiplierValue[3, 1], fracx);
-                    //x3 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 2] * climateMultiplierValue[0, 2], lhm[ix + 1, iy + 2] * climateMultiplierValue[1, 2], lhm[ix + 2, iy + 2] * climateMultiplierValue[2, 2], lhm[ix + 3, iy + 2] * climateMultiplierValue[3, 2], fracx);
-                    //x4 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 3] * climateMultiplierValue[0, 3], lhm[ix + 1, iy + 3] * climateMultiplierValue[1, 3], lhm[ix + 2, iy + 3] * climateMultiplierValue[2, 3], lhm[ix + 3, iy + 3] * climateMultiplierValue[3, 3], fracx);
                     x1 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 0], lhm[ix + 1, iy + 0], lhm[ix + 2, iy + 0], lhm[ix + 3, iy + 0], fracx);
                     x2 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 1], lhm[ix + 1, iy + 1], lhm[ix + 2, iy + 1], lhm[ix + 3, iy + 1], fracx);
                     x3 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 2], lhm[ix + 1, iy + 2], lhm[ix + 2, iy + 2], lhm[ix + 3, iy + 2], fracx);
                     x4 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 3], lhm[ix + 1, iy + 3], lhm[ix + 2, iy + 3], lhm[ix + 3, iy + 3], fracx);
                     noiseHeight = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, fracy);
 
-                    //x1 = TerrainHelper.CubicInterpolator(climateMultiplierValue[0, 3], climateMultiplierValue[1, 3], climateMultiplierValue[2, 3], climateMultiplierValue[3, 3], sfracx);
-                    //x2 = TerrainHelper.CubicInterpolator(climateMultiplierValue[0, 2], climateMultiplierValue[1, 2], climateMultiplierValue[2, 2], climateMultiplierValue[3, 2], sfracx);
-                    //x3 = TerrainHelper.CubicInterpolator(climateMultiplierValue[0, 1], climateMultiplierValue[1, 1], climateMultiplierValue[2, 1], climateMultiplierValue[3, 1], sfracx);
-                    //x4 = TerrainHelper.CubicInterpolator(climateMultiplierValue[0, 0], climateMultiplierValue[1, 0], climateMultiplierValue[2, 0], climateMultiplierValue[3, 0], sfracx);
-                    //float climateMultiplier = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
-                    float climateMultiplier = TerrainHelper.BilinearInterpolator(climateMultiplierValue[0, 3], climateMultiplierValue[0, 0], climateMultiplierValue[3, 3], climateMultiplierValue[3, 0], sfracx, sfracy);
-                    if (scaledHeight <= scaledOceanElevation)
-                        climateMultiplier = 1.0f;
+                    x1 = TerrainHelper.CubicInterpolator(waterMap2[0, 3], waterMap2[1, 3], waterMap2[2, 3], waterMap2[3, 3], sfracx);
+                    x2 = TerrainHelper.CubicInterpolator(waterMap2[0, 2], waterMap2[1, 2], waterMap2[2, 2], waterMap2[3, 2], sfracx);
+                    x3 = TerrainHelper.CubicInterpolator(waterMap2[0, 1], waterMap2[1, 1], waterMap2[2, 1], waterMap2[3, 1], sfracx);
+                    x4 = TerrainHelper.CubicInterpolator(waterMap2[0, 0], waterMap2[1, 0], waterMap2[2, 0], waterMap2[3, 0], sfracx);
+                    float waterMultiplier = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
 
-                    scaledHeight += noiseHeight * climateMultiplier; // * noiseMapScale;
+                    //float climateMultiplier = TerrainHelper.BilinearInterpolator(climateMultiplierValue[0, 3], climateMultiplierValue[0, 0], climateMultiplierValue[3, 3], climateMultiplierValue[3, 0], sfracx, sfracy);
+                    x1 = TerrainHelper.CubicInterpolator(climateMap[0, 3], climateMap[1, 3], climateMap[2, 3], climateMap[3, 3], sfracx);
+                    x2 = TerrainHelper.CubicInterpolator(climateMap[0, 2], climateMap[1, 2], climateMap[2, 2], climateMap[3, 2], sfracx);
+                    x3 = TerrainHelper.CubicInterpolator(climateMap[0, 1], climateMap[1, 1], climateMap[2, 1], climateMap[3, 1], sfracx);
+                    x4 = TerrainHelper.CubicInterpolator(climateMap[0, 0], climateMap[1, 0], climateMap[2, 0], climateMap[3, 0], sfracx);
+                    float climateMultiplier = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
 
-                    //float climateMultiplierX1 = TerrainHelper.CubicInterpolator(climateMultiplierValue[ix, iy + 0], climateMultiplierValue[ix + 1, iy + 0], climateMultiplierValue[ix + 2, iy + 0], climateMultiplierValue[ix + 3, iy + 0], sfracx);
-                    //float climateMultiplierX2 = TerrainHelper.CubicInterpolator(climateMultiplierValue[ix, iy + 1], climateMultiplierValue[ix + 1, iy + 1], climateMultiplierValue[ix + 2, iy + 1], climateMultiplierValue[ix + 3, iy + 1], sfracx);
-                    //float climateMultiplierX3 = TerrainHelper.CubicInterpolator(climateMultiplierValue[ix, iy + 2], climateMultiplierValue[ix + 1, iy + 2], climateMultiplierValue[ix + 2, iy + 2], climateMultiplierValue[ix + 3, iy + 2], sfracx);
-                    //float climateMultiplierX4 = TerrainHelper.CubicInterpolator(climateMultiplierValue[ix, iy + 3], climateMultiplierValue[ix + 1, iy + 3], climateMultiplierValue[ix + 2, iy + 3], climateMultiplierValue[ix + 3, iy + 3], sfracx);
-                    //float climateMultiplier = TerrainHelper.CubicInterpolator(climateMultiplierX1, climateMultiplierX2, climateMultiplierX3, climateMultiplierX4, sfracy);
-                    
+                    scaledHeight += noiseHeight * waterMultiplier * climateMultiplier;
 
                     // Additional noise mask for small terrain features at ground level
                     // small terrain features' height scale should depend on climate of map pixel
                     float extraNoiseScale = GetExtraNoiseScaleBasedOnClimate(mx, my);
                     // prevent seams between different climate map pixels
                     if (x <= 0 || y <= 0 || x >= dim - 1 || y >= dim - 1)
-                    {
-                        //noiseMapScale = defaultNoiseMapScale;
+                    {                        
                         extraNoiseScale = defaultExtraNoiseScale;
                     }
                     int noisex = mapPixel.mapPixelX * (HeightmapDimension - 1) + x;
