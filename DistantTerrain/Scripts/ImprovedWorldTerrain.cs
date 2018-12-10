@@ -397,7 +397,7 @@ namespace DistantTerrain
                             UnityEngine.Random.InitState(TerrainHelper.MakeTerrainKey(x, y));
 
                             float additionalHeightBasedOnClimate = GetAdditionalHeightBasedOnClimate(x, y);
-                            mapMultipliers[y * width + x] = (Math.Min(maxHeightsExaggerationMultiplier, UnityEngine.Random.Range(0.0f, additionalHeightBasedOnClimate) + multiplierLocation * Math.Max(1.0f, distanceFromWater * exaggerationFactorWaterDistance)));
+                            mapMultipliers[y * width + x] = (Math.Min(maxHeightsExaggerationMultiplier, UnityEngine.Random.Range(0.0f, additionalHeightBasedOnClimate) + /*multiplierLocation **/ Math.Max(1.0f, distanceFromWater * exaggerationFactorWaterDistance)));
                         }
                     }
 
