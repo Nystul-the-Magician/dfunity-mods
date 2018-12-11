@@ -1,4 +1,4 @@
-﻿//Distant Terrain Mod for Daggerfall-Unity
+//Distant Terrain Mod for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -43,8 +43,8 @@ namespace DistantTerrain
             // Get this mod
             mod = initParams.Mod;
 
-            // Load settings. Pass this mod as paramater
-            ModSettings settings = new ModSettings(mod);
+            // Load settings.
+            ModSettings settings = mod.GetSettings();
 
             // settings
             enableTerrainTransition = settings.GetBool("TerrainTransition", "enable");
