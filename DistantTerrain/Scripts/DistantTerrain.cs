@@ -68,8 +68,9 @@ namespace DistantTerrain
 
         public RenderTexture reflectionSeaTexture = null;
 
-        private float extraTranslationY = -10.0f;
-        private float extraWaterTranslationY = -35.25f;
+        private float extraTranslationY = -1.0f; // only minimum amount (1m) since terrain heights almost match when terrain transition is active (the mismatch is because no neighbor terrains can be set)
+        private float extraTranslationY_noTerrainTransition = -110.0f; // this is used when terrain transition is disabled - large amount to minimize terrain seams
+        private float extraWaterTranslationY = -ImprovedTerrainSampler.scaledOceanElevation;
 
         /// <summary>
         /// extra translation property is the amount of y-bias of the FarTerrain geometry (needed to prevent precision rendering issues at the transition from terrain transition ring and far terrain geometry))
@@ -420,7 +421,10 @@ namespace DistantTerrain
                 //Debug.Log("update from floating origin event");
                 UpdatePositionWorldTerrain(ref worldTerrainGameObject, offset);
 
-                UpdateTransitionRingPosition(offset);
+                if (enableTerrainTransition)
+                {
+                    UpdateTransitionRingPosition(offset);
+                }
             }
         }
 
@@ -441,6 +445,11 @@ namespace DistantTerrain
                 {
                     terrainTransitionRingArray[i] = new TransitionTerrainDesc();
                 }
+            }
+            else
+            {
+                // use different extra translation y value if terrain transition is deactivated (so terrain seams get less likely)
+                extraTranslationY = extraTranslationY_noTerrainTransition;
             }
 
             if (enableImprovedTerrain)
