@@ -48,6 +48,9 @@ namespace DistantTerrain
         public const float extraNoiseScaleClimateMountainWoods = 32f;
         public const float extraNoiseScaleClimateWoodlands = 24f;
         public const float extraNoiseScaleClimateHauntedWoodlands = 22f;
+
+        public const float interpolationEndDistanceFromWaterForNoiseScaleMultiplier = 5.0f;
+
         //public const float extraNoiseScale = 3f; //10f; //3f;
         public const float scaledOceanElevation = 3.4f * baseHeightScale;
         public const float scaledBeachElevation = 5.0f * baseHeightScale;
@@ -150,7 +153,12 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < 4; x++)
                 {
-                    noiseHeightMultiplierMap[x, y] = waterMap[x, y] * climateMap[x, y] * (Mathf.Min(5.0f, waterDistanceMap[x, y]) / 5.0f);
+                    // interpolation multiplier taking near coast map pixels into account
+                    // (multiply with 0 at coast line and 1 at interpolationEndDistanceFromWaterForNoiseScaleMultiplier)
+                    float multFact = (Mathf.Min(interpolationEndDistanceFromWaterForNoiseScaleMultiplier, waterDistanceMap[x, y]) / interpolationEndDistanceFromWaterForNoiseScaleMultiplier);
+
+                    // blend watermap with climatemap taking into account multFact
+                    noiseHeightMultiplierMap[x, y] = waterMap[x, y] * climateMap[x, y] * multFact;
                 }
             }
 
