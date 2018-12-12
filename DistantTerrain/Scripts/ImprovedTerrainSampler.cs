@@ -77,10 +77,10 @@ namespace DistantTerrain
 
         public override void GenerateSamples(ref MapPixelData mapPixel)
         {
-            DaggerfallUnity dfUnity = DaggerfallUnity.Instance;
-
             System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
             long startTime = stopwatch.ElapsedMilliseconds;
+
+            DaggerfallUnity dfUnity = DaggerfallUnity.Instance;
 
             // Create samples arrays
             mapPixel.tilemapSamples = new TilemapSample[MapsFile.WorldMapTileDim, MapsFile.WorldMapTileDim];
@@ -128,15 +128,9 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < 4; x++)
                 {
-                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 1, WoodsFile.mapWidthValue));
-                    int mapPixelY = Math.Max(0, Math.Min(my + y - 1, WoodsFile.mapHeightValue));                    
+                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
+                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));                    
                     climateMap[x, y] = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
-
-                    //UnityEngine.Random.InitState(TerrainHelper.MakeTerrainKey(mx + x - 1, my + y - 1));
-                    //int mapPixelX = Math.Max(0, Math.Min(mx + x - 1, WoodsFile.mapWidthValue));
-                    //int mapPixelY = Math.Max(0, Math.Min(my + y - 1, WoodsFile.mapHeightValue));
-                    //float maxNoise = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
-                    //climateMap[x, y] = UnityEngine.Random.Range(0.0f, maxNoise) - maxNoise / 2;
                 }
             }
 
@@ -145,11 +139,22 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < 4; x++)
                 {
-                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 1, WoodsFile.mapWidthValue));
-                    int mapPixelY = Math.Max(0, Math.Min(my + y - 1, WoodsFile.mapHeightValue));
+                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
+                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));
                     waterDistanceMap[x, y] = (float)Math.Sqrt(ImprovedWorldTerrain.MapDistanceSquaredFromWater[mapPixelY * WoodsFile.mapWidthValue + mapPixelX]);
                 }
             }
+
+            float[,] noiseHeightMultiplierMap = new float[4, 4];
+            for (int y = 0; y < 4; y++)
+            {
+                for (int x = 0; x < 4; x++)
+                {
+                    noiseHeightMultiplierMap[x, y] = waterMap[x, y] * climateMap[x, y] * (Mathf.Min(5.0f, waterDistanceMap[x, y]) / 5.0f);
+                }
+            }
+
+            float extraNoiseScaleBasedOnClimate = GetExtraNoiseScaleBasedOnClimate(mx, my);
 
             // Extract height samples for all chunks
             float averageHeight = 0;
@@ -187,44 +192,26 @@ namespace DistantTerrain
                     x4 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 3], lhm[ix + 1, iy + 3], lhm[ix + 2, iy + 3], lhm[ix + 3, iy + 3], fracx);
                     noiseHeight = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, fracy);
 
-                    x1 = TerrainHelper.CubicInterpolator(waterMap[0, 3], waterMap[1, 3], waterMap[2, 3], waterMap[3, 3], sfracx);
-                    x2 = TerrainHelper.CubicInterpolator(waterMap[0, 2], waterMap[1, 2], waterMap[2, 2], waterMap[3, 2], sfracx);
-                    x3 = TerrainHelper.CubicInterpolator(waterMap[0, 1], waterMap[1, 1], waterMap[2, 1], waterMap[3, 1], sfracx);
-                    x4 = TerrainHelper.CubicInterpolator(waterMap[0, 0], waterMap[1, 0], waterMap[2, 0], waterMap[3, 0], sfracx);
-                    float waterMultiplier = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
+                    x1 = TerrainHelper.CubicInterpolator(noiseHeightMultiplierMap[0, 3], noiseHeightMultiplierMap[1, 3], noiseHeightMultiplierMap[2, 3], noiseHeightMultiplierMap[3, 3], sfracx);
+                    x2 = TerrainHelper.CubicInterpolator(noiseHeightMultiplierMap[0, 2], noiseHeightMultiplierMap[1, 2], noiseHeightMultiplierMap[2, 2], noiseHeightMultiplierMap[3, 2], sfracx);
+                    x3 = TerrainHelper.CubicInterpolator(noiseHeightMultiplierMap[0, 1], noiseHeightMultiplierMap[1, 1], noiseHeightMultiplierMap[2, 1], noiseHeightMultiplierMap[3, 1], sfracx);
+                    x4 = TerrainHelper.CubicInterpolator(noiseHeightMultiplierMap[0, 0], noiseHeightMultiplierMap[1, 0], noiseHeightMultiplierMap[2, 0], noiseHeightMultiplierMap[3, 0], sfracx);
+                    float noiseHeightMultiplier = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
 
-                    //float climateMultiplier = TerrainHelper.BilinearInterpolator(climateMultiplierValue[0, 3], climateMultiplierValue[0, 0], climateMultiplierValue[3, 3], climateMultiplierValue[3, 0], sfracx, sfracy);
-                    x1 = TerrainHelper.CubicInterpolator(climateMap[0, 3], climateMap[1, 3], climateMap[2, 3], climateMap[3, 3], sfracx);
-                    x2 = TerrainHelper.CubicInterpolator(climateMap[0, 2], climateMap[1, 2], climateMap[2, 2], climateMap[3, 2], sfracx);
-                    x3 = TerrainHelper.CubicInterpolator(climateMap[0, 1], climateMap[1, 1], climateMap[2, 1], climateMap[3, 1], sfracx);
-                    x4 = TerrainHelper.CubicInterpolator(climateMap[0, 0], climateMap[1, 0], climateMap[2, 0], climateMap[3, 0], sfracx);
-                    float climateMultiplier = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
-
-                    x1 = TerrainHelper.CubicInterpolator(waterDistanceMap[0, 3], waterDistanceMap[1, 3], waterDistanceMap[2, 3], waterDistanceMap[3, 3], sfracx);
-                    x2 = TerrainHelper.CubicInterpolator(waterDistanceMap[0, 2], waterDistanceMap[1, 2], waterDistanceMap[2, 2], waterDistanceMap[3, 2], sfracx);
-                    x3 = TerrainHelper.CubicInterpolator(waterDistanceMap[0, 1], waterDistanceMap[1, 1], waterDistanceMap[2, 1], waterDistanceMap[3, 1], sfracx);
-                    x4 = TerrainHelper.CubicInterpolator(waterDistanceMap[0, 0], waterDistanceMap[1, 0], waterDistanceMap[2, 0], waterDistanceMap[3, 0], sfracx);
-                    float waterDistance = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
-
-                    scaledHeight += noiseHeight * climateMultiplier * waterMultiplier * (Mathf.Min(5.0f, waterDistance) / 5.0f);
-                    //scaledHeight += (noiseHeight + 35.0f * climateMultiplier) * waterMultiplier;
-
-                    // float distanceFromWater = (float)Math.Sqrt(ImprovedWorldTerrain.MapDistanceSquaredFromWater[my * WoodsFile.mapWidthValue + mx]);
-                    // * ((10.0f - Mathf.Max(10.0f,(10.0f - distanceFromWater))) / 10.0f)
-
+                    scaledHeight += noiseHeight * noiseHeightMultiplier;                  
 
                     // Additional noise mask for small terrain features at ground level
                     // small terrain features' height scale should depend on climate of map pixel
-                    float extraNoiseScale = GetExtraNoiseScaleBasedOnClimate(mx, my);
+                    float extraNoiseScale = extraNoiseScaleBasedOnClimate;
                     // prevent seams between different climate map pixels
                     if (x <= 0 || y <= 0 || x >= dim - 1 || y >= dim - 1)
-                    {                        
+                    {
                         extraNoiseScale = defaultExtraNoiseScale;
                     }
                     int noisex = mapPixel.mapPixelX * (HeightmapDimension - 1) + x;
                     int noisey = (MapsFile.MaxMapPixelY - mapPixel.mapPixelY) * (HeightmapDimension - 1) + y;
                     float lowFreq = TerrainHelper.GetNoise(noisex, noisey, 0.3f, 0.5f, 0.5f, 1);
-                    float highFreq = TerrainHelper.GetNoise(noisex, noisey, 0.9f, 0.5f, 0.5f, 1);                    
+                    float highFreq = TerrainHelper.GetNoise(noisex, noisey, 0.9f, 0.5f, 0.5f, 1);
                     scaledHeight += (lowFreq * highFreq) * extraNoiseScale;
 
                     // Clamp lower values to ocean elevation
@@ -247,6 +234,9 @@ namespace DistantTerrain
             // Average and max heights are passed back for locations
             mapPixel.averageHeight = (averageHeight /= (float)(dim * dim)) / MaxTerrainHeight;
             mapPixel.maxHeight = maxHeight / MaxTerrainHeight;
+
+            long totalTime = stopwatch.ElapsedMilliseconds - startTime;
+            DaggerfallUnity.LogMessage(string.Format("GenerateSamples took: {0}ms", totalTime), true);
         }
 
         private float GetNoiseMapScaleBasedOnClimate(int mapPixelX, int mapPixelY)
