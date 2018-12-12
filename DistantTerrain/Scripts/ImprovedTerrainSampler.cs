@@ -102,7 +102,7 @@ namespace DistantTerrain
             byte[,] shm = dfUnity.ContentReader.WoodsFileReader.GetHeightMapValuesRange(mx - 2, my - 2, 4);
             byte[,] lhm = dfUnity.ContentReader.WoodsFileReader.GetLargeHeightMapValuesRange(mx - 1, my, 3);
 
-            float[,] multiplierValue = new float[4, 4];
+            float[,] baseHeightValue = new float[4, 4];
             for (int y = 0; y < 4; y++)
             {
                 for (int x = 0; x < 4; x++)
@@ -110,7 +110,7 @@ namespace DistantTerrain
                     int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
                     int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));
 
-                    multiplierValue[x, y] = ImprovedWorldTerrain.computeHeightMultiplier(mapPixelX, mapPixelY);
+                    baseHeightValue[x, y] = shm[x,y] * ImprovedWorldTerrain.computeHeightMultiplier(mapPixelX, mapPixelY);
                 }
             }
 
@@ -162,6 +162,33 @@ namespace DistantTerrain
                 }
             }
 
+            //float[,] noiseHeightMultiplierMap = new float[4, 4];
+            //for (int y = 0; y < 4; y++)
+            //{
+            //    for (int x = 0; x < 4; x++)
+            //    {
+            //        int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
+            //        int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));
+
+            //        float climateValue = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
+
+            //        float waterDistance = (float)Math.Sqrt(ImprovedWorldTerrain.MapDistanceSquaredFromWater[mapPixelY * WoodsFile.mapWidthValue + mapPixelX]);
+
+            //        float waterValue;
+            //        if (shm[x, y] <= 2) // mappixel is water
+            //            waterValue = 0.0f;
+            //        else
+            //            waterValue = 1.0f;
+
+            //        // interpolation multiplier taking near coast map pixels into account
+            //        // (multiply with 0 at coast line and 1 at interpolationEndDistanceFromWaterForNoiseScaleMultiplier)
+            //        float multFact = (Mathf.Min(interpolationEndDistanceFromWaterForNoiseScaleMultiplier, waterDistance) / interpolationEndDistanceFromWaterForNoiseScaleMultiplier);
+
+            //        // blend watermap with climatemap taking into account multFact
+            //        noiseHeightMultiplierMap[x, y] = waterValue * climateValue * multFact;
+            //    }
+            //}
+
             float extraNoiseScaleBasedOnClimate = GetExtraNoiseScaleBasedOnClimate(mx, my);
 
             // Extract height samples for all chunks
@@ -186,10 +213,10 @@ namespace DistantTerrain
                     float scaledHeight = 0;
 
                     // Bicubic sample small height map for base terrain elevation
-                    x1 = TerrainHelper.CubicInterpolator(shm[0, 3] * multiplierValue[0, 3], shm[1, 3] * multiplierValue[1, 3], shm[2, 3] * multiplierValue[2, 3], shm[3, 3] * multiplierValue[3, 3], sfracx);
-                    x2 = TerrainHelper.CubicInterpolator(shm[0, 2] * multiplierValue[0, 2], shm[1, 2] * multiplierValue[1, 2], shm[2, 2] * multiplierValue[2, 2], shm[3, 2] * multiplierValue[3, 2], sfracx);
-                    x3 = TerrainHelper.CubicInterpolator(shm[0, 1] * multiplierValue[0, 1], shm[1, 1] * multiplierValue[1, 1], shm[2, 1] * multiplierValue[2, 1], shm[3, 1] * multiplierValue[3, 1], sfracx);
-                    x4 = TerrainHelper.CubicInterpolator(shm[0, 0] * multiplierValue[0, 0], shm[1, 0] * multiplierValue[1, 0], shm[2, 0] * multiplierValue[2, 0], shm[3, 0] * multiplierValue[3, 0], sfracx);
+                    x1 = TerrainHelper.CubicInterpolator(baseHeightValue[0, 3], baseHeightValue[1, 3], baseHeightValue[2, 3], baseHeightValue[3, 3], sfracx);
+                    x2 = TerrainHelper.CubicInterpolator(baseHeightValue[0, 2], baseHeightValue[1, 2], baseHeightValue[2, 2], baseHeightValue[3, 2], sfracx);
+                    x3 = TerrainHelper.CubicInterpolator(baseHeightValue[0, 1], baseHeightValue[1, 1], baseHeightValue[2, 1], baseHeightValue[3, 1], sfracx);
+                    x4 = TerrainHelper.CubicInterpolator(baseHeightValue[0, 0], baseHeightValue[1, 0], baseHeightValue[2, 0], baseHeightValue[3, 0], sfracx);
                     baseHeight = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
                     scaledHeight += baseHeight * baseHeightScale;
 
