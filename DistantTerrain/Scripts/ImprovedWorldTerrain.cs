@@ -38,22 +38,21 @@ namespace DistantTerrain
         const string out_filepathOutTreeCoverageMap = "Game/Addons/DistantTerrain/Resources/mapTreeCoverage_out.bin"; //  only used on manual trigger in unity editor - never in executable - so it should be ok
 
         const float minDistanceFromWaterForExtraExaggeration = 3.0f; // when does exaggeration start in terms of how far does terrain have to be away from water
-        const float exaggerationFactorWaterDistance = 0.15f; //0.123f; //0.15f; // how strong is the distance from water incorporated into the multiplier
+        const float exaggerationFactorWaterDistance = 0.075f; // 0.15f; //0.123f; //0.15f; // how strong is the distance from water incorporated into the multiplier
         const float extraExaggerationFactorLocationDistance = 0.0275f; // how strong is the distance from locations incorporated into the multiplier
         public const float maxHeightsExaggerationMultiplier = 25.0f; // this directly affects maxTerrainHeight in TerrainHelper.cs: maxTerrainHeight should be maxHeightsExaggerationMultiplier * baseHeightScale * 128 + noiseMapScale * 128 + extraNoiseScale
 
         // additional height noise based on climate        
         public const float additionalHeightNoiseClimateOcean = 0.0f;
-        public const float additionalHeightNoiseClimateDesert = 0.05f;
-        public const float additionalHeightNoiseClimateDesert2 = 0.25f;
-        public const float additionalHeightNoiseClimateMountain = 0.55f;
+        public const float additionalHeightNoiseClimateDesert = 0.85f; //0.35f;
+        public const float additionalHeightNoiseClimateDesert2 = 1.05f;
+        public const float additionalHeightNoiseClimateMountain = 0.45f;
         public const float additionalHeightNoiseClimateRainforest = 0.27f;
-        public const float additionalHeightNoiseClimateSwamp = 0.1f;
-        public const float additionalHeightNoiseClimateSubtropical = 0.15f;
-        public const float additionalHeightNoiseClimateMountainWoods = 0.55f;
-        public const float additionalHeightNoiseClimateWoodlands = 0.45f;
-        public const float additionalHeightNoiseClimateHauntedWoodlands = 0.25f;
-        public const float maxAdditionalHeightNoiseClimate = additionalHeightNoiseClimateMountain; // must match the highest additionalHeight of all climates above
+        public const float additionalHeightNoiseClimateSwamp = 1.7f;
+        public const float additionalHeightNoiseClimateSubtropical = 0.65f;
+        public const float additionalHeightNoiseClimateMountainWoods = 1.05f;
+        public const float additionalHeightNoiseClimateWoodlands = 0.65f; //0.45f;
+        public const float additionalHeightNoiseClimateHauntedWoodlands = 0.25f;        
 
         // 2D distance transform image - squared distance to water pixels of the world map
         private static float[] mapDistanceSquaredFromWater = null;
@@ -397,7 +396,7 @@ namespace DistantTerrain
                             UnityEngine.Random.InitState(TerrainHelper.MakeTerrainKey(x, y));
 
                             float additionalHeightBasedOnClimate = GetAdditionalHeightBasedOnClimate(x, y);
-                            mapMultipliers[y * width + x] = (Math.Min(maxHeightsExaggerationMultiplier, UnityEngine.Random.Range(0.0f, additionalHeightBasedOnClimate) + /*multiplierLocation **/ Math.Max(1.0f, distanceFromWater * exaggerationFactorWaterDistance)));
+                            mapMultipliers[y * width + x] = (Math.Min(maxHeightsExaggerationMultiplier, /*-additionalHeightBasedOnClimate * 0.5f*/ + UnityEngine.Random.Range(/*0.0f*/-additionalHeightBasedOnClimate, additionalHeightBasedOnClimate) + /*multiplierLocation **/ Math.Max(1.0f, distanceFromWater * exaggerationFactorWaterDistance)));
                         }
                     }
 

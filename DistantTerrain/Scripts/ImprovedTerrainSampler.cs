@@ -22,28 +22,28 @@ namespace DistantTerrain
     public class ImprovedTerrainSampler : TerrainSampler
     {
         // Scale factors for this sampler implementation
-        public const float baseHeightScale = 8f; //12f; //16f; // 8f;
-        public const float maxNoiseMapScale = 15f; //4f; //15f; //4f;
+        public const float baseHeightScale = 8f; //12f; //16f; // 8f;        
         public const float defaultNoiseMapScale = 15f;
         public const float defaultExtraNoiseScale = 3f;
         // additional height noise based on climate      
         public const float noiseMapScaleClimateOcean = 0.0f;
-        public const float noiseMapScaleClimateDesert = 1.25f;
-        public const float noiseMapScaleClimateDesert2 = 10.0f;
+        public const float noiseMapScaleClimateDesert = 2.0f; //1.25f;
+        public const float noiseMapScaleClimateDesert2 = 32.0f;
         public const float noiseMapScaleClimateMountain = 15.0f;
         public const float noiseMapScaleClimateRainforest = 7.5f;
-        public const float noiseMapScaleClimateSwamp = 2.5f;
-        public const float noiseMapScaleClimateSubtropical = 4.75f; // 3.25f
+        public const float noiseMapScaleClimateSwamp = 3.8f;
+        public const float noiseMapScaleClimateSubtropical = 3.35f; // 3.25f
         public const float noiseMapScaleClimateMountainWoods = 12.5f;
-        public const float noiseMapScaleClimateWoodlands = 10.0f;
+        public const float noiseMapScaleClimateWoodlands = 22.0f; //10.0f;
         public const float noiseMapScaleClimateHauntedWoodlands = 8.0f;
+        public const float maxNoiseMapScale = 32.0f; //32f; //15f; //4f; //15f; //4f;
         // extra noise scale based on climate
         public const float extraNoiseScaleClimateOcean = 0.0f;
-        public const float extraNoiseScaleClimateDesert = 7f;
-        public const float extraNoiseScaleClimateDesert2 = 19f;
+        public const float extraNoiseScaleClimateDesert = 29f; //7f;
+        public const float extraNoiseScaleClimateDesert2 = 38f;
         public const float extraNoiseScaleClimateMountain = 62f;
         public const float extraNoiseScaleClimateRainforest = 16f;
-        public const float extraNoiseScaleClimateSwamp = 9f;
+        public const float extraNoiseScaleClimateSwamp = 20f;
         public const float extraNoiseScaleClimateSubtropical = 26f; // 17f
         public const float extraNoiseScaleClimateMountainWoods = 32f;
         public const float extraNoiseScaleClimateWoodlands = 24f;
@@ -73,7 +73,7 @@ namespace DistantTerrain
 
         public override float TerrainHeightScale(int x, int y)
         {
-            return ImprovedWorldTerrain.computeHeightMultiplier(x, y) * ImprovedTerrainSampler.baseHeightScale + this.GetNoiseMapScaleBasedOnClimate(x, y);
+            return ImprovedWorldTerrain.computeHeightMultiplier(x, y) * ImprovedTerrainSampler.baseHeightScale + this.GetNoiseMapScaleBasedOnClimate(x, y); // * 0.5f;
         }
 
 

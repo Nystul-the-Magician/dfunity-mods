@@ -68,9 +68,9 @@ namespace DistantTerrain
 
         public RenderTexture reflectionSeaTexture = null;
 
-        private float extraTranslationY = -1.0f; // only minimum amount (1m) since terrain heights almost match when terrain transition is active (the mismatch is because no neighbor terrains can be set)
+        private float extraTranslationY = -5.0f; // only minimum amount (5m) since terrain heights almost match when terrain transition is active (the mismatch is because no neighbor terrains can be set)
         private float extraTranslationY_noTerrainTransition = -110.0f; // this is used when terrain transition is disabled - large amount to minimize terrain seams
-        private float extraWaterTranslationY = -ImprovedTerrainSampler.scaledOceanElevation;
+        private float extraWaterTranslationY = -ImprovedTerrainSampler.scaledOceanElevation; //-55.0f; //-ImprovedTerrainSampler.scaledOceanElevation;
 
         /// <summary>
         /// extra translation property is the amount of y-bias of the FarTerrain geometry (needed to prevent precision rendering issues at the transition from terrain transition ring and far terrain geometry))
@@ -1520,7 +1520,7 @@ namespace DistantTerrain
             newMaterial.SetInt("_PlayerPosX", this.playerGPS.CurrentMapPixel.X);
             newMaterial.SetInt("_PlayerPosY", this.playerGPS.CurrentMapPixel.Y);
 
-            newMaterial.SetInt("_TerrainDistance", streamingWorld.TerrainDistance); // - 1); // -1... allow the outer ring of of detailed terrain to intersect with far terrain (to prevent some holes)
+            newMaterial.SetInt("_TerrainDistance", streamingWorld.TerrainDistance);
 
             Vector3 vecWaterHeight = new Vector3(0.0f, (dfUnity.TerrainSampler.OceanElevation + 1.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
             Vector3 vecWaterHeightTransformed = worldTerrainGameObject.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
