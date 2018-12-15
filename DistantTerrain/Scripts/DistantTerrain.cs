@@ -58,11 +58,11 @@ namespace DistantTerrain
         //[Range(0.0001f, 0.000001f)]
         //public float blendFactor = 0.000015f;
 
-        [Range(0.0f, 300000.0f)]
-        public float blendStart = 120000.0f;
+        [Range(0.0f, 145000.0f)]
+        public float blendStart = 100000.0f;
 
-        [Range(0.0f, 300000.0f)]
-        public float blendEnd = 145000.0f;
+        [Range(0.0f, 145000.0f)]
+        public float blendEnd = 120000.0f;
 
         int layerWorldTerrain;
 
@@ -70,7 +70,7 @@ namespace DistantTerrain
 
         private float extraTranslationY = -5.0f; // only minimum amount (5m) since terrain heights almost match when terrain transition is active (the mismatch is because no neighbor terrains can be set)
         private float extraTranslationY_noTerrainTransition = -110.0f; // this is used when terrain transition is disabled - large amount to minimize terrain seams
-        private float extraWaterTranslationY = -ImprovedTerrainSampler.scaledOceanElevation; //-55.0f; //-ImprovedTerrainSampler.scaledOceanElevation;
+        private float extraWaterTranslationY = -55.0f; //-ImprovedTerrainSampler.scaledOceanElevation;
 
         /// <summary>
         /// extra translation property is the amount of y-bias of the FarTerrain geometry (needed to prevent precision rendering issues at the transition from terrain transition ring and far terrain geometry))
@@ -646,7 +646,7 @@ namespace DistantTerrain
                 return;
 
             // Set main camera settings
-            Camera.main.farClipPlane = mainCameraFarClipPlane;
+            //Camera.main.farClipPlane = mainCameraFarClipPlane;
 
             // Set fog mode and density
             // This must be done in script from startup only when mod is enabled
@@ -654,40 +654,43 @@ namespace DistantTerrain
             RenderSettings.fogMode = sceneFogMode;
             RenderSettings.fogDensity = sceneFogDensity;
 
-            if (!stackedNearCamera)
-            {
-                GameObject goStackedNearCamera = new GameObject("stackedNearCamera");
-                stackedNearCamera = goStackedNearCamera.AddComponent<Camera>();
-                stackedNearCamera.gameObject.AddComponent<CloneCameraRotationFromMainCamera>();
-                stackedNearCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
-                stackedNearCamera.transform.SetParent(this.transform);
+            //if (!stackedNearCamera)
+            //{
+            //    GameObject goStackedNearCamera = new GameObject("stackedNearCamera");
+            //    stackedNearCamera = goStackedNearCamera.AddComponent<Camera>();
+            //    stackedNearCamera.gameObject.AddComponent<CloneCameraRotationFromMainCamera>();
+            //    stackedNearCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
+            //    stackedNearCamera.transform.SetParent(this.transform);
 
-            }
-            // important that camera properties are propagated every time SetupGameObjects() is called,
-            // otherwise things like fov won't be propagated correctly since first call of functions
-            // happens when the main camera still has default values (that get changed later)
-            stackedNearCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
-            stackedNearCamera.nearClipPlane = 980.0f;
-            stackedNearCamera.farClipPlane = 15000.0f;
-            stackedNearCamera.fieldOfView = Camera.main.fieldOfView;
-            stackedNearCamera.renderingPath = Camera.main.renderingPath;
+            //}
+            //// important that camera properties are propagated every time SetupGameObjects() is called,
+            //// otherwise things like fov won't be propagated correctly since first call of functions
+            //// happens when the main camera still has default values (that get changed later)
+            //stackedNearCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
+            //stackedNearCamera.nearClipPlane = 980.0f;
+            //stackedNearCamera.farClipPlane = 15000.0f;
+            //stackedNearCamera.fieldOfView = Camera.main.fieldOfView;
+            //stackedNearCamera.renderingPath = Camera.main.renderingPath;
 
-            if (!stackedCamera)
-            {
-                GameObject goStackedCamera = new GameObject("stackedCamera");
-                stackedCamera = goStackedCamera.AddComponent<Camera>();
-                stackedCamera.gameObject.AddComponent<CloneCameraRotationFromMainCamera>();
-                stackedCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
-                stackedCamera.transform.SetParent(this.transform);
-            }
-            // important that camera properties are propagated every time SetupGameObjects() is called,
-            // otherwise things like fov won't be propagated correctly since first call of functions
-            // happens when the main camera still has default values (that get changed later)
-            stackedCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
-            stackedCamera.nearClipPlane = 980.0f;
-            stackedCamera.farClipPlane = 300000.0f;
-            stackedCamera.fieldOfView = Camera.main.fieldOfView;
-            stackedCamera.renderingPath = Camera.main.renderingPath;
+            //if (!stackedCamera)
+            //{
+            //    GameObject goStackedCamera = new GameObject("stackedCamera");
+            //    stackedCamera = goStackedCamera.AddComponent<Camera>();
+            //    stackedCamera.gameObject.AddComponent<CloneCameraRotationFromMainCamera>();
+            //    stackedCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
+            //    stackedCamera.transform.SetParent(this.transform);
+            //}
+            //// important that camera properties are propagated every time SetupGameObjects() is called,
+            //// otherwise things like fov won't be propagated correctly since first call of functions
+            //// happens when the main camera still has default values (that get changed later)
+            //stackedCamera.cullingMask = (1 << layerWorldTerrain) + (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
+            //stackedCamera.nearClipPlane = 980.0f;
+            //stackedCamera.farClipPlane = 300000.0f;
+            //stackedCamera.fieldOfView = Camera.main.fieldOfView;
+            //stackedCamera.renderingPath = Camera.main.renderingPath;
+
+            Camera.main.farClipPlane = blendEnd;
+            Camera.main.cullingMask += (1 << layerWorldTerrain);
 
             if (!renderTextureSky)
             {
@@ -709,9 +712,9 @@ namespace DistantTerrain
 
                 cameraRenderSkyboxToTexture.clearFlags = CameraClearFlags.Skybox;
                 cameraRenderSkyboxToTexture.cullingMask = 0; // nothing
-                cameraRenderSkyboxToTexture.nearClipPlane = stackedCamera.nearClipPlane;
-                cameraRenderSkyboxToTexture.farClipPlane = stackedCamera.farClipPlane;
-                cameraRenderSkyboxToTexture.fieldOfView = stackedCamera.fieldOfView;
+                cameraRenderSkyboxToTexture.nearClipPlane = Camera.main.nearClipPlane;
+                cameraRenderSkyboxToTexture.farClipPlane = Camera.main.farClipPlane;
+                cameraRenderSkyboxToTexture.fieldOfView = Camera.main.fieldOfView;
             }
             // important that camera properties are propagated every time SetupGameObjects() is called,
             // otherwise things like fov won't be propagated correctly since first call of functions
@@ -730,18 +733,18 @@ namespace DistantTerrain
 
             // set up camera stack - AFTER layer "WorldTerrain" has been assigned to worldTerrainGameObject (is done in function generateWorldTerrain())
 
-            Camera.main.clearFlags = CameraClearFlags.Depth;
-            stackedNearCamera.clearFlags = CameraClearFlags.Depth;
-            stackedCamera.clearFlags = CameraClearFlags.Depth;
-            stackedCamera.depth = stackedCameraDepth; // rendered first            
-            stackedNearCamera.depth = stackedNearCameraDepth;
+            //Camera.main.clearFlags = CameraClearFlags.Depth;
+            //stackedNearCamera.clearFlags = CameraClearFlags.Depth;
+            //stackedCamera.clearFlags = CameraClearFlags.Depth;
+            //stackedCamera.depth = stackedCameraDepth; // rendered first            
+            //stackedNearCamera.depth = stackedNearCameraDepth;
             //Camera.main.depth = 3; // renders over stacked camera
 
-            UnityStandardAssets.ImageEffects.GlobalFog globalFogScript = Camera.main.GetComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
-            globalFogScript.excludeFarPixels = false; // this is important so that global fog works correctly with camera stack
+            //UnityStandardAssets.ImageEffects.GlobalFog globalFogScript = Camera.main.GetComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
+            //globalFogScript.excludeFarPixels = false; // this is important so that global fog works correctly with camera stack
 
             cameraRenderSkyboxToTexture.depth = cameraRenderSkyboxToTextureDepth; // make sure to render first
-            cameraRenderSkyboxToTexture.renderingPath = stackedCamera.renderingPath;
+            cameraRenderSkyboxToTexture.renderingPath = Camera.main.renderingPath;
             cameraRenderSkyboxToTexture.targetTexture = renderTextureSky;
         }
 
