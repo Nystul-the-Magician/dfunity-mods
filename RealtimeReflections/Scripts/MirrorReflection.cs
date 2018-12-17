@@ -7,6 +7,7 @@
 // This script is derived from MirrorReflection4 script
 
 using UnityEngine;
+using UnityEngine.PostProcessing;
 using System.Collections;
  
 namespace RealtimeReflections
@@ -31,6 +32,9 @@ namespace RealtimeReflections
         private static bool s_InsideRendering = false;
 
         private Camera cameraToUse = null;
+
+        // use same post processing profile as main camera
+        private PostProcessingBehaviour postProcessingBehaviour;
 
         public struct EnvironmentSetting
         {
@@ -61,6 +65,7 @@ namespace RealtimeReflections
             {
                 cameraToUse = Camera.main;
             }
+            postProcessingBehaviour = Camera.main.GetComponent<PostProcessingBehaviour>();
         }
 
 	    // This is called when it's known that the object will be rendered by some
@@ -212,7 +217,12 @@ namespace RealtimeReflections
 		    dest.fieldOfView = src.fieldOfView;
 		    dest.aspect = src.aspect;
 		    dest.orthographicSize = src.orthographicSize;
-	    }
+
+            //update fog settings (post processing profile)
+            PostProcessingBehaviour reflectionCamPostProcessingBehaviour = dest.gameObject.GetComponent<PostProcessingBehaviour>();
+            if (reflectionCamPostProcessingBehaviour)
+                reflectionCamPostProcessingBehaviour.profile = postProcessingBehaviour.profile;
+        }
  
 	    // On-demand create any objects we need
 	    private void CreateMirrorObjects( Camera currentCamera, out Camera reflectionCamera )
@@ -254,19 +264,25 @@ namespace RealtimeReflections
 
                 if (currentBackgroundSettings == EnvironmentSetting.OutdoorSetting)
                 {
-                    // attach global fog to camera - this is important to get the same reflections like on normal terrain when deferred rendering is used
-                    if ((reflectionCamera.renderingPath == RenderingPath.DeferredShading) || (reflectionCamera.renderingPath == RenderingPath.UsePlayerSettings))
+                    if (postProcessingBehaviour != null)
                     {
-                        UnityStandardAssets.ImageEffects.GlobalFog scriptGlobalFog = go.AddComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
-                        UnityStandardAssets.ImageEffects.GlobalFog globalFogMainCamera = Camera.main.gameObject.GetComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
-                        scriptGlobalFog.distanceFog = globalFogMainCamera.distanceFog;
-                        scriptGlobalFog.excludeFarPixels = true; // skybox + sun will show up in reflections (otherwise no sun reflection)
-                        scriptGlobalFog.useRadialDistance = globalFogMainCamera.useRadialDistance;
-                        scriptGlobalFog.heightFog = globalFogMainCamera.heightFog;
-                        scriptGlobalFog.height = globalFogMainCamera.height;
-                        scriptGlobalFog.heightDensity = globalFogMainCamera.heightDensity;
-                        scriptGlobalFog.startDistance = globalFogMainCamera.startDistance;
+                        PostProcessingBehaviour reflectionCamPostProcessingBehaviour = go.AddComponent<PostProcessingBehaviour>();
+                        reflectionCamPostProcessingBehaviour.profile = postProcessingBehaviour.profile;
                     }
+
+                    //// attach global fog to camera - this is important to get the same reflections like on normal terrain when deferred rendering is used
+                    //if ((reflectionCamera.renderingPath == RenderingPath.DeferredShading) || (reflectionCamera.renderingPath == RenderingPath.UsePlayerSettings))
+                    //{
+                    //    UnityStandardAssets.ImageEffects.GlobalFog scriptGlobalFog = go.AddComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
+                    //    UnityStandardAssets.ImageEffects.GlobalFog globalFogMainCamera = Camera.main.gameObject.GetComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
+                    //    scriptGlobalFog.distanceFog = globalFogMainCamera.distanceFog;
+                    //    scriptGlobalFog.excludeFarPixels = true; // skybox + sun will show up in reflections (otherwise no sun reflection)
+                    //    scriptGlobalFog.useRadialDistance = globalFogMainCamera.useRadialDistance;
+                    //    scriptGlobalFog.heightFog = globalFogMainCamera.heightFog;
+                    //    scriptGlobalFog.height = globalFogMainCamera.height;
+                    //    scriptGlobalFog.heightDensity = globalFogMainCamera.heightDensity;
+                    //    scriptGlobalFog.startDistance = globalFogMainCamera.startDistance;
+                    //}
                 }
 
                 go.transform.SetParent(GameObject.Find("RealtimeReflections").transform);
