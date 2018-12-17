@@ -91,8 +91,6 @@ namespace EnhancedSky
 
         // used to set post processing fog settings (excludeSkybox setting)
         private PostProcessingBehaviour postProcessingBehaviour;
-        private PostProcessingProfile defaultPostProcessingProfile;
-        private PostProcessingProfile modifiedPostProcessingProfile;
 
         public int cloudQuality = 400;
         public int cloudSeed = -1;
@@ -191,9 +189,23 @@ namespace EnhancedSky
             if (postProcessingBehaviour != null)
             {
                 if (weather == DaggerfallWorkshop.Game.Weather.WeatherType.Fog)
-                    postProcessingBehaviour.profile = defaultPostProcessingProfile; // default profile use fog setting excludeSkybox == false
+                {
+                    if (postProcessingBehaviour != null)
+                    {
+                        var fogSettings = postProcessingBehaviour.profile.fog.settings;
+                        fogSettings.excludeSkybox = false;
+                        postProcessingBehaviour.profile.fog.settings = fogSettings;
+                    }
+                }
                 else
-                    postProcessingBehaviour.profile = modifiedPostProcessingProfile; // modified profile use fog setting excludeSkybox == true
+                {
+                    if (postProcessingBehaviour != null)
+                    {
+                        var fogSettings = postProcessingBehaviour.profile.fog.settings;
+                        fogSettings.excludeSkybox = true;
+                        postProcessingBehaviour.profile.fog.settings = fogSettings;
+                    }
+                }
             }
         }
 
@@ -210,11 +222,6 @@ namespace EnhancedSky
                 {
                     dfallSky.SetActive(true);
                     Destroy(_container);
-
-                    if (postProcessingBehaviour != null)
-                    {
-                        postProcessingBehaviour.profile = defaultPostProcessingProfile;
-                    }
                 }
                 else if(toggle)
                 {
@@ -226,12 +233,7 @@ namespace EnhancedSky
                         throw new System.NullReferenceException();
 
                     dfallSky.SetActive(false);
-                    SkyObjectSizeChange(SkyObjectSizeSetting);
-                    
-                    if (postProcessingBehaviour != null)
-                    {
-                        postProcessingBehaviour.profile = modifiedPostProcessingProfile;
-                    }
+                    SkyObjectSizeChange(SkyObjectSizeSetting);                   
                 }
                 
             }
@@ -391,32 +393,7 @@ namespace EnhancedSky
                     weatherMan = GameManager.Instance.WeatherManager;
 
                 if (!postProcessingBehaviour)
-                {
                     postProcessingBehaviour = Camera.main.GetComponent<PostProcessingBehaviour>();
-                    if (postProcessingBehaviour != null)
-                    {
-                        defaultPostProcessingProfile = postProcessingBehaviour.profile;
-                        modifiedPostProcessingProfile = new PostProcessingProfile();
-                        modifiedPostProcessingProfile.ambientOcclusion.settings = defaultPostProcessingProfile.ambientOcclusion.settings;
-                        modifiedPostProcessingProfile.antialiasing.settings = defaultPostProcessingProfile.antialiasing.settings;
-                        modifiedPostProcessingProfile.bloom.settings = defaultPostProcessingProfile.bloom.settings;
-                        modifiedPostProcessingProfile.chromaticAberration.settings = defaultPostProcessingProfile.chromaticAberration.settings;
-                        modifiedPostProcessingProfile.colorGrading.settings = defaultPostProcessingProfile.colorGrading.settings;
-                        modifiedPostProcessingProfile.depthOfField.settings = defaultPostProcessingProfile.depthOfField.settings;
-                        modifiedPostProcessingProfile.dithering.settings = defaultPostProcessingProfile.dithering.settings;
-                        modifiedPostProcessingProfile.eyeAdaptation.settings = defaultPostProcessingProfile.eyeAdaptation.settings;
-                        modifiedPostProcessingProfile.fog.settings = defaultPostProcessingProfile.fog.settings;
-                        modifiedPostProcessingProfile.grain.settings = defaultPostProcessingProfile.grain.settings;
-                        modifiedPostProcessingProfile.motionBlur.settings = defaultPostProcessingProfile.motionBlur.settings;
-                        modifiedPostProcessingProfile.screenSpaceReflection.settings = defaultPostProcessingProfile.screenSpaceReflection.settings;
-                        modifiedPostProcessingProfile.userLut.settings = defaultPostProcessingProfile.userLut.settings;
-                        modifiedPostProcessingProfile.vignette.settings = defaultPostProcessingProfile.vignette.settings;
-                        FogModel.Settings modifiedSettings = modifiedPostProcessingProfile.fog.settings;
-                        modifiedSettings.excludeSkybox = true;
-                        modifiedPostProcessingProfile.fog.settings = modifiedSettings;
-                        modifiedPostProcessingProfile.fog.enabled = true;
-                    }
-                }
             }
             catch
             {
