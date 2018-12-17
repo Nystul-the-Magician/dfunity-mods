@@ -50,8 +50,12 @@ namespace DistantTerrain
         public int stackedNearCameraDepth = -1;
         public int cameraRenderSkyboxToTextureDepth = -10;
         public float mainCameraFarClipPlane = 1200.0f;
-        public FogMode sceneFogMode = FogMode.Exponential;
-        public float sceneFogDensity = 0.000025f;
+        public FogMode sceneFogMode = FogMode.Exponential;        
+        public float SunnyFogDensity = 0.00005f;
+        public float OvercastFogDensity = 0.000075f;
+        public float RainyFogDensity = 0.0001f;
+        public float SnowyFogDensity = 0.0001f;
+        public float HeavyFogDensity = 0.05f;
 
         //public RenderTexture renderTextureSky;
 
@@ -595,6 +599,13 @@ namespace DistantTerrain
 
                 SetupGameObjects(); // it should be possible to eliminated this line without any impact: please verify!
             }
+
+            // set fog settings via WeatherManager class
+            GameManager.Instance.WeatherManager.SunnyFogDensity = SunnyFogDensity;
+            GameManager.Instance.WeatherManager.OvercastFogDensity = OvercastFogDensity;
+            GameManager.Instance.WeatherManager.RainyFogDensity = RainyFogDensity;
+            GameManager.Instance.WeatherManager.SnowyFogDensity = SnowyFogDensity;
+            GameManager.Instance.WeatherManager.HeavyFogDensity = HeavyFogDensity;
         }
 
         void OnDestroy()
@@ -648,11 +659,11 @@ namespace DistantTerrain
             // Set main camera settings
             //Camera.main.farClipPlane = mainCameraFarClipPlane;
 
-            // Set fog mode and density
-            // This must be done in script from startup only when mod is enabled
-            // The settings in Lighting panel are for core game (no mods) only
-            RenderSettings.fogMode = sceneFogMode;
-            RenderSettings.fogDensity = sceneFogDensity;
+            //// Set fog mode and density
+            //// This must be done in script from startup only when mod is enabled
+            //// The settings in Lighting panel are for core game (no mods) only
+            //RenderSettings.fogMode = sceneFogMode;
+            //RenderSettings.fogDensity = sceneFogDensity;
 
             //if (!stackedNearCamera)
             //{
@@ -690,7 +701,7 @@ namespace DistantTerrain
             //stackedCamera.renderingPath = Camera.main.renderingPath;
 
             Camera.main.farClipPlane = blendEnd;
-            Camera.main.cullingMask += (1 << layerWorldTerrain);
+            Camera.main.cullingMask |= (1 << layerWorldTerrain);
 
             if (!renderTextureSky)
             {
@@ -1139,7 +1150,7 @@ namespace DistantTerrain
             }
 
             terrain.heightmapPixelError = 0; // 0 ... prevent unity terrain lod approach, set to higher values to enable it
-            //terrain.castShadows = true;
+            terrain.castShadows = false; // important to prevent wrong shadows (note: I spotted them in Sentinel to the north of the city wall with certain sun settings)
 
             // Promote heights
             Vector3 size = terrain.terrainData.size;
