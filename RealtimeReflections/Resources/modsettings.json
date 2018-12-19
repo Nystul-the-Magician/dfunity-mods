@@ -1,0 +1,74 @@
+{
+    "Version": null,
+    "Sections": [
+        {
+            "Name": "FloorReflectionTexture",
+            "Description": "reflection texture for floor reflections beneath the player",
+            "IsAdvanced": false,
+            "Keys": [
+                {
+                    "Min": 64,
+                    "Max": 2048,
+                    "Value": 512,
+                    "Name": "width",
+                    "Description": "width of reflection texture - used for aestetics, not quality",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.SliderIntKey"
+                },
+                {
+                    "Min": 64,
+                    "Max": 2048,
+                    "Value": 512,
+                    "Name": "height",
+                    "Description": "height of reflection texture - used for aestetics, not quality",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.SliderIntKey"
+                }
+            ],
+            "$version": "v1"
+        },
+        {
+            "Name": "LowerLevelReflectionTexture",
+            "Description": "reflection texture for lower level or sea reflections",
+            "IsAdvanced": false,
+            "Keys": [
+                {
+                    "Min": 64,
+                    "Max": 2048,
+                    "Value": 512,
+                    "Name": "width",
+                    "Description": "width of 2nd reflection texture - used for aestetics, not quality",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.SliderIntKey"
+                },
+                {
+                    "Min": 64,
+                    "Max": 2048,
+                    "Value": 512,
+                    "Name": "height",
+                    "Description": "height of 2nd reflection texture - used for aestetics, not quality",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.SliderIntKey"
+                }
+            ],
+            "$version": "v1"
+        },
+        {
+            "Name": "ReflectionParameters",
+            "Description": "parameters that affect reflection properties",
+            "IsAdvanced": false,
+            "Keys": [
+                {
+                    "Min": 0.125,
+                    "Max": 32.0,
+                    "Value": 4.0,
+                    "Name": "roughnessMultiplier",
+                    "Description": "used to compensate for different reflection texture resolutions",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.SliderFloatKey"
+                }
+            ],
+            "$version": "v1"
+        }
+    ]
+}

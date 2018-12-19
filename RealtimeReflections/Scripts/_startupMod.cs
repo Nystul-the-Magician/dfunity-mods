@@ -50,11 +50,11 @@ namespace RealtimeReflections
             ModSettings settings = mod.GetSettings();
 
             // settings
-            floorReflectionTextureWidth = settings.GetInt("FloorReflectionTexture", "width");
-            floorReflectionTextureHeight = settings.GetInt("FloorReflectionTexture", "height");
-            lowerLevelReflectionTextureWidth = settings.GetInt("LowerLevelReflectionTexture", "width");
-            lowerLevelReflectionTextureHeight = settings.GetInt("LowerLevelReflectionTexture", "height");
-            roughnessMultiplier = settings.GetFloat("ReflectionParameters", "roughnessMultiplier");
+            floorReflectionTextureWidth = settings.GetValue<int>("FloorReflectionTexture", "width");
+            floorReflectionTextureHeight = settings.GetValue<int>("FloorReflectionTexture", "height");
+            lowerLevelReflectionTextureWidth = settings.GetValue<int>("LowerLevelReflectionTexture", "width");
+            lowerLevelReflectionTextureHeight = settings.GetValue<int>("LowerLevelReflectionTexture", "height");
+            roughnessMultiplier = settings.GetValue<float>("ReflectionParameters", "roughnessMultiplier");
 
             shaderTilemapWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapWithReflections.shader");
             shaderTilemapTextureArrayWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapTextureArrayWithReflections.shader");

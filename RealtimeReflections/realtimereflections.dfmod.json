@@ -1,9 +1,9 @@
 {
     "ModTitle": "Realtime Reflections",
-    "ModVersion": "2.2.0",
+    "ModVersion": "2.2.2",
     "ModAuthor": "Nystul",
-    "ContactInfo": "http://forums.dfworkshop.net",
-    "DFUnity_Verion": "0.4.12",
+    "ContactInfo": "https://forums.dfworkshop.net/viewtopic.php?f=27&t=122",
+    "DFUnity_Version": "",
     "ModDescription": "realtime reflections for floor textures (interiors) and water tiles (exteriors)",
     "GUID": "03e6ca57-eeb9-4a53-b61a-237406a9f749",
     "Files": [
@@ -20,7 +20,6 @@
         "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/UpdateReflectionTextures.cs",
         "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/DeferredPlanarReflections.cs",
         "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/_startupMod.cs",
-        "Assets/Game/Addons/RealtimeReflections_standalone/Resources/Realtime Reflections.ini.txt",
-        "Assets/Game/Addons/RealtimeReflections_standalone/realtimereflections.dfmod.json"
+        "Assets/Game/Addons/RealtimeReflections_standalone/Resources/modsettings.json"
     ]
 }
