@@ -601,11 +601,11 @@ namespace DistantTerrain
             }
 
             // set fog settings via WeatherManager class
-            GameManager.Instance.WeatherManager.SunnyFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = SunnyFogDensity, startDistance = 0, endDistance = 0 };
-            GameManager.Instance.WeatherManager.OvercastFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = OvercastFogDensity, startDistance = 0, endDistance = 0 };
-            GameManager.Instance.WeatherManager.RainyFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = RainyFogDensity, startDistance = 0, endDistance = 0 };
-            GameManager.Instance.WeatherManager.SnowyFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = SnowyFogDensity, startDistance = 0, endDistance = 0 };
-            GameManager.Instance.WeatherManager.HeavyFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = HeavyFogDensity, startDistance = 0, endDistance = 0 };
+            GameManager.Instance.WeatherManager.SunnyFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = SunnyFogDensity, startDistance = 0, endDistance = 0, excludeSkybox = true };
+            GameManager.Instance.WeatherManager.OvercastFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = OvercastFogDensity, startDistance = 0, endDistance = 0, excludeSkybox = true };
+            GameManager.Instance.WeatherManager.RainyFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = RainyFogDensity, startDistance = 0, endDistance = 0, excludeSkybox = true };
+            GameManager.Instance.WeatherManager.SnowyFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = SnowyFogDensity, startDistance = 0, endDistance = 0, excludeSkybox = true };
+            GameManager.Instance.WeatherManager.HeavyFogSettings = new WeatherManager.FogSettings { fogMode = FogMode.Exponential, density = HeavyFogDensity, startDistance = 0, endDistance = 0, excludeSkybox = false };
         }
 
         void OnDestroy()
