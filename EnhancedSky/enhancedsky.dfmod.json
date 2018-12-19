@@ -1,13 +1,14 @@
 {
     "ModTitle": "Enhanced Sky",
-    "ModVersion": "2.1.0",
+    "ModVersion": "2.1.1",
     "ModAuthor": "Lypyl",
-    "ContactInfo": "http://forums.dfworkshop.net/viewtopic.php?f=14&t=29",
+    "ContactInfo": "https://forums.dfworkshop.net/viewtopic.php?f=27&t=1542",
     "DFUnity_Version": "",
     "ModDescription": "Standalone version of the Enhanced Sky mod",
     "GUID": "d3639c51-0754-4eb9-bf83-cabb817adfbb",
     "Files": [
-        "Assets/Game/Addons/EnhancedSky_standalone/Resources/Enhanced Sky.ini.txt",
+		"Assets/Game/Addons/EnhancedSky_standalone/Attribution.txt",
+        "Assets/Game/Addons/EnhancedSky_standalone/Resources/modsettings.json",
         "Assets/Game/Addons/EnhancedSky_standalone/Scripts/_startupMod.cs",
         "Assets/Game/Addons/EnhancedSky_standalone/Scripts/MoonController.cs",
         "Assets/Game/Addons/EnhancedSky_standalone/Scripts/StarController.cs",

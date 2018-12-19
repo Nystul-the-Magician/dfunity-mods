@@ -1,8 +1,19 @@
 fileFormatVersion: 2
-guid: fa49ea06300cea541b2eb9fcdb4c5e26
-timeCreated: 1431851374
-licenseType: Free
-DDSImporter:
+guid: 32e38fcd1d9e0b24fa3916510e9e2654
+IHVImageFormatImporter:
+  externalObjects: {}
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  isReadable: 0
+  sRGBTexture: 1
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 

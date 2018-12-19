@@ -1,0 +1,29 @@
+{
+    "Version": null,
+    "Sections": [
+        {
+            "Name": "GeneralSettings",
+            "Description": null,
+            "IsAdvanced": false,
+            "Keys": [
+                {
+                    "Value": false,
+                    "Name": "UseSunFlare",
+                    "Description": "defines if mod should use sun flare",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.ToggleKey"
+                },
+                {
+                    "Min": 128,
+                    "Max": 2048,
+                    "Value": 800,
+                    "Name": "CloudQuality",
+                    "Description": "texture resolution for cloud creation",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.SliderIntKey"
+                }
+            ],
+            "$version": "v1"
+        }
+    ]
+}

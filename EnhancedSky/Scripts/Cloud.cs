@@ -1,4 +1,4 @@
-﻿//Enhanced Sky for Daggerfall Tools for Unity by Lypyl, contact at lypyl@dfworkshop.net
+//Enhanced Sky for Daggerfall Tools for Unity by Lypyl, contact at lypyl@dfworkshop.net
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: LypyL
@@ -97,7 +97,7 @@ namespace EnhancedSky
                 if (SkyMan.IsOvercast)
                 {
                     CloudColor = PresetContainer.Instance.colorOver;
-                    transform.localPosition = new Vector3(0, 0.11f, 0);
+                    transform.localPosition = new Vector3(0, -0.15f, 0);
 
 
                 }

@@ -1,4 +1,4 @@
-﻿//Enhanced Sky for Daggerfall Tools for Unity by Lypyl, contact at lypyl@dfworkshop.net
+//Enhanced Sky for Daggerfall Tools for Unity by Lypyl, contact at lypyl@dfworkshop.net
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: LypyL
@@ -73,11 +73,14 @@ namespace EnhancedSky
             mod = initParams.Mod;
 
             // Load settings. Pass this mod as paramater
-            ModSettings settings = new ModSettings(mod);
+            ModSettings settings = mod.GetSettings();
 
             // settings
-            enableSunFlare = settings.GetBool("GeneralSettings", "UseSunFlare");
-            cloudQuality = settings.GetInt("GeneralSettings", "CloudQuality");
+            //enableSunFlare = settings.GetBool("GeneralSettings", "UseSunFlare");
+            //cloudQuality = settings.GetInt("GeneralSettings", "CloudQuality");
+
+            enableSunFlare = settings.GetValue<bool>("GeneralSettings", "UseSunFlare");
+            cloudQuality = settings.GetValue<int>("GeneralSettings", "CloudQuality");
 
             shaderDepthMask = mod.GetAsset<Shader>("Materials/Resources/DepthMask.shader") as Shader;        
             shaderUnlitAlphaWithFade = mod.GetAsset<Shader>("Materials/Resources/UnlitAlphaWithFade.shader") as Shader;
@@ -85,6 +88,8 @@ namespace EnhancedSky
 
             starsMat = mod.GetAsset<Material>("Materials/Resources/Stars") as Material;        
             skyMat = mod.GetAsset<Material>("Materials/Resources/Sky") as Material;
+
+            //cloudMesh = mod.GetAsset<Mesh>("Model Imports/Hemisphere_01_smooth.fbx") as Mesh;
 
             containerPrefab = mod.GetAsset<Object>("Prefabs/Resources/NewEnhancedSkyContainer.prefab") as Object;
 
@@ -138,8 +143,8 @@ namespace EnhancedSky
             componentSkyManager.ModSelf = mod;
 
             starMaskMat = new Material(shaderDepthMask);
-            skyObjMat = new Material(shaderUnlitAlphaWithFade);
-            
+            skyObjMat = new Material(shaderUnlitAlphaWithFade);            
+
             componentSkyManager.StarMaskMat = starMaskMat;
             componentSkyManager.SkyObjMat = skyObjMat;
             componentSkyManager.StarsMat = starsMat;
