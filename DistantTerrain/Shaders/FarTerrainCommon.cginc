@@ -1,4 +1,4 @@
-﻿//Distant Terrain Mod for Daggerfall Tools For Unity
+//Distant Terrain Mod for Daggerfall Tools For Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -16,6 +16,7 @@ struct Input
 	float3 worldPos; // interpolated vertex positions used for correct coast line texturing
 	float3 worldNormal; // interpolated vertex normals used for texturing terrain based on terrain slope
 	float4 screenPos;
+    float eyeDepth;
 	INTERNAL_DATA
 };
 
@@ -34,6 +35,9 @@ float _blendWeightFarTerrainTop;
 float _blendWeightFarTerrainBottom;
 float _blendWeightFarTerrainLeft;
 float _blendWeightFarTerrainRight;
+
+sampler2D_float _CameraDepthTexture;
+float4 _CameraDepthTexture_TexelSize;
 
 sampler2D _TileAtlasTexDesert;
 sampler2D _TileAtlasTexWoodland;
@@ -74,8 +78,16 @@ void fcolor (Input IN, SurfaceOutputStandard o, inout fixed4 color) //inout half
 
 	//half4 color = outDiffuse;
 
-	float dist = distance(IN.worldPos.xz, _WorldSpaceCameraPos.xz); //max(abs(IN.worldPos.x - _WorldSpaceCameraPos.x), abs(IN.worldPos.z - _WorldSpaceCameraPos.z));
-	
+	////float dist = distance(IN.worldPos.xz, _WorldSpaceCameraPos.xz); //max(abs(IN.worldPos.x - _WorldSpaceCameraPos.x), abs(IN.worldPos.z - _WorldSpaceCameraPos.z));
+ //   float depth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, IN.uv_MainTex);
+ //   depth = Linear01Depth(depth);
+ //   float dist = depth *_ProjectionParams.z;
+ //   dist -= _ProjectionParams.y;
+
+    float rawZ = SAMPLE_DEPTH_TEXTURE_PROJ(_CameraDepthTexture, UNITY_PROJ_COORD(IN.screenPos));
+    float sceneZ = LinearEyeDepth(rawZ);
+    float partZ = IN.eyeDepth;
+    float dist = partZ;
 	float blendFacTerrain = 1.0f;
 				
 	if (_FogMode == 1) // linear
@@ -98,20 +110,22 @@ void fcolor (Input IN, SurfaceOutputStandard o, inout fixed4 color) //inout half
 		fogFac = _FogDensity * dist;
 		blendFacTerrain = exp2(-fogFac*fogFac);
 	}
+
+    blendFacTerrain = saturate(blendFacTerrain);
 	
 	const float fadeRange = _BlendEnd - _BlendStart + 1.0f;
 	float alphaFadeAmount = max(0.0f, min(1.0f, (_BlendEnd - dist) / fadeRange));
 
 	if (_FogFromSkyTex == 1)
 	{
-		float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
-		color.rgb = blendFacTerrain * color.rgb + (1.0f - blendFacTerrain) * tex2D(_SkyTex, screenUV).rgb;
+		float2 screenUV = IN.screenPos.xy / IN.screenPos.w;		
+        color.rgb = lerp(color, tex2D(_SkyTex, screenUV).rgb, 1.0f - blendFacTerrain);
 	}
 	else
-	{
-		color.rgb = blendFacTerrain * color.rgb + (1.0f - blendFacTerrain) * unity_FogColor.rgb;
+	{		
+        color.rgb = lerp(color, unity_FogColor.rgb, 1.0f - blendFacTerrain);
 	}
-
+    //color.rgb = depth;
 	color.a = alphaFadeAmount;
 
 	//outDiffuse = half4(1.0f, 0.0f, 0.0f,0.5f); //color;

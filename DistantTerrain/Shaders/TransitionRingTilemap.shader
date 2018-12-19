@@ -1,4 +1,4 @@
-﻿//Distant Terrain Mod for Daggerfall Tools For Unity
+//Distant Terrain Mod for Daggerfall Tools For Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -82,7 +82,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemap" {
 		sampler2D _TileAtlasReflectiveTex;
 
 		#pragma target 3.0
-		#pragma surface surf Standard noforwardadd finalcolor:fcolor alpha:fade keepalpha
+		#pragma surface surf Standard noforwardadd //finalcolor:fcolor alpha:fade keepalpha
 		#pragma glsl
 
 		#pragma multi_compile __ ENABLE_WATER_REFLECTIONS

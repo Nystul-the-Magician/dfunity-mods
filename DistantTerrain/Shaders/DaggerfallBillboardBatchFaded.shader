@@ -1,4 +1,4 @@
-﻿//Distant Terrain Mod for Daggerfall Tools For Unity
+//Distant Terrain Mod for Daggerfall Tools For Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)

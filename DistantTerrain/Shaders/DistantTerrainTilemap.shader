@@ -1,4 +1,4 @@
-﻿//Distant Terrain Mod for Daggerfall Tools For Unity
+//Distant Terrain Mod for Daggerfall Tools For Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -57,69 +57,71 @@ Shader "Daggerfall/DistantTerrain/DistantTerrainTilemap" {
 		
 		ZWrite Off
 		Cull Back
+        //Fog{ Mode Off }
 
-		CGPROGRAM
+		//CGPROGRAM
 
-		#pragma target 3.0		
-		//#pragma surface surf Lambert vertex:vert alpha:fade keepalpha finalcolor:fcolor noforwardadd
-		#pragma surface surf Standard noforwardadd finalcolor:fcolor alpha:fade keepalpha
-		#pragma glsl
-		#pragma multi_compile __ ENABLE_WATER_REFLECTIONS
+		//#pragma target 3.0		
+		//#pragma surface surf Standard vertex:vert noforwardadd finalcolor:fcolor alpha:fade keepalpha nolightmap //nofog
+		//#pragma glsl
+		//#pragma multi_compile __ ENABLE_WATER_REFLECTIONS
 
-		#include "FarTerrainCommon.cginc"
+		//#include "FarTerrainCommon.cginc"
 
-		//void vert(inout appdata_full v, out Input OUT)
-		//{	
-		//	float4 vertex = v.vertex;
-		//	float3 worldpos = mul(_Object2World, vertex).xyz;
-		//	float dist = distance(worldpos.xz, _WorldSpaceCameraPos.xz);
-		//	float curvature_start = 25000.0f;
-		//	if (dist > curvature_start)
+		////void vert(inout appdata_full v, out Input OUT)
+		////{	
+		////	float4 vertex = v.vertex;
+		////	float3 worldpos = mul(_Object2World, vertex).xyz;
+		////	float dist = distance(worldpos.xz, _WorldSpaceCameraPos.xz);
+		////	float curvature_start = 25000.0f;
+		////	if (dist > curvature_start)
+		////	{
+		////		worldpos.y = worldpos.y * max(0.0f, ((curvature_start + 100000.0f - dist) / (curvature_start + 100000.0f)));
+		////	}
+		////	v.vertex = mul(_World2Object, float4(worldpos.x, worldpos.y, worldpos.z, 1.0f));
+		////	UNITY_INITIALIZE_OUTPUT(Input, OUT);
+		////	OUT.worldPos = worldpos;
+		////}
+
+		//void surf (Input IN, inout SurfaceOutputStandard o)
+		//{		
+		//	half4 c; // output color value
+
+		//	float4 terrainTileInfo = tex2D(_FarTerrainTilemapTex, IN.uv_MainTex).rgba;
+
+		//	int mapPixelX = IN.uv_MainTex.x*_FarTerrainTilemapDim;
+		//	int mapPixelY = 499 - IN.uv_MainTex.y*_FarTerrainTilemapDim;
+
+		//	// fragment discarding inside area spanned by _TerrainDistance and one extra ring of blocks (these will be rendered by TransitionRingTilemap shader)
+		//	if ((abs(mapPixelX+1-_PlayerPosX)<=_TerrainDistance+1)&&(abs(mapPixelY+1-_PlayerPosY)<=_TerrainDistance+1))
 		//	{
-		//		worldpos.y = worldpos.y * max(0.0f, ((curvature_start + 100000.0f - dist) / (curvature_start + 100000.0f)));
+		//		// for debugging fragment discard area use red color (also used to debug world terrain positioning with floating origin script)
+		//		//float4 ret = float4(1.0f,0.0f,0.0f,1.0f); o.Albedo = ret.rgb; o.Alpha = ret.a; return;
+		//		discard;
 		//	}
-		//	v.vertex = mul(_World2Object, float4(worldpos.x, worldpos.y, worldpos.z, 1.0f));
-		//	UNITY_INITIALIZE_OUTPUT(Input, OUT);
-		//	OUT.worldPos = worldpos;
+
+		//	// fragments more distant than _BlendEnd will be discarded as well
+		//	const float fadeRange = _BlendEnd - _BlendStart + 1.0f;
+		//	float dist = distance(IN.worldPos.xz, _WorldSpaceCameraPos.xz); //max(abs(IN.worldPos.x - _WorldSpaceCameraPos.x), abs(IN.worldPos.z - _WorldSpaceCameraPos.z));			
+		//	if (dist>_BlendEnd)
+		//	{
+		//		discard;
+		//	}
+
+		//	int index = terrainTileInfo.r * _MaxIndex;
+
+		//	c = getColorFromTerrain(IN, IN.uv_MainTex, _FarTerrainTilemapDim, _FarTerrainTilesetDim, index);
+		//	
+		//	float treeCoverage = terrainTileInfo.g;
+		//	int locationRangeX = terrainTileInfo.b * _MaxIndex;
+		//	int locationRangeY = terrainTileInfo.a * _MaxIndex;
+		//	c.rgb = updateColorWithInfoForTreeCoverageAndLocations(c.rgb, treeCoverage, locationRangeX, locationRangeY, mapPixelX, mapPixelY, IN.uv_MainTex);
+
+		//	o.Albedo = c.rgb;
+  //          //o.Metallic = _Metallic;
+  //          //o.Smoothness = _Glossiness;
 		//}
-
-		void surf (Input IN, inout SurfaceOutputStandard o)
-		{		
-			half4 c; // output color value
-
-			float4 terrainTileInfo = tex2D(_FarTerrainTilemapTex, IN.uv_MainTex).rgba;
-
-			int mapPixelX = IN.uv_MainTex.x*_FarTerrainTilemapDim;
-			int mapPixelY = 499 - IN.uv_MainTex.y*_FarTerrainTilemapDim;
-
-			// fragment discarding inside area spanned by _TerrainDistance and one extra ring of blocks (these will be rendered by TransitionRingTilemap shader)
-			if ((abs(mapPixelX+1-_PlayerPosX)<=_TerrainDistance+1)&&(abs(mapPixelY+1-_PlayerPosY)<=_TerrainDistance+1))
-			{
-				// for debugging fragment discard area use red color (also used to debug world terrain positioning with floating origin script)
-				//float4 ret = float4(1.0f,0.0f,0.0f,1.0f); o.Albedo = ret.rgb; o.Alpha = ret.a; return;
-				discard;
-			}
-
-			// fragments more distant than _BlendEnd will be discarded as well
-			const float fadeRange = _BlendEnd - _BlendStart + 1.0f;
-			float dist = distance(IN.worldPos.xz, _WorldSpaceCameraPos.xz); //max(abs(IN.worldPos.x - _WorldSpaceCameraPos.x), abs(IN.worldPos.z - _WorldSpaceCameraPos.z));			
-			if (dist>_BlendEnd)
-			{
-				discard;
-			}
-
-			int index = terrainTileInfo.r * _MaxIndex;
-
-			c = getColorFromTerrain(IN, IN.uv_MainTex, _FarTerrainTilemapDim, _FarTerrainTilesetDim, index);
-			
-			float treeCoverage = terrainTileInfo.g;
-			int locationRangeX = terrainTileInfo.b * _MaxIndex;
-			int locationRangeY = terrainTileInfo.a * _MaxIndex;
-			c.rgb = updateColorWithInfoForTreeCoverageAndLocations(c.rgb, treeCoverage, locationRangeX, locationRangeY, mapPixelX, mapPixelY, IN.uv_MainTex);
-
-			o.Albedo = c.rgb;
-		}
-		ENDCG
+		//ENDCG
 
 		// extra pass that renders to depth buffer only (world terrain is semi-transparent) - important for reflections to work
 		Pass {						
@@ -130,15 +132,22 @@ Shader "Daggerfall/DistantTerrain/DistantTerrainTilemap" {
 
 		ZWrite On
 		Cull Back
+        //Fog{ Mode Off }
 
 		CGPROGRAM
 
-		#pragma target 3.0		
-		#pragma surface surf Standard noforwardadd finalcolor:fcolor alpha:fade keepalpha
+		#pragma target 3.0				
+        #pragma surface surf Standard vertex:vert noforwardadd finalcolor:fcolor alpha:fade keepalpha nolightmap //nofog
 		#pragma glsl
 		#pragma multi_compile __ ENABLE_WATER_REFLECTIONS
 
 		#include "FarTerrainCommon.cginc"
+
+        void vert(inout appdata_full v, out Input o)
+        {
+            UNITY_INITIALIZE_OUTPUT(Input, o);
+            COMPUTE_EYEDEPTH(o.eyeDepth);
+        }
 
 		void surf (Input IN, inout SurfaceOutputStandard o)
 		{
