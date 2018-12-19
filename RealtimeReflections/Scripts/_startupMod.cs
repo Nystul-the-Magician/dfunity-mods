@@ -1,4 +1,4 @@
-﻿//RealtimeReflections for Daggerfall-Unity
+//RealtimeReflections for Daggerfall-Unity
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
@@ -47,7 +47,7 @@ namespace RealtimeReflections
             mod = initParams.Mod;
 
             // Load settings. Pass this mod as paramater
-            ModSettings settings = new ModSettings(mod);
+            ModSettings settings = mod.GetSettings();
 
             // settings
             floorReflectionTextureWidth = settings.GetInt("FloorReflectionTexture", "width");
