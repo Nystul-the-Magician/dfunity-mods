@@ -164,6 +164,9 @@ namespace EnhancedSky
                 //container.transform.Find("Stars").Find("StarParticles").gameObject.AddComponent<StarController>();
                 //container.transform.Find("Rotator").gameObject.AddComponent<RotationScript>();
                 //container.transform.Find("cloudPrefab").gameObject.AddComponent<Cloud>();
+
+                GameObject goParticles = container.transform.Find("Stars").Find("StarParticles").gameObject;
+                goParticles.GetComponent<ParticleSystemRenderer>().sharedMaterial = new Material(shaderUnlitAlphaWithFade);
             }
             else
                 throw new System.NullReferenceException();            
