@@ -7,7 +7,7 @@
     "ModDescription": "Standalone version of the Enhanced Sky mod",
     "GUID": "d3639c51-0754-4eb9-bf83-cabb817adfbb",
     "Files": [
-		"Assets/Game/Addons/EnhancedSky_standalone/Attribution.txt",
+        "Assets/Game/Addons/EnhancedSky_standalone/Attribution.txt",
         "Assets/Game/Addons/EnhancedSky_standalone/Resources/modsettings.json",
         "Assets/Game/Addons/EnhancedSky_standalone/Scripts/_startupMod.cs",
         "Assets/Game/Addons/EnhancedSky_standalone/Scripts/MoonController.cs",
@@ -35,8 +35,6 @@
         "Assets/Game/Addons/EnhancedSky_standalone/Texture Imports/Resources/secunda_one_wax.dds",
         "Assets/Game/Addons/EnhancedSky_standalone/Texture Imports/Resources/secunda_three_wan.dds",
         "Assets/Game/Addons/EnhancedSky_standalone/Texture Imports/Resources/secunda_three_wax.dds",
-        "Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/EnhancedSkyContainer.prefab",
-        "Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/EnhancedSkyController.prefab",
         "Assets/Game/Addons/EnhancedSky_standalone/Model Imports/Hemisphere_01_smooth.fbx",
         "Assets/Game/Addons/EnhancedSky_standalone/Model Imports/hemisphere_simple.fbx",
         "Assets/Game/Addons/EnhancedSky_standalone/Materials/Resources/DepthMask.shader",
@@ -48,7 +46,6 @@
         "Assets/Game/Addons/EnhancedSky_standalone/LightFlares/Flare50mm.psd",
         "Assets/Game/Addons/EnhancedSky_standalone/LightFlares/Flare50mm.mat",
         "Assets/Game/Addons/EnhancedSky_standalone/LightFlares/Sun.flare",
-        "Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/NewEnhancedSkyContainer.prefab",
-        "Assets/Game/Addons/EnhancedSky_standalone/enhancedsky.dfmod.json"
+        "Assets/Game/Addons/EnhancedSky_standalone/Prefabs/Resources/NewEnhancedSkyContainer.prefab"
     ]
 }

@@ -58,6 +58,8 @@ namespace EnhancedSky
         private static Material starsMat = null;
         private static Material starMaskMat = null;
 
+        private static Flare sunFlare = null;
+
         private static Preset presetPresetContainer = null;
 
         [Invoke(StateManager.StateTypes.Start)]
@@ -89,6 +91,8 @@ namespace EnhancedSky
             starsMat = mod.GetAsset<Material>("Materials/Resources/Stars") as Material;        
             skyMat = mod.GetAsset<Material>("Materials/Resources/Sky") as Material;
 
+            sunFlare = mod.GetAsset<Flare>("LightFlares/Sun.flare") as Flare;
+
             //cloudMesh = mod.GetAsset<Mesh>("Model Imports/Hemisphere_01_smooth.fbx") as Mesh;
 
             containerPrefab = mod.GetAsset<Object>("Prefabs/Resources/NewEnhancedSkyContainer.prefab") as Object;
@@ -119,6 +123,8 @@ namespace EnhancedSky
 
                 starsMat = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Materials/Resources/Stars.mat", typeof(Material)) as Material;
                 skyMat = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/Materials/Resources/Sky.mat", typeof(Material)) as Material;
+
+                sunFlare = AssetDatabase.LoadAssetAtPath("Assets/Game/Addons/EnhancedSky_standalone/LightFlares/Sun.flare", typeof(Flare)) as Flare;
             }
 #endif
 
@@ -167,6 +173,9 @@ namespace EnhancedSky
 
                 GameObject goParticles = container.transform.Find("Stars").Find("StarParticles").gameObject;
                 goParticles.GetComponent<ParticleSystemRenderer>().sharedMaterial = new Material(shaderUnlitAlphaWithFade);
+
+                GameObject goSun = container.transform.Find("Rotator").Find("Sun").gameObject;
+                goSun.GetComponent<LensFlare>().flare = sunFlare;
             }
             else
                 throw new System.NullReferenceException();            
