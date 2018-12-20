@@ -30,11 +30,11 @@ namespace DistantTerrain
         public const float noiseMapScaleClimateDesert = 2.0f; //1.25f;
         public const float noiseMapScaleClimateDesert2 = 32.0f;
         public const float noiseMapScaleClimateMountain = 15.0f;
-        public const float noiseMapScaleClimateRainforest = 7.5f;
+        public const float noiseMapScaleClimateRainforest = 11.5f;
         public const float noiseMapScaleClimateSwamp = 3.8f;
         public const float noiseMapScaleClimateSubtropical = 3.35f; // 3.25f
-        public const float noiseMapScaleClimateMountainWoods = 12.5f;
-        public const float noiseMapScaleClimateWoodlands = 22.0f; //10.0f;
+        public const float noiseMapScaleClimateMountainWoods = 16.5f; // 12.5f
+        public const float noiseMapScaleClimateWoodlands = 18.0f; //10.0f;
         public const float noiseMapScaleClimateHauntedWoodlands = 8.0f;
         public const float maxNoiseMapScale = 32.0f; //32f; //15f; //4f; //15f; //4f;
         // extra noise scale based on climate

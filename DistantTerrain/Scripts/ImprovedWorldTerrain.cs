@@ -47,11 +47,11 @@ namespace DistantTerrain
         public const float additionalHeightNoiseClimateDesert = 0.85f; //0.35f;
         public const float additionalHeightNoiseClimateDesert2 = 1.05f;
         public const float additionalHeightNoiseClimateMountain = 0.45f;
-        public const float additionalHeightNoiseClimateRainforest = 0.27f;
+        public const float additionalHeightNoiseClimateRainforest = 0.77f;
         public const float additionalHeightNoiseClimateSwamp = 1.7f;
         public const float additionalHeightNoiseClimateSubtropical = 0.65f;
         public const float additionalHeightNoiseClimateMountainWoods = 1.05f;
-        public const float additionalHeightNoiseClimateWoodlands = 0.65f; //0.45f;
+        public const float additionalHeightNoiseClimateWoodlands = 0.59f; //0.45f;
         public const float additionalHeightNoiseClimateHauntedWoodlands = 0.25f;        
 
         // 2D distance transform image - squared distance to water pixels of the world map
@@ -396,7 +396,8 @@ namespace DistantTerrain
                             UnityEngine.Random.InitState(TerrainHelper.MakeTerrainKey(x, y));
 
                             float additionalHeightBasedOnClimate = GetAdditionalHeightBasedOnClimate(x, y);
-                            mapMultipliers[y * width + x] = (Math.Min(maxHeightsExaggerationMultiplier, /*-additionalHeightBasedOnClimate * 0.5f*/ + UnityEngine.Random.Range(/*0.0f*/-additionalHeightBasedOnClimate, additionalHeightBasedOnClimate) + /*multiplierLocation **/ Math.Max(1.0f, distanceFromWater * exaggerationFactorWaterDistance)));
+                            float additionalHeightApplied = UnityEngine.Random.Range(-additionalHeightBasedOnClimate * 0.5f, additionalHeightBasedOnClimate);
+                            mapMultipliers[y * width + x] = (Math.Min(maxHeightsExaggerationMultiplier, additionalHeightApplied + /*multiplierLocation **/ Math.Max(1.0f, distanceFromWater * exaggerationFactorWaterDistance)));
                         }
                     }
 
