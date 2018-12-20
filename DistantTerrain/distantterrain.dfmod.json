@@ -1,15 +1,14 @@
 {
     "ModTitle": "Distant Terrain",
-    "ModVersion": "2.4.3",
+    "ModVersion": "2.5.0",
     "ModAuthor": "Nystul",
-    "ContactInfo": "http://forums.dfworkshop.net",
+    "ContactInfo": "https://forums.dfworkshop.net/viewtopic.php?f=27&t=10",
     "DFUnity_Version": "",
     "ModDescription": "adds distant terrain and increases view distance",
     "GUID": "9632a2ad-2ea0-46b6-b9b1-a4dafcca8a9a",
     "Files": [
         "Assets/Game/Addons/DistantTerrain_standalone/Resources/mapLocationRangeX.bin.txt",
         "Assets/Game/Addons/DistantTerrain_standalone/Resources/mapTreeCoverage.bin.txt",
-        "Assets/Game/Addons/DistantTerrain_standalone/Resources/Distant Terrain.ini.txt",
         "Assets/Game/Addons/DistantTerrain_standalone/Resources/mapLocationRangeY.bin.txt",
         "Assets/Game/Addons/DistantTerrain_standalone/Scripts/DistantTerrain.cs",
         "Assets/Game/Addons/DistantTerrain_standalone/Scripts/ImprovedTerrainSampler.cs",
@@ -23,6 +22,6 @@
         "Assets/Game/Addons/DistantTerrain_standalone/Shaders/DaggerfallBillboardBatchFaded.shader",
         "Assets/Game/Addons/DistantTerrain_standalone/Shaders/TransitionRingTilemap.shader",
         "Assets/Game/Addons/DistantTerrain_standalone/Shaders/FarTerrainCommon.cginc",
-        "Assets/Game/Addons/DistantTerrain_standalone/distantterrain.dfmod.json"
+        "Assets/Game/Addons/DistantTerrain_standalone/Resources/modsettings.json"
     ]
 }
