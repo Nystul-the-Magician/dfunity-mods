@@ -47,11 +47,11 @@ namespace DistantTerrain
             ModSettings settings = mod.GetSettings();
 
             // settings
-            enableTerrainTransition = settings.GetBool("GeneralSettings", "TerrainTransition");
-            enableFadeIntoSkybox = settings.GetBool("GeneralSettings", "FadeIntoSkybox");
-            enableSeaReflections = settings.GetBool("GeneralSettings", "SeaReflections");
-            enableImprovedTerrain = settings.GetBool("ImprovedTerrainSettings", "EnableImprovedTerrain");
-            indicateLocations = settings.GetBool("ImprovedTerrainSettings", "IndicateLocations");
+            enableTerrainTransition = settings.GetValue<bool>("GeneralSettings", "TerrainTransition");
+            enableFadeIntoSkybox = settings.GetValue<bool>("GeneralSettings", "FadeIntoSkybox");
+            enableSeaReflections = settings.GetValue<bool>("GeneralSettings", "SeaReflections");
+            enableImprovedTerrain = settings.GetValue<bool>("ImprovedTerrainSettings", "EnableImprovedTerrain");
+            indicateLocations = settings.GetValue<bool>("ImprovedTerrainSettings", "IndicateLocations");
 
             shaderDistantTerrainTilemap = mod.GetAsset<Shader>("Shaders/DistantTerrainTilemap.shader");
             shaderBillboardBatchFaded = mod.GetAsset<Shader>("Shaders/DaggerfallBillboardBatchFaded.shader");
