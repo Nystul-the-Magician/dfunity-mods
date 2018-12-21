@@ -50,10 +50,10 @@ namespace DistantTerrain
         public int stackedCameraDepth = -2;
         public int stackedNearCameraDepth = -1;
         public int cameraRenderSkyboxToTextureDepth = -10;
-        public float mainCameraFarClipPlane = 1200.0f; //15000.0f; //1200.0f;
+        public float mainCameraFarClipPlane = 15000.0f; //1200.0f;
         public float nearClipPlaneStackedCamera = 980.0f;
-        public float stackedNearCameraNearClipPlane = 980.0f;
-        public float stackedNearCameraFarClipPlane = 15000.0f;
+        //public float stackedNearCameraNearClipPlane = 980.0f;
+        //public float stackedNearCameraFarClipPlane = 15000.0f;
         public FogMode sceneFogMode = FogMode.Exponential;        
         public float SunnyFogDensity = 0.00005f;
         public float OvercastFogDensity = 0.000075f;
@@ -669,28 +669,29 @@ namespace DistantTerrain
             // Set main camera settings
             Camera.main.farClipPlane = mainCameraFarClipPlane;
 
-            if (!stackedNearCamera)
-            {
-                GameObject goStackedNearCamera = new GameObject("stackedNearCamera");
-                stackedNearCamera = goStackedNearCamera.AddComponent<Camera>();
-                stackedNearCamera.gameObject.AddComponent<CloneCameraRotationFromMainCamera>();
-                stackedNearCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
-                stackedNearCamera.transform.SetParent(this.transform);
+            //if (!stackedNearCamera)
+            //{
+            //    GameObject goStackedNearCamera = new GameObject("stackedNearCamera");
+            //    stackedNearCamera = goStackedNearCamera.AddComponent<Camera>();
+            //    stackedNearCamera.gameObject.AddComponent<CloneCameraRotationFromMainCamera>();
+            //    stackedNearCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
+            //    stackedNearCamera.transform.SetParent(this.transform);
 
-                if (postProcessingBehaviour != null)
-                {
-                    PostProcessingBehaviour stackedNearCameraPostProcessingBehaviour = goStackedNearCamera.AddComponent<PostProcessingBehaviour>();
-                    stackedNearCameraPostProcessingBehaviour.profile = postProcessingBehaviour.profile;
-                }
-            }
-            // important that camera properties are propagated every time SetupGameObjects() is called,
-            // otherwise things like fov won't be propagated correctly since first call of functions
-            // happens when the main camera still has default values (that get changed later)
-            stackedNearCamera.cullingMask = (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
-            stackedNearCamera.nearClipPlane = stackedNearCameraNearClipPlane; //980.0f;
-            stackedNearCamera.farClipPlane = stackedNearCameraFarClipPlane; //15000.0f;
-            stackedNearCamera.fieldOfView = Camera.main.fieldOfView;
-            stackedNearCamera.renderingPath = Camera.main.renderingPath;
+            //    //// breaks fog
+            //    //if (postProcessingBehaviour != null)
+            //    //{
+            //    //    PostProcessingBehaviour stackedNearCameraPostProcessingBehaviour = goStackedNearCamera.AddComponent<PostProcessingBehaviour>();
+            //    //    stackedNearCameraPostProcessingBehaviour.profile = postProcessingBehaviour.profile;
+            //    //}
+            //}
+            //// important that camera properties are propagated every time SetupGameObjects() is called,
+            //// otherwise things like fov won't be propagated correctly since first call of functions
+            //// happens when the main camera still has default values (that get changed later)
+            //stackedNearCamera.cullingMask = (1 << LayerMask.NameToLayer("Default")) + (1 << LayerMask.NameToLayer("Water")); // add water layer so reflections are updated in time (workaround)
+            //stackedNearCamera.nearClipPlane = stackedNearCameraNearClipPlane; //980.0f;
+            //stackedNearCamera.farClipPlane = stackedNearCameraFarClipPlane; //15000.0f;
+            //stackedNearCamera.fieldOfView = Camera.main.fieldOfView;
+            //stackedNearCamera.renderingPath = Camera.main.renderingPath;
 
             if (!stackedCamera)
             {
@@ -700,6 +701,7 @@ namespace DistantTerrain
                 stackedCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
                 stackedCamera.transform.SetParent(this.transform);
 
+                //breaks fog
                 if (postProcessingBehaviour != null)
                 {
                     PostProcessingBehaviour stackedCameraPostProcessingBehaviour = goStackedCamera.AddComponent<PostProcessingBehaviour>();
@@ -761,10 +763,10 @@ namespace DistantTerrain
             // set up camera stack - AFTER layer "WorldTerrain" has been assigned to worldTerrainGameObject (is done in function generateWorldTerrain())
 
             Camera.main.clearFlags = CameraClearFlags.Depth;
-            stackedNearCamera.clearFlags = CameraClearFlags.Depth;
+            //stackedNearCamera.clearFlags = CameraClearFlags.Depth;
             stackedCamera.clearFlags = CameraClearFlags.Depth;
-            stackedCamera.depth = stackedCameraDepth; // rendered first            
-            stackedNearCamera.depth = stackedNearCameraDepth;
+            //stackedNearCamera.depth = stackedNearCameraDepth;
+            stackedCamera.depth = stackedCameraDepth; // rendered first
             Camera.main.depth = 3; // renders over stacked camera
 
             cameraRenderSkyboxToTexture.depth = cameraRenderSkyboxToTextureDepth; // make sure to render first
