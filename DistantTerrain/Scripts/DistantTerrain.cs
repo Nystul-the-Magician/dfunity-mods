@@ -248,6 +248,8 @@ namespace DistantTerrain
         // stacked camera (used for far terrain) to prevent floating-point rendering precision problems for huge clipping ranges
         Camera stackedCamera = null;
 
+        PostProcessingBehaviour stackedCameraPostProcessingBehaviour = null;
+
         public Camera getFarTerrainCamera() { return stackedCamera; }
         public Camera getStackedNearCamera() { return stackedNearCamera; }
 
@@ -701,10 +703,9 @@ namespace DistantTerrain
                 stackedCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
                 stackedCamera.transform.SetParent(this.transform);
 
-                //breaks fog
                 if (postProcessingBehaviour != null)
                 {
-                    PostProcessingBehaviour stackedCameraPostProcessingBehaviour = goStackedCamera.AddComponent<PostProcessingBehaviour>();
+                    stackedCameraPostProcessingBehaviour = goStackedCamera.AddComponent<PostProcessingBehaviour>();
                     stackedCameraPostProcessingBehaviour.profile = postProcessingBehaviour.profile;
                 }
             }
@@ -839,6 +840,11 @@ namespace DistantTerrain
                     terrain.materialTemplate.SetFloat("_BlendStart", blendStart);
                     terrain.materialTemplate.SetFloat("_BlendEnd", blendEnd);
                 }
+
+                //if (stackedCameraPostProcessingBehaviour != null && postProcessingBehaviour != null)
+                //{                    
+                //    stackedCameraPostProcessingBehaviour.profile = postProcessingBehaviour.profile;
+                //}
 
                 if (doSeasonalTexturesUpdate)
                 {
