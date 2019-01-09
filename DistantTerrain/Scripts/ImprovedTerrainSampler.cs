@@ -82,7 +82,7 @@ namespace DistantTerrain
         /// </summary>
         public class HeightsComputationTask
         {
-            private class DataForTask
+            public class DataForTask
             {
                 public int numTasks;
                 public int currentTask;
@@ -314,14 +314,14 @@ namespace DistantTerrain
             var heightsComputationTaskArray = new HeightsComputationTask[numParallelTasks];
 
             // array of the data needed by the different tasks
-            var dataForTasks = new DataForTask[numParallelTasks];        
+            var dataForTasks = new HeightsComputationTask.DataForTask[numParallelTasks];        
 
             for (int i = 0; i < numParallelTasks; i++)
             {
                 doneEvents[i] = new ManualResetEvent(false);
                 var heightsComputationTask = new HeightsComputationTask(doneEvents[i]);
                 heightsComputationTaskArray[i] = heightsComputationTask;
-                dataForTasks[i] = new DataForTask();
+                dataForTasks[i] = new HeightsComputationTask.DataForTask();
                 dataForTasks[i].numTasks = numParallelTasks;
                 dataForTasks[i].currentTask = i;
                 dataForTasks[i].HeightmapDimension = HeightmapDimension;
