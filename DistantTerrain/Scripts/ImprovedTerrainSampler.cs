@@ -77,22 +77,25 @@ namespace DistantTerrain
             return ImprovedWorldTerrain.computeHeightMultiplier(x, y) * ImprovedTerrainSampler.baseHeightScale + this.GetNoiseMapScaleBasedOnClimate(x, y); // * 0.5f;
         }
 
-        private class DataForTask
-        {
-            public int numTasks;
-            public int currentTask;
-            public int HeightmapDimension;
-            public float MaxTerrainHeight;
-            public float div;
-            public float[,] baseHeightValue;
-            public byte[,] lhm;
-            public float[,] noiseHeightMultiplierMap;
-            public float extraNoiseScaleBasedOnClimate;
-            public MapPixelData mapPixel;
-        }
-
+        /// <summary>
+        /// helper class to do parallel computing of heights
+        /// </summary>
         public class HeightsComputationTask
         {
+            private class DataForTask
+            {
+                public int numTasks;
+                public int currentTask;
+                public int HeightmapDimension;
+                public float MaxTerrainHeight;
+                public float div;
+                public float[,] baseHeightValue;
+                public byte[,] lhm;
+                public float[,] noiseHeightMultiplierMap;
+                public float extraNoiseScaleBasedOnClimate;
+                public MapPixelData mapPixel;
+            }
+
             private ManualResetEvent _doneEvent;
 
             public HeightsComputationTask(ManualResetEvent doneEvent)
@@ -115,7 +118,7 @@ namespace DistantTerrain
                 float[,] noiseHeightMultiplierMap = dataForTask.noiseHeightMultiplierMap;
                 float extraNoiseScaleBasedOnClimate = dataForTask.extraNoiseScaleBasedOnClimate;
 
-                //mapPixel.heightmapSamples = new float[dim, dim];
+                // split the work between different tasks running in different threads (thread n computes data elements n, n + numTasks, n + numTasks*2, ...)
                 for (int y = dataForTask.currentTask; y < dim; y+=dataForTask.numTasks)
                 {
                     for (int x = 0; x < dim; x++)
@@ -176,9 +179,9 @@ namespace DistantTerrain
                         dataForTask.mapPixel.heightmapSamples[y, x] = height;
                     }
                 }
+
                 _doneEvent.Set();
             }
-
         }
 
         public override void GenerateSamples(ref MapPixelData mapPixel)
@@ -301,9 +304,16 @@ namespace DistantTerrain
 
             float extraNoiseScaleBasedOnClimate = GetExtraNoiseScaleBasedOnClimate(mx, my);
 
+            // the number of parallel tasks (use logical processor count for now - seems to be a good value)
             int numParallelTasks = Environment.ProcessorCount;
+
+            // events used to synchronize thread computations (wait for them to finish)
             var doneEvents = new ManualResetEvent[numParallelTasks];
+
+            // the array of instances of the height computations helper class
             var heightsComputationTaskArray = new HeightsComputationTask[numParallelTasks];
+
+            // array of the data needed by the different tasks
             var dataForTasks = new DataForTask[numParallelTasks];        
 
             for (int i = 0; i < numParallelTasks; i++)
@@ -325,8 +335,10 @@ namespace DistantTerrain
                 ThreadPool.QueueUserWorkItem(heightsComputationTask.ThreadProc, dataForTasks[i]);
             }
 
+            // wait for all tasks to finish computation
             WaitHandle.WaitAll(doneEvents);
 
+            // computed average and max height in a second pass (after threaded tasks computed all heights)
             float averageHeight = 0;
             float maxHeight = float.MinValue;
 
@@ -336,7 +348,7 @@ namespace DistantTerrain
                 for (int x = 0; x < dim; x++)
                 {
                     // get sample
-                    float height = mapPixel.heightmapSamples[y, x] /** MaxTerrainHeight*/;
+                    float height = mapPixel.heightmapSamples[y, x];
 
                     // Accumulate average height
                     averageHeight += height;
@@ -347,82 +359,9 @@ namespace DistantTerrain
                 }
             }
 
-            //// Extract height samples for all chunks
-            //float baseHeight, noiseHeight;
-            //float x1, x2, x3, x4;
-            //int dim = HeightmapDimension;
-            ////mapPixel.heightmapSamples = new float[dim, dim];
-            //for (int y = 0; y < dim; y++)
-            //{
-            //    for (int x = 0; x < dim; x++)
-            //    {
-            //        float rx = (float)x / div;
-            //        float ry = (float)y / div;
-            //        int ix = Mathf.FloorToInt(rx);
-            //        int iy = Mathf.FloorToInt(ry);
-            //        float sfracx = (float)x / (float)(dim - 1);
-            //        float sfracy = (float)y / (float)(dim - 1);
-            //        float fracx = (float)(x - ix * div) / div;
-            //        float fracy = (float)(y - iy * div) / div;
-            //        float scaledHeight = 0;
-
-            //        // Bicubic sample small height map for base terrain elevation
-            //        x1 = TerrainHelper.CubicInterpolator(baseHeightValue[0, 3], baseHeightValue[1, 3], baseHeightValue[2, 3], baseHeightValue[3, 3], sfracx);
-            //        x2 = TerrainHelper.CubicInterpolator(baseHeightValue[0, 2], baseHeightValue[1, 2], baseHeightValue[2, 2], baseHeightValue[3, 2], sfracx);
-            //        x3 = TerrainHelper.CubicInterpolator(baseHeightValue[0, 1], baseHeightValue[1, 1], baseHeightValue[2, 1], baseHeightValue[3, 1], sfracx);
-            //        x4 = TerrainHelper.CubicInterpolator(baseHeightValue[0, 0], baseHeightValue[1, 0], baseHeightValue[2, 0], baseHeightValue[3, 0], sfracx);
-            //        baseHeight = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
-            //        scaledHeight += baseHeight * baseHeightScale;
-
-            //        // Bicubic sample large height map for noise mask over terrain features
-            //        x1 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 0], lhm[ix + 1, iy + 0], lhm[ix + 2, iy + 0], lhm[ix + 3, iy + 0], fracx);
-            //        x2 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 1], lhm[ix + 1, iy + 1], lhm[ix + 2, iy + 1], lhm[ix + 3, iy + 1], fracx);
-            //        x3 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 2], lhm[ix + 1, iy + 2], lhm[ix + 2, iy + 2], lhm[ix + 3, iy + 2], fracx);
-            //        x4 = TerrainHelper.CubicInterpolator(lhm[ix, iy + 3], lhm[ix + 1, iy + 3], lhm[ix + 2, iy + 3], lhm[ix + 3, iy + 3], fracx);
-            //        noiseHeight = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, fracy);
-
-            //        x1 = TerrainHelper.CubicInterpolator(noiseHeightMultiplierMap[0, 3], noiseHeightMultiplierMap[1, 3], noiseHeightMultiplierMap[2, 3], noiseHeightMultiplierMap[3, 3], sfracx);
-            //        x2 = TerrainHelper.CubicInterpolator(noiseHeightMultiplierMap[0, 2], noiseHeightMultiplierMap[1, 2], noiseHeightMultiplierMap[2, 2], noiseHeightMultiplierMap[3, 2], sfracx);
-            //        x3 = TerrainHelper.CubicInterpolator(noiseHeightMultiplierMap[0, 1], noiseHeightMultiplierMap[1, 1], noiseHeightMultiplierMap[2, 1], noiseHeightMultiplierMap[3, 1], sfracx);
-            //        x4 = TerrainHelper.CubicInterpolator(noiseHeightMultiplierMap[0, 0], noiseHeightMultiplierMap[1, 0], noiseHeightMultiplierMap[2, 0], noiseHeightMultiplierMap[3, 0], sfracx);
-            //        float noiseHeightMultiplier = TerrainHelper.CubicInterpolator(x1, x2, x3, x4, sfracy);
-
-            //        scaledHeight += noiseHeight * noiseHeightMultiplier;
-
-            //        // Additional noise mask for small terrain features at ground level
-            //        // small terrain features' height scale should depend on climate of map pixel
-            //        float extraNoiseScale = extraNoiseScaleBasedOnClimate;
-            //        // prevent seams between different climate map pixels
-            //        if (x <= 0 || y <= 0 || x >= dim - 1 || y >= dim - 1)
-            //        {
-            //            extraNoiseScale = defaultExtraNoiseScale;
-            //        }
-            //        int noisex = mapPixel.mapPixelX * (HeightmapDimension - 1) + x;
-            //        int noisey = (MapsFile.MaxMapPixelY - mapPixel.mapPixelY) * (HeightmapDimension - 1) + y;
-            //        float lowFreq = TerrainHelper.GetNoise(noisex, noisey, 0.3f, 0.5f, 0.5f, 1);
-            //        float highFreq = TerrainHelper.GetNoise(noisex, noisey, 0.9f, 0.5f, 0.5f, 1);
-            //        scaledHeight += (lowFreq * highFreq) * extraNoiseScale;
-
-            //        // Clamp lower values to ocean elevation
-            //        if (scaledHeight < scaledOceanElevation)
-            //            scaledHeight = scaledOceanElevation;
-
-            //        // Accumulate average height
-            //        averageHeight += scaledHeight;
-
-            //        // Get max height
-            //        if (scaledHeight > maxHeight)
-            //            maxHeight = scaledHeight;
-
-            //        // Set sample
-            //        float height = Mathf.Clamp01(scaledHeight / MaxTerrainHeight);
-            //        mapPixel.heightmapSamples[y, x] = height;
-            //    }
-            //}
-
             // Average and max heights are passed back for locations
-            mapPixel.averageHeight = (averageHeight /= (float)(dim * dim)) /*/ MaxTerrainHeight*/;
-            mapPixel.maxHeight = maxHeight /*/ MaxTerrainHeight*/;
+            mapPixel.averageHeight = (averageHeight /= (float)(dim * dim));
+            mapPixel.maxHeight = maxHeight;
 
             //long totalTime = stopwatch.ElapsedMilliseconds - startTime;
             //DaggerfallUnity.LogMessage(string.Format("GenerateSamples took: {0}ms", totalTime), true);
