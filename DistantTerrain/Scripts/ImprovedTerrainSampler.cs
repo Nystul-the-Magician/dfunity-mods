@@ -183,8 +183,8 @@ namespace DistantTerrain
 
         public override void GenerateSamples(ref MapPixelData mapPixel)
         {
-            System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            long startTime = stopwatch.ElapsedMilliseconds;
+            //System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            //long startTime = stopwatch.ElapsedMilliseconds;
 
             DaggerfallUnity dfUnity = DaggerfallUnity.Instance;
 
@@ -301,7 +301,7 @@ namespace DistantTerrain
 
             float extraNoiseScaleBasedOnClimate = GetExtraNoiseScaleBasedOnClimate(mx, my);
 
-            int numParallelTasks = 8;
+            int numParallelTasks = Environment.ProcessorCount;
             var doneEvents = new ManualResetEvent[numParallelTasks];
             var heightsComputationTaskArray = new HeightsComputationTask[numParallelTasks];
             var dataForTasks = new DataForTask[numParallelTasks];        
@@ -424,8 +424,8 @@ namespace DistantTerrain
             mapPixel.averageHeight = (averageHeight /= (float)(dim * dim)) /*/ MaxTerrainHeight*/;
             mapPixel.maxHeight = maxHeight /*/ MaxTerrainHeight*/;
 
-            long totalTime = stopwatch.ElapsedMilliseconds - startTime;
-            DaggerfallUnity.LogMessage(string.Format("GenerateSamples took: {0}ms", totalTime), true);
+            //long totalTime = stopwatch.ElapsedMilliseconds - startTime;
+            //DaggerfallUnity.LogMessage(string.Format("GenerateSamples took: {0}ms", totalTime), true);
         }
 
         private float GetNoiseMapScaleBasedOnClimate(int mapPixelX, int mapPixelY)
