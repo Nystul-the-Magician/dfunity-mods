@@ -61,6 +61,11 @@ namespace DistantTerrain
         // Max terrain height of this sampler implementation
         public const float maxTerrainHeight = ImprovedWorldTerrain.maxHeightsExaggerationMultiplier * baseHeightScale * 128 + maxNoiseMapScale * 128 + 128;//1380f; //26115f;
 
+        // References to small & large heightmap source data.        
+        NativeArray<byte> lhmNativeArray;
+        NativeArray<float> baseHeightValueNativeArray;
+        NativeArray<float> noiseHeightMultiplierNativeArray;
+
         public override int Version
         {
             get { return 2; }
@@ -630,22 +635,21 @@ namespace DistantTerrain
 
             float extraNoiseScaleBasedOnClimate = GetExtraNoiseScaleBasedOnClimate(mx, my);
 
-            byte sDim = 4;
-            //NativeArray<byte> shm = new NativeArray<byte>(dfUnity.ContentReader.WoodsFileReader.GetHeightMapValuesRangeJobs(mx - 2, my - 2, sDim), Allocator.TempJob);            
-            NativeArray<float> baseHeightValueNativeArray = new NativeArray<float>(shm.Length, Allocator.TempJob);
+            byte sDim = 4;            
+            baseHeightValueNativeArray = new NativeArray<float>(shm.Length, Allocator.TempJob);
             int i = 0;
             for (int y = 0; y < sDim; y++)
                 for (int x = 0; x < sDim; x++)
                     baseHeightValueNativeArray[i++] = baseHeightValue[x, y];
 
             i = 0;
-            NativeArray<float> noiseHeightMultiplierNativeArray = new NativeArray<float>(noiseHeightMultiplierMap.Length, Allocator.TempJob);
+            noiseHeightMultiplierNativeArray = new NativeArray<float>(noiseHeightMultiplierMap.Length, Allocator.TempJob);
             for (int y = 0; y < sDim; y++)
                 for (int x = 0; x < sDim; x++)
                     noiseHeightMultiplierNativeArray[i++] = noiseHeightMultiplierMap[x, y];
 
             // TODO - shortcut conversion & flattening.
-            NativeArray<byte> lhmNativeArray = new NativeArray<byte>(lhm.Length, Allocator.TempJob);
+            lhmNativeArray = new NativeArray<byte>(lhm.Length, Allocator.TempJob);
             byte lDim = (byte)lhm.GetLength(0);
             i = 0;
             for (int y = 0; y < lDim; y++)
@@ -674,5 +678,14 @@ namespace DistantTerrain
             return generateSamplesHandle;
         }
 
+        public override void Dispose()
+        {
+            if (baseHeightValueNativeArray.IsCreated)
+                baseHeightValueNativeArray.Dispose();
+            if (noiseHeightMultiplierNativeArray.IsCreated)
+                noiseHeightMultiplierNativeArray.Dispose();
+            if (lhmNativeArray.IsCreated)
+                lhmNativeArray.Dispose();
+        }
     }
 }
