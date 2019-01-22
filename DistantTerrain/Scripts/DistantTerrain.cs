@@ -19,6 +19,7 @@ using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Utility;
 using DaggerfallWorkshop.Game.Serialization;
 using DaggerfallWorkshop.Game.Utility.ModSupport;
+using Unity.Jobs;
 
 namespace DistantTerrain
 {
@@ -567,7 +568,12 @@ namespace DistantTerrain
 
             if (enableTerrainTransition)
             {
-                GenerateTerrainTransitionRing();
+                // AJRB: don't generate the entire transition ring on startup!
+                if (gameobjectTerrainTransitionRing == null)
+                {
+                    gameobjectTerrainTransitionRing = new GameObject("TerrainTransitionRing");
+                    gameobjectTerrainTransitionRing.transform.SetParent(GameManager.Instance.ExteriorParent.transform);
+                }
             }
         }
 
@@ -1449,7 +1455,9 @@ namespace DistantTerrain
 
             // Update data for terrain
             //UpdateMapPixelData(ref dfTerrain, terrainDesc.mapPixelX, terrainDesc.mapPixelY, streamingWorld.TerrainTexturing);
-            dfTerrain.UpdateMapPixelData(streamingWorld.TerrainTexturing);
+            //dfTerrain.UpdateMapPixelData(streamingWorld.TerrainTexturing);
+            JobHandle updateTerrainDataHandle = dfTerrain.BeginMapPixelDataUpdate(streamingWorld.TerrainTexturingJobs);
+            updateTerrainDataHandle.Complete();
 
             // Update heights of transition terrain ring
             float weightFarTerrainLeft = 0.0f;
@@ -1487,10 +1495,11 @@ namespace DistantTerrain
                 }
             }
 
-            dfTerrain.UpdateTileMapData();
+            //dfTerrain.UpdateTileMapData();
+            dfTerrain.CompleteMapPixelDataUpdate(streamingWorld.TerrainTexturingJobs);
 
             // Promote data to live terrain
-            dfTerrain.UpdateClimateMaterial();
+/*            dfTerrain.UpdateClimateMaterial();
 
             // important to put call to dfTerrain.PromoteTerrainData into a try-catch block
             // (since it raises PromoteTerrainEvent and another mod that consumes the event
@@ -1504,7 +1513,7 @@ namespace DistantTerrain
             {
                 Debug.LogError("exception after raising PromoteTerrainEvent in dfTerrain.PromoteTerrainData : " + e.Message);
             }
-
+*/
             // inject transition ring shader
             Terrain terrain = transitionTerrainDesc.terrainDesc.terrainObject.GetComponent<Terrain>();
             Material oldMaterial = terrain.materialTemplate;
@@ -1610,7 +1619,7 @@ namespace DistantTerrain
 
             // Only set active again once complete
             terrainDesc.terrainObject.SetActive(true);
-            terrainDesc.terrainObject.name = streamingWorld.GetTerrainName(dfTerrain.MapPixelX, dfTerrain.MapPixelY);
+            terrainDesc.terrainObject.name = TerrainHelper.GetTerrainName(dfTerrain.MapPixelX, dfTerrain.MapPixelY);
         }
 
         private bool CreateTerrainTransitionRing(int mapPixelX, int mapPixelY, int indexTerrain)
@@ -1662,7 +1671,7 @@ namespace DistantTerrain
             terrainTransitionRingArray[terrainIndex].terrainDesc.terrainObject.transform.localPosition = localPosition;
             
             // if block was not reused - it does not exist - so create unity terrain object - otherwise position update will be enough
-            if (!terrainTransitionRingArray[terrainIndex].keepThisBlock)
+            if (true || !terrainTransitionRingArray[terrainIndex].keepThisBlock)    // AJRB: Always generate terrain data since it's disposed of.. Discuss with Nystul.
             {
                 UpdateTerrainDataTransitionRing(terrainTransitionRingArray[terrainIndex]);
             }
@@ -1785,10 +1794,18 @@ namespace DistantTerrain
 
                         yield return new WaitForEndOfFrame();
                     }
-                    
+
+                    // Log whenever the change that enforces always regenerating terrain data would have failed to layout nature
+                    if (terrainTransitionRingArray[i].keepThisBlock)
+                        Debug.LogFormat("Would not be updating terrain nature for ({0},{1})", terrainTransitionRingArray[i].terrainDesc.mapPixelX, terrainTransitionRingArray[i].terrainDesc.mapPixelY);
+
                     if (terrainTransitionRingArray[i].terrainDesc.updateNature)
                     {
-                        streamingWorld.UpdateTerrainNature(terrainTransitionRingArray[i].terrainDesc);
+                        try {
+                            streamingWorld.UpdateTerrainNature(terrainTransitionRingArray[i].terrainDesc);
+                        } catch (Exception e) {
+                            Debug.LogFormat("Exception updating terrain nature! ({0},{1})", terrainTransitionRingArray[i].terrainDesc.mapPixelX, terrainTransitionRingArray[i].terrainDesc.mapPixelY, e);
+                        }
                         terrainTransitionRingArray[i].terrainDesc.updateNature = false;
 
                         MeshRenderer meshRenderer = terrainTransitionRingArray[i].terrainDesc.billboardBatchObject.GetComponent<MeshRenderer>();
@@ -1824,11 +1841,6 @@ namespace DistantTerrain
             if (!enableTerrainTransition)
                 return;
 
-            if (gameobjectTerrainTransitionRing == null)
-            {
-                gameobjectTerrainTransitionRing = new GameObject("TerrainTransitionRing");
-                gameobjectTerrainTransitionRing.transform.SetParent(GameManager.Instance.ExteriorParent.transform);
-            }
             //// this is not perfect I know - but since events can get in asynchronous and may trigger an update and thus an invocation to GenerateTerrainTransitionRing() it is important that no update is currently performed
             //while (transitionRingAllBlocksReady == true)
             //{
