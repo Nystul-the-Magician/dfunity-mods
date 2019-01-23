@@ -48,8 +48,9 @@ namespace DistantTerrain
         // WeatherManager is used for seasonal textures
         public WeatherManager weatherManager;
 
-        public int stackedCameraDepth = -2;
-        public int stackedNearCameraDepth = -1;
+        public int mainCameraDepth = 3;
+        public int stackedCameraDepth = 2;
+        //public int stackedNearCameraDepth = 1;
         public int cameraRenderSkyboxToTextureDepth = -10;
         public float mainCameraFarClipPlane = 15000.0f; //1200.0f;
         public float nearClipPlaneStackedCamera = 980.0f;
@@ -776,7 +777,7 @@ namespace DistantTerrain
             stackedCamera.clearFlags = CameraClearFlags.Depth;
             //stackedNearCamera.depth = stackedNearCameraDepth;
             stackedCamera.depth = stackedCameraDepth; // rendered first
-            Camera.main.depth = 3; // renders over stacked camera
+            Camera.main.depth = mainCameraDepth; // renders over stacked camera
 
             cameraRenderSkyboxToTexture.depth = cameraRenderSkyboxToTextureDepth; // make sure to render first
             cameraRenderSkyboxToTexture.renderingPath = Camera.main.renderingPath;
