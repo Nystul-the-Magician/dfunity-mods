@@ -20,6 +20,7 @@ using DaggerfallWorkshop.Utility;
 using DaggerfallWorkshop.Game.Serialization;
 using DaggerfallWorkshop.Game.Utility.ModSupport;
 using Unity.Jobs;
+using Unity.Collections;
 
 namespace DistantTerrain
 {
@@ -1438,12 +1439,81 @@ namespace DistantTerrain
             }
         }
 
-        // Update terrain data
-        private void UpdateTerrainDataTransitionRing(TransitionTerrainDesc transitionTerrainDesc)
+        struct UpdateTransitionRingHeightsJob : IJobParallelFor
+        {
+            public NativeArray<float> heightmapData;
+
+            public float weightFarTerrainLeft;
+            public float weightFarTerrainRight;
+            public float weightFarTerrainTop;
+            public float weightFarTerrainBottom;
+
+            public float heightFarTerrainTopLeft;
+            public float heightFarTerrainTopRight;
+            public float heightFarTerrainBottomLeft;
+            public float heightFarTerrainBottomRight;
+
+            public int heightmapHeight;
+            public int heightmapWidth;
+
+            public void Execute(int index)
+            {
+                // Use cols=x and rows=y for height data
+                int x = JobA.Col(index, heightmapWidth);
+                int y = JobA.Row(index, heightmapHeight);
+                float fractionalAmountX = (float)x / ((float)heightmapWidth - 1);
+                float fractionalAmountY = (float)y / ((float)heightmapHeight - 1);
+
+                float weightFarTerrainX = weightFarTerrainLeft * (1.0f - fractionalAmountX) + weightFarTerrainRight * (fractionalAmountX);
+                float weightFarTerrainY = weightFarTerrainTop * (1.0f - fractionalAmountY) + weightFarTerrainBottom * (fractionalAmountY);
+                float weightFarTerrainCombined = Math.Max(weightFarTerrainX, weightFarTerrainY);
+                float heightFarTerrain = heightFarTerrainTopLeft * (1.0f - fractionalAmountX) * (1.0f - fractionalAmountY) +
+                                         heightFarTerrainTopRight * (fractionalAmountX) * (1.0f - fractionalAmountY) +
+                                         heightFarTerrainBottomLeft * (1.0f - fractionalAmountX) * (fractionalAmountY) +
+                                         heightFarTerrainBottomRight * (fractionalAmountX) * (fractionalAmountY);
+
+                float height = heightmapData[index] * (1.0f - weightFarTerrainCombined) + heightFarTerrain * (weightFarTerrainCombined);
+                heightmapData[index] = height;
+            }
+        }
+
+        // Schedules job to update the heights of terrain for the transition terrain ring
+        private JobHandle ScheduleUpdateTransitionRingHeightsJob(TransitionTerrainDesc transitionTerrainDesc, DaggerfallTerrain dfTerrain, JobHandle dependencies)
         {
             StreamingWorld.TerrainDesc terrainDesc = transitionTerrainDesc.terrainDesc;
 
+            float heightFarTerrainTopLeft = worldHeights[worldMapHeight - 1 - terrainDesc.mapPixelY, terrainDesc.mapPixelX - 1]; // TODO: map border handling
+            float heightFarTerrainTopRight = worldHeights[worldMapHeight - 1 - terrainDesc.mapPixelY, terrainDesc.mapPixelX]; // TODO: map border handling
+            float heightFarTerrainBottomLeft = worldHeights[worldMapHeight - 1 - terrainDesc.mapPixelY + 1, terrainDesc.mapPixelX - 1]; // TODO: map border handling
+            float heightFarTerrainBottomRight = worldHeights[worldMapHeight - 1 - terrainDesc.mapPixelY + 1, terrainDesc.mapPixelX]; // TODO: map border handling
+
+            //Debug.Log(String.Format("heightFarTerrainTopLeft: {0}, heightFarTerrainTopRight: {1}, heightFarTerrainBottomLeft: {0}, heightFarTerrainBottomRight: {1}", heightFarTerrainTopLeft, heightFarTerrainTopRight, heightFarTerrainBottomLeft, heightFarTerrainBottomRight));
+
+            int heightmapHeight = dfTerrain.MapData.heightmapSamples.GetLength(0);
+            int heightmapWidth = dfTerrain.MapData.heightmapSamples.GetLength(1);
+
+            UpdateTransitionRingHeightsJob updateTransitionRingHeightsJob = new UpdateTransitionRingHeightsJob()
+            {
+                heightmapData = dfTerrain.MapData.heightmapData,
+                weightFarTerrainLeft = (transitionTerrainDesc.transitionRingBorderDesc.isLeftRingBorder) ? 1.0f : 0.0f,
+                weightFarTerrainRight = (transitionTerrainDesc.transitionRingBorderDesc.isRightRingBorder) ? 1.0f : 0.0f,
+                weightFarTerrainTop = (transitionTerrainDesc.transitionRingBorderDesc.isTopRingBorder) ? 1.0f : 0.0f,
+                weightFarTerrainBottom = (transitionTerrainDesc.transitionRingBorderDesc.isBottomRingBorder) ? 1.0f : 0.0f,
+                heightFarTerrainTopLeft = heightFarTerrainTopLeft,
+                heightFarTerrainTopRight = heightFarTerrainTopRight,
+                heightFarTerrainBottomLeft = heightFarTerrainBottomLeft,
+                heightFarTerrainBottomRight = heightFarTerrainBottomRight,
+                heightmapHeight = heightmapHeight,
+                heightmapWidth = heightmapWidth,    // AJRB: can heightmap be rectangular? I don't see how since 2d array is defined by [,] which is by definition square
+            };
+            return updateTransitionRingHeightsJob.Schedule(heightmapWidth * heightmapHeight, 64, dependencies);
+        }
+
+        // Update terrain data
+        private void UpdateTerrainDataTransitionRing(TransitionTerrainDesc transitionTerrainDesc)
+        {
             // Instantiate Daggerfall terrain
+            StreamingWorld.TerrainDesc terrainDesc = transitionTerrainDesc.terrainDesc;
             DaggerfallTerrain dfTerrain = terrainDesc.terrainObject.GetComponent<DaggerfallTerrain>();
             if (dfTerrain)
             {
@@ -1453,53 +1523,16 @@ namespace DistantTerrain
                 dfTerrain.InstantiateTerrain();
             }
 
-            // Update data for terrain
-            //UpdateMapPixelData(ref dfTerrain, terrainDesc.mapPixelX, terrainDesc.mapPixelY, streamingWorld.TerrainTexturing);
-            //dfTerrain.UpdateMapPixelData(streamingWorld.TerrainTexturing);
+            // Schedule jobs to update terrain data.
             JobHandle updateTerrainDataHandle = dfTerrain.BeginMapPixelDataUpdate(streamingWorld.TerrainTexturingJobs);
 
-            // AJRB: TODO: put jobified version of heights update in here... for now just request job completion.
-            updateTerrainDataHandle.Complete();
+            // Schedule job to update heights of transition terrain ring.
+            JobHandle updateTransitionRingHeightsJobHandle = ScheduleUpdateTransitionRingHeightsJob(transitionTerrainDesc, dfTerrain, updateTerrainDataHandle);
+
+            // AJRB: TODO: possibly decouple from FPS here... for now just request job completion.
+            updateTransitionRingHeightsJobHandle.Complete();
 
             dfTerrain.CompleteMapPixelDataUpdate(streamingWorld.TerrainTexturingJobs);
-
-            // Update heights of transition terrain ring
-            float weightFarTerrainLeft = 0.0f;
-            float weightFarTerrainRight = 0.0f;
-            float weightFarTerrainTop = 0.0f;
-            float weightFarTerrainBottom = 0.0f;
-            if (transitionTerrainDesc.transitionRingBorderDesc.isLeftRingBorder) weightFarTerrainLeft = 1.0f;
-            if (transitionTerrainDesc.transitionRingBorderDesc.isRightRingBorder) weightFarTerrainRight = 1.0f;
-            if (transitionTerrainDesc.transitionRingBorderDesc.isTopRingBorder) weightFarTerrainTop = 1.0f;
-            if (transitionTerrainDesc.transitionRingBorderDesc.isBottomRingBorder) weightFarTerrainBottom = 1.0f;
-            float heightFarTerrainTopLeft = worldHeights[worldMapHeight - 1 - terrainDesc.mapPixelY, terrainDesc.mapPixelX - 1]; // TODO: map border handling
-            float heightFarTerrainTopRight = worldHeights[worldMapHeight - 1 - terrainDesc.mapPixelY, terrainDesc.mapPixelX]; // TODO: map border handling
-            float heightFarTerrainBottomLeft = worldHeights[worldMapHeight - 1 - terrainDesc.mapPixelY + 1, terrainDesc.mapPixelX - 1]; // TODO: map border handling
-            float heightFarTerrainBottomRight = worldHeights[worldMapHeight - 1 - terrainDesc.mapPixelY + 1, terrainDesc.mapPixelX]; // TODO: map border handling
-
-            //Debug.Log(String.Format("heightFarTerrainTopLeft: {0}, heightFarTerrainTopRight: {1}, heightFarTerrainBottomLeft: {0}, heightFarTerrainBottomRight: {1}", heightFarTerrainTopLeft, heightFarTerrainTopRight, heightFarTerrainBottomLeft, heightFarTerrainBottomRight));
-
-            //Terrain terrain = terrainDesc.terrainObject.GetComponent<Terrain>();
-            int heightmapHeight = dfTerrain.MapData.heightmapSamples.GetLength(0);
-            int heightmapWidth = dfTerrain.MapData.heightmapSamples.GetLength(1);
-            for (int y = 0; y < heightmapHeight; y++)
-            {
-                float fractionalAmountY = (float)y / ((float)heightmapHeight - 1);
-                for (int x = 0; x < heightmapWidth; x++)
-                {
-                    float fractionalAmountX = (float)x / ((float)heightmapWidth - 1);
-                    float weightFarTerrainX = weightFarTerrainLeft * (1.0f - fractionalAmountX) + weightFarTerrainRight * (fractionalAmountX);
-                    float weightFarTerrainY = weightFarTerrainTop * (1.0f - fractionalAmountY) + weightFarTerrainBottom * (fractionalAmountY);
-                    float weightFarTerrainCombined = Math.Max(weightFarTerrainX, weightFarTerrainY);
-                    float heightFarTerrain = heightFarTerrainTopLeft * (1.0f - fractionalAmountX) * (1.0f - fractionalAmountY) +
-                                             heightFarTerrainTopRight * (fractionalAmountX) * (1.0f - fractionalAmountY) +
-                                             heightFarTerrainBottomLeft * (1.0f - fractionalAmountX) * (fractionalAmountY) +
-                                             heightFarTerrainBottomRight * (fractionalAmountX) * (fractionalAmountY);
-                    dfTerrain.MapData.heightmapSamples[y, x] = dfTerrain.MapData.heightmapSamples[y, x] * (1.0f - weightFarTerrainCombined) + heightFarTerrain * (weightFarTerrainCombined);
-                }
-            }
-
-            //dfTerrain.UpdateTileMapData();
 
             // Promote data to live terrain
             dfTerrain.UpdateClimateMaterial();
@@ -1555,10 +1588,10 @@ namespace DistantTerrain
             newMaterial.SetTexture("_TileAtlasTexMountain", textureAtlasMountainSummer);
             newMaterial.SetTexture("_TileAtlasTexSwamp", textureAtlasSwampSummer);
 
-            newMaterial.SetFloat("_blendWeightFarTerrainTop", weightFarTerrainTop);
-            newMaterial.SetFloat("_blendWeightFarTerrainBottom", weightFarTerrainBottom);
-            newMaterial.SetFloat("_blendWeightFarTerrainLeft", weightFarTerrainLeft);
-            newMaterial.SetFloat("_blendWeightFarTerrainRight", weightFarTerrainRight);
+            newMaterial.SetFloat("_blendWeightFarTerrainLeft", (transitionTerrainDesc.transitionRingBorderDesc.isLeftRingBorder) ? 1.0f : 0.0f);
+            newMaterial.SetFloat("_blendWeightFarTerrainRight", (transitionTerrainDesc.transitionRingBorderDesc.isRightRingBorder) ? 1.0f : 0.0f);
+            newMaterial.SetFloat("_blendWeightFarTerrainTop", (transitionTerrainDesc.transitionRingBorderDesc.isTopRingBorder) ? 1.0f : 0.0f);
+            newMaterial.SetFloat("_blendWeightFarTerrainBottom", (transitionTerrainDesc.transitionRingBorderDesc.isBottomRingBorder) ? 1.0f : 0.0f);
 
             //newMaterial.SetInt("_TextureSetSeasonCode", 0);
 
