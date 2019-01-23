@@ -163,9 +163,6 @@ namespace DistantTerrain
         // texture for terrainInfoTileMap
         Texture2D textureTerrainInfoTileMap = null;
 
-        // Distance Terrain own instance of terrain texturing. (this should come from core at some point when mod mechanism is created)
-        TerrainTexturingJobs terrainTexturingJobs = new TerrainTexturingJobs();
-
         ClimateSeason currentSeason = ClimateSeason.Summer;
 
         Texture2D textureAtlasDesertSummer = null;
@@ -1459,12 +1456,12 @@ namespace DistantTerrain
             // Update data for terrain
             //UpdateMapPixelData(ref dfTerrain, terrainDesc.mapPixelX, terrainDesc.mapPixelY, streamingWorld.TerrainTexturing);
             //dfTerrain.UpdateMapPixelData(streamingWorld.TerrainTexturing);
-            JobHandle updateTerrainDataHandle = dfTerrain.BeginMapPixelDataUpdate(terrainTexturingJobs);
+            JobHandle updateTerrainDataHandle = dfTerrain.BeginMapPixelDataUpdate(streamingWorld.TerrainTexturingJobs);
 
             // AJRB: TODO: put jobified version of heights update in here... for now just request job completion.
             updateTerrainDataHandle.Complete();
 
-            dfTerrain.CompleteMapPixelDataUpdate(terrainTexturingJobs);
+            dfTerrain.CompleteMapPixelDataUpdate(streamingWorld.TerrainTexturingJobs);
 
             // Update heights of transition terrain ring
             float weightFarTerrainLeft = 0.0f;
