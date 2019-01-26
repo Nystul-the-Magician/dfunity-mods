@@ -278,7 +278,6 @@ namespace DistantTerrain
             DaggerfallUnity dfUnity = DaggerfallUnity.Instance;
 
             // Create samples arrays
-            mapPixel.tilemapSamples = new TilemapSample[MapsFile.WorldMapTileDim, MapsFile.WorldMapTileDim];
             mapPixel.heightmapSamples = new float[HeightmapDimension, HeightmapDimension];
 
             // Divisor ensures continuous 0-1 range of tile samples
@@ -550,10 +549,6 @@ namespace DistantTerrain
         public override JobHandle ScheduleGenerateSamplesJob(ref MapPixelData mapPixel)
         { 
             DaggerfallUnity dfUnity = DaggerfallUnity.Instance;
-
-            // Create samples arrays
-            mapPixel.tilemapSamples = new TilemapSample[MapsFile.WorldMapTileDim, MapsFile.WorldMapTileDim];
-            mapPixel.heightmapSamples = new float[HeightmapDimension, HeightmapDimension];
 
             // Divisor ensures continuous 0-1 range of tile samples
             float div = (float)(HeightmapDimension - 1) / 3f;
