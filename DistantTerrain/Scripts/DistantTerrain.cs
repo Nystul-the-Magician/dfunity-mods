@@ -1453,16 +1453,15 @@ namespace DistantTerrain
             public float heightFarTerrainBottomLeft;
             public float heightFarTerrainBottomRight;
 
-            public int heightmapHeight;
-            public int heightmapWidth;
+            public int heightmapDim;
 
             public void Execute(int index)
             {
                 // Use cols=x and rows=y for height data
-                int x = JobA.Col(index, heightmapWidth);
-                int y = JobA.Row(index, heightmapHeight);
-                float fractionalAmountX = (float)x / ((float)heightmapWidth - 1);
-                float fractionalAmountY = (float)y / ((float)heightmapHeight - 1);
+                int x = JobA.Col(index, heightmapDim);
+                int y = JobA.Row(index, heightmapDim);
+                float fractionalAmountX = (float)x / ((float)heightmapDim - 1);
+                float fractionalAmountY = (float)y / ((float)heightmapDim - 1);
 
                 float weightFarTerrainX = weightFarTerrainLeft * (1.0f - fractionalAmountX) + weightFarTerrainRight * (fractionalAmountX);
                 float weightFarTerrainY = weightFarTerrainTop * (1.0f - fractionalAmountY) + weightFarTerrainBottom * (fractionalAmountY);
@@ -1489,9 +1488,7 @@ namespace DistantTerrain
 
             //Debug.Log(String.Format("heightFarTerrainTopLeft: {0}, heightFarTerrainTopRight: {1}, heightFarTerrainBottomLeft: {0}, heightFarTerrainBottomRight: {1}", heightFarTerrainTopLeft, heightFarTerrainTopRight, heightFarTerrainBottomLeft, heightFarTerrainBottomRight));
 
-            int heightmapHeight = dfTerrain.MapData.heightmapSamples.GetLength(0);
-            int heightmapWidth = dfTerrain.MapData.heightmapSamples.GetLength(1);
-
+            int heightmapDim = dfUnity.TerrainSampler.HeightmapDimension;
             UpdateTransitionRingHeightsJob updateTransitionRingHeightsJob = new UpdateTransitionRingHeightsJob()
             {
                 heightmapData = dfTerrain.MapData.heightmapData,
@@ -1503,10 +1500,9 @@ namespace DistantTerrain
                 heightFarTerrainTopRight = heightFarTerrainTopRight,
                 heightFarTerrainBottomLeft = heightFarTerrainBottomLeft,
                 heightFarTerrainBottomRight = heightFarTerrainBottomRight,
-                heightmapHeight = heightmapHeight,
-                heightmapWidth = heightmapWidth,    // AJRB: can heightmap be rectangular? I don't see how since 2d array is defined by [,] which is by definition square
+                heightmapDim = heightmapDim,
             };
-            return updateTransitionRingHeightsJob.Schedule(heightmapWidth * heightmapHeight, 64, dependencies);
+            return updateTransitionRingHeightsJob.Schedule(heightmapDim * heightmapDim, 64, dependencies);
         }
 
         // Update terrain data
@@ -1524,7 +1520,7 @@ namespace DistantTerrain
             }
 
             // Schedule jobs to update terrain data.
-            JobHandle updateTerrainDataHandle = dfTerrain.BeginMapPixelDataUpdate(streamingWorld.TerrainTexturingJobs);
+            JobHandle updateTerrainDataHandle = dfTerrain.BeginMapPixelDataUpdate(streamingWorld.TerrainTexturing);
 
             // Schedule job to update heights of transition terrain ring.
             JobHandle updateTransitionRingHeightsJobHandle = ScheduleUpdateTransitionRingHeightsJob(transitionTerrainDesc, dfTerrain, updateTerrainDataHandle);
@@ -1532,7 +1528,7 @@ namespace DistantTerrain
             // AJRB: TODO: possibly decouple from FPS here... for now just request job completion.
             updateTransitionRingHeightsJobHandle.Complete();
 
-            dfTerrain.CompleteMapPixelDataUpdate(streamingWorld.TerrainTexturingJobs);
+            dfTerrain.CompleteMapPixelDataUpdate(streamingWorld.TerrainTexturing);
 
             // Promote data to live terrain
             dfTerrain.UpdateClimateMaterial();
