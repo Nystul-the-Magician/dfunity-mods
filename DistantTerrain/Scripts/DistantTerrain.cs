@@ -3,7 +3,7 @@
 //http://www.dfworkshop.net/
 //Author: Michael Rauter (a.k.a. Nystul)
 //License: MIT License (http://www.opensource.org/licenses/mit-license.php)
-//Contributors: Lypyl, Interkarma
+//Contributors: Hazelnut, Lypyl, Interkarma
 
 using UnityEngine;
 using UnityEngine.PostProcessing;
