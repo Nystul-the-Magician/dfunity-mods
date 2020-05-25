@@ -4,10 +4,10 @@
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: SkyObjMat
-  m_Shader: {fileID: 4800000, guid: 84a8ca7fa56cb9f4ba6d8ec28dc1974d, type: 3}
+  m_Name: SkyObjMat_old
+  m_Shader: {fileID: 4800000, guid: 668d130e7c2666f4cb1dee5d84585564, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0

@@ -323,16 +323,6 @@ namespace EnhancedSky
             }
             if (tempPhase != MoonPhases.New)
             {
-                
-                try
-                {
-                    Resources.UnloadAsset(moonRend.material.mainTexture);
-                }
-                catch(Exception ex)
-                {
-                    Debug.LogError(ex.Message + " | isMasser: " + isMasser);
-
-                }
                 Texture2D tempText = GetTexture(tempPhase, textureLookup);
                 if (tempText != null)
                     moonRend.material.mainTexture = tempText;
