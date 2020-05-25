@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: SkyObjMat_old
+  m_Name: SkyObjMat
   m_Shader: {fileID: 4800000, guid: 668d130e7c2666f4cb1dee5d84585564, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 5
