@@ -298,8 +298,8 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < 4; x++)
                 {
-                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
-                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));
+                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue-1));
+                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue-1));
 
                     baseHeightValue[x, y] = shm[x,y] * ImprovedWorldTerrain.computeHeightMultiplier(mapPixelX, mapPixelY);
                 }
@@ -322,8 +322,8 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < 4; x++)
                 {
-                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
-                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));                    
+                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue-1));
+                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue-1));                    
                     climateMap[x, y] = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
                 }
             }
@@ -333,8 +333,8 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < 4; x++)
                 {
-                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
-                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));
+                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue-1));
+                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue-1));
                     waterDistanceMap[x, y] = (float)Math.Sqrt(ImprovedWorldTerrain.MapDistanceSquaredFromWater[mapPixelY * WoodsFile.mapWidthValue + mapPixelX]);
                 }
             }
@@ -358,8 +358,8 @@ namespace DistantTerrain
             //{
             //    for (int x = 0; x < 4; x++)
             //    {
-            //        int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
-            //        int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));
+            //        int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue-1));
+            //        int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue-1));
 
             //        float climateValue = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
 
@@ -568,8 +568,8 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < 4; x++)
                 {
-                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
-                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));
+                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue-1));
+                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue-1));
 
                     baseHeightValue[x, y] = shm[x, y] * ImprovedWorldTerrain.computeHeightMultiplier(mapPixelX, mapPixelY);
                 }
@@ -592,8 +592,8 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < 4; x++)
                 {
-                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
-                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));
+                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue-1));
+                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue-1));
                     climateMap[x, y] = GetNoiseMapScaleBasedOnClimate(mapPixelX, mapPixelY);
                 }
             }
@@ -603,8 +603,8 @@ namespace DistantTerrain
             {
                 for (int x = 0; x < 4; x++)
                 {
-                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue));
-                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue));
+                    int mapPixelX = Math.Max(0, Math.Min(mx + x - 2, WoodsFile.mapWidthValue-1));
+                    int mapPixelY = Math.Max(0, Math.Min(my + y - 2, WoodsFile.mapHeightValue-1));
                     waterDistanceMap[x, y] = (float)Math.Sqrt(ImprovedWorldTerrain.MapDistanceSquaredFromWater[mapPixelY * WoodsFile.mapWidthValue + mapPixelX]);
                 }
             }
