@@ -780,6 +780,13 @@ namespace DistantTerrain
             cameraRenderSkyboxToTexture.depth = cameraRenderSkyboxToTextureDepth; // make sure to render first
             cameraRenderSkyboxToTexture.renderingPath = Camera.main.renderingPath;
             cameraRenderSkyboxToTexture.targetTexture = renderTextureSky;
+
+            if (DaggerfallUnity.Settings.RetroRenderingMode > 0)
+            {
+                Camera.main.targetTexture = DaggerfallWorkshop.Game.GameManager.Instance.RetroRenderer.RetroTexture;
+                stackedCamera.targetTexture = DaggerfallWorkshop.Game.GameManager.Instance.RetroRenderer.RetroTexture;
+            }
+
         }
 
         void setMaterialFogParameters(ref Material terrainMaterial)
