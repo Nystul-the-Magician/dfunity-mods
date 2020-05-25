@@ -9,6 +9,12 @@
 
 using UnityEngine;
 
+//using DaggerfallConnect;
+//using DaggerfallConnect.Arena2;
+//using DaggerfallConnect.Utility;
+using DaggerfallWorkshop;
+using DaggerfallWorkshop.Utility;
+
 namespace EnhancedSky
 {
     public class SkyCam : MonoBehaviour
@@ -50,9 +56,12 @@ namespace EnhancedSky
                 skyCamera.renderingPath = RenderingPath.DeferredShading;
 
             }
+            
 
-
-
+            if (DaggerfallUnity.Settings.RetroRenderingMode > 0)
+            {
+                skyCamera.targetTexture = DaggerfallWorkshop.Game.GameManager.Instance.RetroRenderer.RetroTexture;
+            }
 
         }
 
