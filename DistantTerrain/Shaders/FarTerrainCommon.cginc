@@ -133,7 +133,7 @@ void fcolor (Input IN, SurfaceOutputStandard o, inout fixed4 color) //inout half
 }
 
 
-half4 getColorByTextureAtlasIndex(Input IN, uniform sampler2D textureAtlas, int index, float2 uvTex, int texDim, int tilesetDim)
+half4 getColorByTextureAtlasIndex(Input IN, uniform sampler2D textureAtlas, uint index, float2 uvTex, int texDim, int tilesetDim)
 {			
 	const float textureCrispness = 3.5f; // defines how crisp textures of extended terrain are (higher values result in more crispness)
 	const float textureCrispnessDiminishingFactor = 0.075f; // defines how fast crispness of textures diminishes with more distance from the player (the camera)
@@ -256,10 +256,11 @@ half4 getColorFromTerrain(Input IN, float2 uvTex, int texDim, int tilesetDim, in
 	return c;
 }
 
-half3 updateColorWithInfoForTreeCoverageAndLocations(half3 colorIn, float treeCoverage, int locationRangeX, int locationRangeY, int mapPixelX, int mapPixelY, float2 uvTex)
+half3 updateColorWithInfoForTreeCoverageAndLocations(half3 colorIn, int treeCoverage, int locationRangeX, int locationRangeY, int mapPixelX, int mapPixelY, float2 uvTex)
 {
 	half3 c = colorIn;
 	half3 treeColor;
+	float treeCoverage2 = (float)treeCoverage / 255.0f;
 
 	// next line is the location placement I started with and which I understand...
 	//  if ((locationXfract < (float)locationRangeX/8.0f) && (locationYfract < (float)locationRangeY / 8.0f)) // 8.0f is maximum location range (8 rmb blocks) - blocks are placed in the corner, so I played around with placement and came up with the following lines (no idea why it works but it does)
@@ -283,13 +284,13 @@ half3 updateColorWithInfoForTreeCoverageAndLocations(half3 colorIn, float treeCo
 
 	if ((abs(locationXfract - extraX) < (float)locationRangeX/xDividor) && (abs(locationYfract - extraY) < (float)locationRangeY/yDividor)) 
 	{
-	c.rgb = min(1.0f, 0.4f * c.rgb + 0.6f * ((1.0f - treeCoverage) * c.rgb + treeCoverage * treeColor));
-	c.rgb = 1.0f * c.rgb;
+		c.rgb = min(1.0f, 0.4f * c.rgb + 0.6f *((1.0f - treeCoverage2) * c.rgb + treeCoverage2 * treeColor));
+		c.rgb = 1.0f * c.rgb;
 	}
 	else
 	{		
-	c.rgb = min(1.0f, 0.3f * c.rgb + 0.7f * ((1.0f - treeCoverage) * c.rgb + treeCoverage * treeColor));		
-	c.rgb = 0.9f * c.rgb;
+		c.rgb = min(1.0f, 0.3f * c.rgb + 0.7f *((1.0f - treeCoverage2) * c.rgb + treeCoverage2 * treeColor));
+		c.rgb = 0.9f * c.rgb;
 	}
 	return c;
 }

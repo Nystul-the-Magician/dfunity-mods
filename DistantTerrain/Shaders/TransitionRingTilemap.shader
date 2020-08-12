@@ -85,7 +85,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemap" {
 		#pragma surface surf Standard noforwardadd //finalcolor:fcolor alpha:fade keepalpha
 		#pragma glsl
 
-		#pragma multi_compile __ ENABLE_WATER_REFLECTIONS
+		#pragma multi_compile_local __ ENABLE_WATER_REFLECTIONS
 
 		void surf (Input IN, inout SurfaceOutputStandard o)
 		{
@@ -116,16 +116,17 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemap" {
 
 			c = getColorFromTerrain(IN, uvTex, _TilemapDim, _TilesetDim, index);
 			
-			float treeCoverage = terrainTileInfo.g;
+			int treeCoverage = terrainTileInfo.g;
 			int locationRangeX = terrainTileInfo.b * _MaxIndex;
 			int locationRangeY = terrainTileInfo.a * _MaxIndex;
 			c.rgb = updateColorWithInfoForTreeCoverageAndLocations(c.rgb, treeCoverage, locationRangeX, locationRangeY, mapPixelX, mapPixelY, uvTex);			
 			
 			// Get offset to tile in atlas
 			index = tex2D(_TilemapTex, IN.uv_MainTex).x * _MaxIndex;
-			int xpos = index % _TilesetDim;
-			int ypos = index / _TilesetDim;
-			float2 uv = float2(xpos, ypos) / _TilesetDim;
+			uint tilesetDim = (uint)_TilesetDim;
+			int xpos = index % tilesetDim;
+			int ypos = index / tilesetDim;
+			float2 uv = float2(xpos, ypos) / tilesetDim;
 
 			// Offset to fragment position inside tile
 			float xoffset = frac(IN.uv_MainTex.x * _TilemapDim) / _GutterSize;

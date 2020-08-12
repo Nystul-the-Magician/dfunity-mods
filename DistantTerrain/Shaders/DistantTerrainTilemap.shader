@@ -65,7 +65,7 @@ Shader "Daggerfall/DistantTerrain/DistantTerrainTilemap" {
 		#pragma target 3.0		
 		#pragma surface surf Standard vertex:vert noforwardadd finalcolor:fcolor alpha:fade keepalpha nolightmap //nofog
 		#pragma glsl
-		#pragma multi_compile __ ENABLE_WATER_REFLECTIONS
+		#pragma multi_compile_local __ ENABLE_WATER_REFLECTIONS
 
 		#include "FarTerrainCommon.cginc"
 
@@ -119,7 +119,7 @@ Shader "Daggerfall/DistantTerrain/DistantTerrainTilemap" {
 
 			c = getColorFromTerrain(IN, IN.uv_MainTex, _FarTerrainTilemapDim, _FarTerrainTilesetDim, index);
 			
-			float treeCoverage = terrainTileInfo.g;
+			int treeCoverage = terrainTileInfo.g;
 			int locationRangeX = terrainTileInfo.b * _MaxIndex;
 			int locationRangeY = terrainTileInfo.a * _MaxIndex;
 			c.rgb = updateColorWithInfoForTreeCoverageAndLocations(c.rgb, treeCoverage, locationRangeX, locationRangeY, mapPixelX, mapPixelY, IN.uv_MainTex);
@@ -146,7 +146,7 @@ Shader "Daggerfall/DistantTerrain/DistantTerrainTilemap" {
 		#pragma target 3.0				
         #pragma surface surf Standard vertex:vert noforwardadd finalcolor:fcolor alpha:fade keepalpha nolightmap //nofog
 		#pragma glsl
-		#pragma multi_compile __ ENABLE_WATER_REFLECTIONS
+		#pragma multi_compile_local __ ENABLE_WATER_REFLECTIONS
 
 		#include "FarTerrainCommon.cginc"
 
@@ -185,11 +185,10 @@ Shader "Daggerfall/DistantTerrain/DistantTerrainTilemap" {
 
 			c = getColorFromTerrain(IN, IN.uv_MainTex, _FarTerrainTilemapDim, _FarTerrainTilesetDim, index);
 			
-			float treeCoverage = terrainTileInfo.g;
+			int treeCoverage = terrainTileInfo.g;
 			int locationRangeX = terrainTileInfo.b * _MaxIndex;
 			int locationRangeY = terrainTileInfo.a * _MaxIndex;
 			c.rgb = updateColorWithInfoForTreeCoverageAndLocations(c.rgb, treeCoverage, locationRangeX, locationRangeY, mapPixelX, mapPixelY, IN.uv_MainTex);
-
 			o.Albedo = c.rgb;
 		}
 		ENDCG

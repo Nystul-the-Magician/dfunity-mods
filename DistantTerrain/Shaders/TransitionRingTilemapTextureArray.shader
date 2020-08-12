@@ -94,7 +94,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 		#pragma surface surf Standard noforwardadd //finalcolor:fcolor alpha:fade keepalpha
 		#pragma glsl
 
-		#pragma multi_compile __ ENABLE_WATER_REFLECTIONS _NORMALMAP
+		#pragma multi_compile_local __ ENABLE_WATER_REFLECTIONS _NORMALMAP
 
 		void surf (Input IN, inout SurfaceOutputStandard o)
 		{
@@ -125,7 +125,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 
 			c = getColorFromTerrain(IN, uvTex, _TilemapDim, _TilesetDim, index);
 			
-			float treeCoverage = terrainTileInfo.g;
+			int treeCoverage = terrainTileInfo.g;
 			int locationRangeX = terrainTileInfo.b * _MaxIndex;
 			int locationRangeY = terrainTileInfo.a * _MaxIndex;
 			c.rgb = updateColorWithInfoForTreeCoverageAndLocations(c.rgb, treeCoverage, locationRangeX, locationRangeY, mapPixelX, mapPixelY, uvTex);			
