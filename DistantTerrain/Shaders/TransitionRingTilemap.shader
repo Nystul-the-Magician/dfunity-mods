@@ -95,7 +95,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemap" {
 			int mapPixelY = _MapPixelY;
 
 			int posX = mapPixelX;
-			int posY = 500 - mapPixelY;
+			int posY = 499 - mapPixelY;
 
 			float2 uvTex =	float2(
 									(float)posX/(float)_FarTerrainTilemapDim + (1.0f/_FarTerrainTilemapDim)*IN.uv_MainTex.x,
@@ -170,7 +170,6 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemap" {
 			#endif
 
 			c.rgb = lerp(c.rgb, c2.rgb, blendWeightCombined);
-
 			o.Albedo = c.rgb;
 		}
 

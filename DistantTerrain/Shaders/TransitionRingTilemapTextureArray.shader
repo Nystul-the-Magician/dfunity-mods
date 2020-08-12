@@ -104,7 +104,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 			int mapPixelY = _MapPixelY;
 
 			int posX = mapPixelX;
-			int posY = 500 - mapPixelY;
+			int posY = 499 - mapPixelY;
 
 			float2 uvTex =	float2(
 									(float)posX/(float)_FarTerrainTilemapDim + (1.0f/_FarTerrainTilemapDim)*IN.uv_MainTex.x,
@@ -187,7 +187,7 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 
 			float blendWeightX = lerp(_blendWeightFarTerrainLeft, _blendWeightFarTerrainRight, IN.uv_MainTex.x);
 			float blendWeightY = lerp(_blendWeightFarTerrainTop, _blendWeightFarTerrainBottom, IN.uv_MainTex.y);
-			float blendWeightCombined = 1.0f - max(blendWeightX, blendWeightY);
+			float blendWeightCombined =  1.0f - max(blendWeightX, blendWeightY);
 			
 			#ifdef _NORMALMAP
 				o.Normal = UnpackNormal(UNITY_SAMPLE_TEX2DARRAY_LOD(_TileNormalMapTexArr, uv3, mipMapLevel));
@@ -209,7 +209,6 @@ Shader "Daggerfall/DistantTerrain/TransitionRingTilemapTextureArray" {
 			#endif
 			
 			c.rgb = lerp(c.rgb, c2.rgb, blendWeightCombined);
-
 			o.Albedo = c.rgb;
 		}
 
