@@ -87,9 +87,9 @@ namespace DistantTerrain
             mapLocationRangeX = null;
             mapLocationRangeY = null;
 
-            Resources.UnloadUnusedAssets();
+            //Resources.UnloadUnusedAssets();
 
-            System.GC.Collect();
+            //System.GC.Collect();
         }
 
         /// <summary>

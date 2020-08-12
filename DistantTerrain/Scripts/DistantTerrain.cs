@@ -83,7 +83,7 @@ namespace DistantTerrain
         private PostProcessingBehaviour postProcessingBehaviour;
 
         private float extraTranslationY = -5.0f; // only minimum amount (5m) since terrain heights almost match when terrain transition is active (the mismatch is because no neighbor terrains can be set)
-        private float extraTranslationY_noTerrainTransition = -400.0f; // this is used when terrain transition is disabled - large amount to minimize terrain seams
+        private float extraTranslationY_noTerrainTransition = -60.0f; //-400.0f; // this is used when terrain transition is disabled - large amount to minimize terrain seams
         private float extraWaterTranslationY = -55.0f; //-ImprovedTerrainSampler.scaledOceanElevation;
 
         /// <summary>
@@ -652,9 +652,9 @@ namespace DistantTerrain
             textureAtlasMountainRain = null;
             textureAtlasSwampRain = null;
 
-            Resources.UnloadUnusedAssets();
+            //Resources.UnloadUnusedAssets();
 
-            System.GC.Collect();
+            //System.GC.Collect();
         }
 
         void TransitionToExterior(PlayerEnterExit.TransitionEventArgs args)
@@ -948,7 +948,8 @@ namespace DistantTerrain
 
                 UpdateSeaReflectionTextureReference();
 
-                Resources.UnloadUnusedAssets();
+                //Resources.UnloadUnusedAssets();
+                //DaggerfallGC.ThrottledUnloadUnusedAssets();
             }
         }
 
@@ -1527,7 +1528,7 @@ namespace DistantTerrain
             }
 
             // Schedule jobs to update terrain data.
-            JobHandle updateTerrainDataHandle = dfTerrain.BeginMapPixelDataUpdate(streamingWorld.TerrainTexturing);
+            JobHandle updateTerrainDataHandle = dfTerrain.BeginMapPixelDataUpdate(dfUnity.TerrainTexturing);
 
             // Schedule job to update heights of transition terrain ring.
             JobHandle updateTransitionRingHeightsJobHandle = ScheduleUpdateTransitionRingHeightsJob(transitionTerrainDesc, dfTerrain, updateTerrainDataHandle);
@@ -1535,7 +1536,7 @@ namespace DistantTerrain
             // AJRB: TODO: possibly decouple from FPS here... for now just request job completion.
             updateTransitionRingHeightsJobHandle.Complete();
 
-            dfTerrain.CompleteMapPixelDataUpdate(streamingWorld.TerrainTexturing);
+            dfTerrain.CompleteMapPixelDataUpdate(dfUnity.TerrainTexturing);
 
             // Promote data to live terrain
             dfTerrain.UpdateClimateMaterial();
