@@ -1,9 +1,9 @@
 {
     "ModTitle": "Realtime Reflections",
-    "ModVersion": "2.2.2",
+    "ModVersion": "2.2.3",
     "ModAuthor": "Nystul",
-    "ContactInfo": "https://forums.dfworkshop.net/viewtopic.php?f=27&t=122",
-    "DFUnity_Version": "",
+    "ContactInfo": "http://forums.dfworkshop.net",
+    "DFUnity_Version": "0.10.25",
     "ModDescription": "realtime reflections for floor textures (interiors) and water tiles (exteriors)",
     "GUID": "03e6ca57-eeb9-4a53-b61a-237406a9f749",
     "Files": [
