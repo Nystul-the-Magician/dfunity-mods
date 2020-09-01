@@ -533,7 +533,7 @@ namespace RealtimeReflections
 
             if (useDeferredReflections)
             {
-                componentDeferredPlanarReflections.enabled = false;
+                componentDeferredPlanarReflections.enabled = true;
             }
         }
 

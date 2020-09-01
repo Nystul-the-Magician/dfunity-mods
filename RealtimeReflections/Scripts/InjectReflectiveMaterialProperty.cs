@@ -292,7 +292,7 @@ namespace RealtimeReflections
 
 
                 Terrain terrain = child.GetComponent<Terrain>();
-
+                
                 if (terrain)
                 {
                     if ((terrain.materialTemplate)) //&&(terrain.materialTemplate.shader.name != "Daggerfall/TilemapWithReflections")) // uncommenting this makes initial location (after startup, not fast travelling) not receive correct shader - don't know why - so workaround is to force injecting materialshader even for unset material (not sure why it works, but it does)

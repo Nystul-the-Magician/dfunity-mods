@@ -37,7 +37,7 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 		#pragma surface surf Standard
 		#pragma glsl
 
-		#pragma multi_compile __ _NORMALMAP
+		#pragma multi_compile_local __ _NORMALMAP
 
 		UNITY_DECLARE_TEX2DARRAY(_TileTexArr);
 

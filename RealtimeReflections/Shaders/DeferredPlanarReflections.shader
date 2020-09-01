@@ -12,9 +12,18 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
     Properties
     {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
+
+		[Gamma] _Metallic("Metallic", Range(0.0, 1.0)) = 0.0
+		_MetallicGlossMap("Metallic", 2D) = "white" {}
+
+		_Glossiness("Smoothness", Range(0.0, 1.0)) = 0.5
+		_GlossMapScale("Smoothness Factor", Range(0.0, 1.0)) = 1.0
+		[Enum(Specular Alpha,0,Albedo Alpha,1)] _SmoothnessTextureChannel("Smoothness texture channel", Float) = 0
     }
 		
 	CGINCLUDE
+
+#include "UnityCG.cginc"
 
 	#include "UnityCG.cginc"
     #include "UnityPBSLighting.cginc"
@@ -47,6 +56,37 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 	int _NumMipMapLevelsReflectionGroundTex;
 	int _NumMipMapLevelsReflectionLowerLevelTex;
 	float _RoughnessMultiplier;
+
+//#ifdef _METALLICGLOSSMAP
+//	sampler2D _MetallicGlossMap;
+//#else	
+//	half _Metallic;
+//	half _Glossiness;
+//#endif
+//	half _GlossMapScale;
+//
+//	half2 MetallicGloss(float2 uv)
+//	{
+//		half2 mg;
+//
+//#ifdef _METALLICGLOSSMAP
+//#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+//		mg.r = tex2D(_MetallicGlossMap, uv).r;
+//		mg.g = tex2D(_MainTex, uv).a;
+//#else
+//		mg = tex2D(_MetallicGlossMap, uv).ra;
+//#endif
+//		mg.g *= _GlossMapScale;
+//#else
+//		mg.r = _Metallic;
+//#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+//		mg.g = tex2D(_MainTex, uv).a * _GlossMapScale;
+//#else
+//		mg.g = _Glossiness;
+//#endif
+//#endif
+//		return mg;
+//	}
 
     struct v2f
     {
@@ -112,6 +152,7 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			
 
 			float indexReflectionsTextureTex = tex2D(_ReflectionsTextureIndexTex, screenUV).r;
+			refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
 			if (indexReflectionsTextureTex == 1.0f)
 			{
 				refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, mipMapLevelReflectionLowerLevelTex);
@@ -131,11 +172,21 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 
 				refl = (1.0f-fadeOutFact) * getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, mipMapLevelReflectionGroundTex); //refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, _Smoothness)).rgb;
 			}
-				
-			half metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;
-			refl *= metallic;
+		
 
-			return half4(refl, 1.0f);
+			float4 mg;
+			mg.r = tex2D(_CameraGBufferTexture1, screenUV).a;
+			half metallic = mg.r;
+			//metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;
+
+			//float4 mg = tex2D(_CameraGBufferTexture1, screenUV);
+			//half metallic = mg.a;
+
+			//half metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;
+
+			refl *= metallic * 0.5f;
+
+			return half4(refl, 1.0f); 
     }
 
     float4 fragComposite(v2f i) : SV_Target
@@ -175,7 +226,7 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
             float3 w_mi = -normalize((wsNormal * (2.0 * cos_o)) - eyeVec);
 
 
-            float3 incomingRadiance = reflectionTexel.rgb;
+			float3 incomingRadiance = reflectionTexel.rgb;
 
             UnityLight light;
             light.color = 0;
@@ -186,10 +237,10 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
             ind.diffuse = 0;
             ind.specular = incomingRadiance;
 
-            float3 reflResult = UNITY_BRDF_PBS (0, specColor, oneMinusReflectivity, 1-roughness, wsNormal, -eyeVec, light, ind).rgb;
+			float3 reflResult = UNITY_BRDF_PBS(0, specColor, oneMinusReflectivity, 1 - roughness, wsNormal, -eyeVec, light, ind).rgb;
             float confidence = reflectionTexel.a;
 
-            specEmission.rgb = tex2D(_CameraReflectionsTexture, tsP).rgb;
+			specEmission.rgb = tex2D(_CameraReflectionsTexture, tsP).rgb;
             float3 finalGlossyTerm;
 
             // Subtract out Unity's glossy result: (we're just applying the delta)
@@ -204,11 +255,11 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			*/
 
             {
-                    finalGlossyTerm = reflResult*saturate(confidence);
+				finalGlossyTerm = reflResult *saturate(confidence);
             }
 
-            finalGlossyTerm *= occlusion;
-
+			finalGlossyTerm *= occlusion;
+			//gbuffer3 = reflectionTexel;
             // Additively blend the glossy GI result with the output buffer
             return gbuffer3 + float4(finalGlossyTerm, 0);
     }
