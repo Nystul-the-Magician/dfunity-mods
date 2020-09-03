@@ -152,10 +152,12 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			
 
 			float indexReflectionsTextureTex = tex2D(_ReflectionsTextureIndexTex, screenUV).r;
-			refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
+			//refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
+			//refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, mipMapLevelReflectionLowerLevelTex);
+			//half3 refl2 = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
 			if (indexReflectionsTextureTex == 1.0f)
 			{
-				refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, mipMapLevelReflectionLowerLevelTex);
+				refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
 			}
 			else if	(abs(indexReflectionsTextureTex - 0.5f) < 0.01f)
 			{
@@ -177,12 +179,13 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			float4 mg;
 			mg.r = tex2D(_CameraGBufferTexture1, screenUV).a;
 			half metallic = mg.r;
+			//metallic *= tex2D(_ReflectionsTextureIndexTex, screenUV).g;
 			//metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;
 
 			//float4 mg = tex2D(_CameraGBufferTexture1, screenUV);
 			//half metallic = mg.a;
 
-			//half metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;
+			//half metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;			
 
 			refl *= metallic * 0.5f;
 

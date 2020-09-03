@@ -108,7 +108,11 @@ namespace RealtimeReflections
             {
                 m_Camera = this.gameObject.AddComponent<Camera>();
                 m_Camera.CopyFrom(Camera.main);
-                m_Camera.renderingPath = RenderingPath.Forward; // important to make fragment shader work with function Camera.RenderWithShader() - it won't work in deferred, this is no problem since we only want to render a custom index rendertexture anyway                
+                m_Camera.RemoveAllCommandBuffers();
+                m_Camera.renderingPath = RenderingPath.Forward; // important to make fragment shader work with function Camera.RenderWithShader() - it won't work in deferred, this is no problem since we only want to render a custom index rendertexture anyway
+                m_Camera.depthTextureMode = DepthTextureMode.None;
+                m_Camera.clearFlags = CameraClearFlags.SolidColor;
+                m_Camera.backgroundColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
                 m_Camera.enabled = false; // important to disable camera so we can invoke Camera.RenderWithShader() manually later
             }
         }
@@ -138,13 +142,23 @@ namespace RealtimeReflections
         {
             m_Camera.transform.position = Camera.main.transform.position;
             m_Camera.transform.rotation = Camera.main.transform.rotation;
-
+            //materialCreateReflectionTextureCoordinates.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            //materialCreateReflectionTextureCoordinates.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
+            //materialCreateReflectionTextureIndex.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            //materialCreateReflectionTextureIndex.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);            
             Shader.SetGlobalFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
             Shader.SetGlobalFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
+
+            materialCreateReflectionTextureCoordinates.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            materialCreateReflectionTextureCoordinates.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+
+            materialCreateReflectionTextureIndex.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            materialCreateReflectionTextureIndex.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+
             m_Camera.targetTexture = renderTextureReflectionTextureCoordinates;
             m_Camera.RenderWithShader(shaderCreateReflectionTextureCoordinates, ""); // apply custom fragment shader and write into renderTextureReflectionTextureCoordinates
             m_Camera.targetTexture = renderTextureReflectionTextureIndex;
-            m_Camera.RenderWithShader(shaderCreateReflectionTextureIndex, ""); // apply custom fragment shader and write into renderTextureReflectionTextureIndex
+            m_Camera.RenderWithShader(shaderCreateReflectionTextureIndex, ""); // apply custom fragment shader and write into renderTextureReflectionTextureIndex            
         }
     }
 }

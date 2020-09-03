@@ -101,27 +101,27 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 
 			half4 result = half4(0.0f, 0.0f, 0.0f, 0.0f);
 			float3 vecUp = float3(0.0f,1.0f,0.0f);
-			if ( (abs(IN.worldPos.y - _LowerLevelHeight) < 0.001f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) )
+			if ( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.01f)) // && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) )
 			{
 				result.r = 1.0f;
 			}
-			else if	( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) ) // fragment belong to object on current ground level plane
-			{
-				result.r = 0.5f;
-			}
-			else if	(
-						(acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) &&
-						(
-						(IN.worldPos.y -_GroundLevelHeight > -0.92f) && // fragment is below (use parallax-corrected reflection)
-						(IN.worldPos.y - _GroundLevelHeight < 0.32f) // fragment is slightly above (use parallax-corrected reflection) - also valid for current ground level plane
-						)
-					)
-			{
-				result.r = 0.75f;
-			}
-			
-			half2 mg = MetallicGloss(IN.uv);
-			result.gb = mg;
+			//else if	( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) ) // fragment belong to object on current ground level plane
+			//{
+			//	result.r = 0.5f;
+			//}
+			//else if	(
+			//			(acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) &&
+			//			(
+			//			(IN.worldPos.y -_GroundLevelHeight > -0.92f) && // fragment is below (use parallax-corrected reflection)
+			//			(IN.worldPos.y - _GroundLevelHeight < 0.32f) // fragment is slightly above (use parallax-corrected reflection) - also valid for current ground level plane
+			//			)
+			//		)
+			//{
+			//	result.r = 0.75f;
+			//}
+			//
+			//half2 mg = MetallicGloss(IN.uv);
+			//result.gb = mg;
 
             return result;
     }
@@ -139,8 +139,8 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 3.0
-			#pragma multi_compile __ _METALLICGLOSSMAP
-			#pragma multi_compile __ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+			#pragma multi_compile_local __ _METALLICGLOSSMAP
+			#pragma multi_compile_local __ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 			ENDCG
 		}
 	}	

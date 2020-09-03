@@ -230,38 +230,38 @@ namespace RealtimeReflections
                     }
                 }
             }
-            else if (GameManager.Instance.IsPlayerInside)
-            {
-                Renderer[] renderers = null;
-                // renderers must be aquired here and not in Update() because it seems that this function's execution can happen in parallel to Update() - so a concurrent conflict can occur (and does)
-                if (gameObjectInterior != null)
-                {
-                    renderers = gameObjectInterior.GetComponentsInChildren<Renderer>();
-                }
-                else if (gameObjectDungeon != null)
-                {
-                    renderers = gameObjectDungeon.GetComponentsInChildren<Renderer>();
-                }
+            //else if (GameManager.Instance.IsPlayerInside)
+            //{
+            //    Renderer[] renderers = null;
+            //    // renderers must be aquired here and not in Update() because it seems that this function's execution can happen in parallel to Update() - so a concurrent conflict can occur (and does)
+            //    if (gameObjectInterior != null)
+            //    {
+            //        renderers = gameObjectInterior.GetComponentsInChildren<Renderer>();
+            //    }
+            //    else if (gameObjectDungeon != null)
+            //    {
+            //        renderers = gameObjectDungeon.GetComponentsInChildren<Renderer>();
+            //    }
 
-                //Debug.Log(String.Format("renderers: {0}", renderers.Length));
+            //    //Debug.Log(String.Format("renderers: {0}", renderers.Length));
 
-                if (renderers != null)
-                {
-                    foreach (Renderer r in renderers)
-                    {
-                        Material[] mats = r.sharedMaterials;
-                        foreach (Material m in mats)
-                        {
-                            //if (m.shader.name == "Daggerfall/RealtimeReflections/FloorMaterialWithReflections")
-                            {
-                                m.SetFloat("_GroundLevelHeight", gameObjectReflectionPlaneGroundLevel.transform.position.y);
-                                m.SetFloat("_LowerLevelHeight", gameObjectReflectionPlaneLowerLevel.transform.position.y);
-                            }
-                        }
-                        r.sharedMaterials = mats;
-                    }
-                }
-            }
+            //    if (renderers != null)
+            //    {
+            //        foreach (Renderer r in renderers)
+            //        {
+            //            Material[] mats = r.sharedMaterials;
+            //            foreach (Material m in mats)
+            //            {
+            //                //if (m.shader.name == "Daggerfall/RealtimeReflections/FloorMaterialWithReflections")
+            //                {
+            //                    m.SetFloat("_GroundLevelHeight", gameObjectReflectionPlaneGroundLevel.transform.position.y);
+            //                    m.SetFloat("_LowerLevelHeight", gameObjectReflectionPlaneLowerLevel.transform.position.y);
+            //                }
+            //            }
+            //            r.sharedMaterials = mats;
+            //        }
+            //    }
+            //}
         }
 
         void InjectMaterialPropertiesIndoor()
