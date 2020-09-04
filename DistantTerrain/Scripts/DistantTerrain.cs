@@ -1189,7 +1189,7 @@ namespace DistantTerrain
 
             // important to prevent wrong shadows (note: I spotted them in Sentinel to the north of the city wall with certain sun settings)
             // note: after reintroducing camera stack I could not reproduce this
-            terrain.castShadows = false;
+            terrain.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
             // Promote heights
             Vector3 size = terrain.terrainData.size;
@@ -1287,8 +1287,7 @@ namespace DistantTerrain
                 }
             }
 
-            // Promote material
-            terrain.materialType = Terrain.MaterialType.Custom;
+            // Promote material            
             terrain.materialTemplate = terrainMaterial;            
 
             terrainGameObject.SetActive(true);
@@ -1653,7 +1652,6 @@ namespace DistantTerrain
                 }
             }
 
-            terrain.materialType = Terrain.MaterialType.Custom;
             terrain.materialTemplate = newMaterial;
             dfTerrain.TerrainMaterial = terrain.materialTemplate; // important so that we can later call DaggerfallTerrain.UpdateClimateMaterial and it will update the correct reference
 

@@ -17,11 +17,11 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates"
 
 	#include "UnityCG.cginc"               
 
-    sampler2D _MainTex;
-	float4 _MainTex_TexelSize;
+	uniform sampler2D _MainTex;
+	uniform float4 _MainTex_TexelSize;
 
-	float _GroundLevelHeight;
-	float _LowerLevelHeight;     
+	uniform float _GroundLevelHeight;
+	uniform float _LowerLevelHeight;     
 
     struct v2f
     {
@@ -52,7 +52,7 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates"
 			else
 			{
 				// parallax-correct reflection position
-				o.parallaxCorrectedScreenPos = ComputeScreenPos(mul(UNITY_MATRIX_VP, posWorldSpace - float4(0.0f, (posWorldSpace.y - _GroundLevelHeight) * 1.7f, 0.0f, 0.0f)));
+				o.parallaxCorrectedScreenPos = ComputeScreenPos(mul(UNITY_MATRIX_VP, posWorldSpace - float4(0.0f, (posWorldSpace.y - _GroundLevelHeight) * 0.0f, 0.0f, 0.0f)));
 			}			
 						
             return o;
@@ -60,9 +60,9 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates"
 				
     float4 frag(v2f IN) : SV_Target
     {
-			half4 col = tex2D(_MainTex, IN.uv);
-			if (col.a < 0.5f)
-				discard;
+			//half4 col = tex2D(_MainTex, IN.uv);
+			//if (col.a < 0.5f)
+			//	discard;
 			
 			float2 parallaxCorrectedScreenPos = IN.parallaxCorrectedScreenPos.xy / IN.parallaxCorrectedScreenPos.w;			
             return float4(parallaxCorrectedScreenPos.x, parallaxCorrectedScreenPos.y, 0.0f, 0.0f);
@@ -72,10 +72,21 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates"
 
 	SubShader
 	{
+		//Pass{
+		//	ZWrite On
+		//	Cull Back
+		//	ColorMask 0
+		//}
+
 		ZTest LEqual Cull Back ZWrite On
+			//Lighting Off
+			//Blend Off
+		//ZTest Never Cull Back ZWrite On
 
 		Pass
 		{
+			//Tags{ "LightMode" = "Always" }
+			//Tags{ "Queue" = "Geometry" "RenderType" = "Opaque" }
 			CGPROGRAM
 			#pragma exclude_renderers gles xbox360 ps3
 			#pragma vertex vert

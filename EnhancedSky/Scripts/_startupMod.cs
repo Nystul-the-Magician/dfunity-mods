@@ -46,21 +46,21 @@ namespace EnhancedSky
         private static Shader shaderDepthMask = null;
         private static Shader shaderUnlitAlphaWithFade = null;
 
-        private static Object prefabEnhancedSkyController = null;
+        //private static Object prefabEnhancedSkyController = null;
 
         private static Object containerPrefab = null;
 
         private static Material skyObjMat = null;
         private static Material skyMat = null;
-        private static Material cloudMat = null;
-        private static Material masserMat = null;
-        private static Material secundaMat = null;
+        //private static Material cloudMat = null;
+        //private static Material masserMat = null;
+        //private static Material secundaMat = null;
         private static Material starsMat = null;
         private static Material starMaskMat = null;
 
         private static Flare sunFlare = null;
 
-        private static Preset presetPresetContainer = null;
+        //private static Preset presetPresetContainer = null;
 
         [Invoke(StateManager.StateTypes.Start)]
         public static void InitStart(InitParams initParams)

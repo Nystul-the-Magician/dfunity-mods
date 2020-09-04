@@ -645,7 +645,7 @@ namespace RealtimeReflections
                 }
 
                 StreamingWorld streamingWorld = GameObject.Find("StreamingWorld").GetComponent<StreamingWorld>();
-                Vector3 vecWaterHeight = new Vector3(0.0f, (DaggerfallUnity.Instance.TerrainSampler.OceanElevation) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
+                Vector3 vecWaterHeight = new Vector3(0.0f, (DaggerfallUnity.Instance.TerrainSampler.OceanElevation + 0.0f) * streamingWorld.TerrainScale, 0.0f); // water height level on y-axis (+1.0f some coastlines are incorrect otherwise)
                 Vector3 vecWaterHeightTransformed = terrainInstancePlayerTerrain.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
                 //Debug.Log(string.Format("x,y,z: {0}, {1}, {2}", vecWaterHeight.x, vecWaterHeight.y, vecWaterHeight.z));
                 //Debug.Log(string.Format("transformed x,y,z: {0}, {1}, {2}", vecWaterHeightTransformed.x, vecWaterHeightTransformed.y, vecWaterHeightTransformed.z));

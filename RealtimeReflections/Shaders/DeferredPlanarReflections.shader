@@ -23,39 +23,37 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 		
 	CGINCLUDE
 
-#include "UnityCG.cginc"
-
 	#include "UnityCG.cginc"
     #include "UnityPBSLighting.cginc"
     #include "UnityStandardBRDF.cginc"
     #include "UnityStandardUtils.cginc"        
 
-    sampler2D _CameraGBufferTexture0;
-    sampler2D _CameraGBufferTexture1;
-    sampler2D _CameraGBufferTexture2;
-    sampler2D _CameraGBufferTexture3;
-    sampler2D _CameraReflectionsTexture;
-    sampler2D _MainTex;
+	uniform sampler2D _CameraGBufferTexture0;
+	uniform sampler2D _CameraGBufferTexture1;
+	uniform sampler2D _CameraGBufferTexture2;
+	uniform sampler2D _CameraGBufferTexture3;
+	uniform sampler2D _CameraReflectionsTexture;
+	uniform sampler2D _MainTex;
 	
-	sampler2D_float _CameraDepthTexture;
-	sampler2D _FinalReflectionTexture;
+	uniform sampler2D_float _CameraDepthTexture;
+	uniform sampler2D _FinalReflectionTexture;
 
-	sampler2D _ReflectionGroundTex;
-	sampler2D _ReflectionLowerLevelTex;
+	uniform sampler2D _ReflectionGroundTex;
+	uniform sampler2D _ReflectionLowerLevelTex;
 
-	sampler2D _ReflectionsTextureIndexTex;
-	sampler2D _ReflectionsTextureCoordinatesTex;
+	uniform sampler2D _ReflectionsTextureIndexTex;
+	uniform sampler2D _ReflectionsTextureCoordinatesTex;
 
-	float4 _MainTex_TexelSize;
-    float4 _ProjInfo;
-    float4x4 _CameraToWorldMatrix;
-	float4x4 _InverseViewProject;
+	uniform float4 _MainTex_TexelSize;
+	uniform float4 _ProjInfo;
+	uniform float4x4 _CameraToWorldMatrix;
+	uniform float4x4 _InverseViewProject;
 
-	float _GroundLevelHeight;
-	float _LowerLevelHeight;
-	int _NumMipMapLevelsReflectionGroundTex;
-	int _NumMipMapLevelsReflectionLowerLevelTex;
-	float _RoughnessMultiplier;
+	uniform float _GroundLevelHeight;
+	uniform float _LowerLevelHeight;
+	uniform int _NumMipMapLevelsReflectionGroundTex;
+	uniform int _NumMipMapLevelsReflectionLowerLevelTex;
+	uniform float _RoughnessMultiplier;
 
 //#ifdef _METALLICGLOSSMAP
 //	sampler2D _MetallicGlossMap;
@@ -148,16 +146,20 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			float roughness = 1.0 - tex2D(_CameraGBufferTexture1, screenUV).a;
 
 			float mipMapLevelReflectionGroundTex = roughness * _RoughnessMultiplier; // (_NumMipMapLevelsReflectionGroundTex - 1 ) * _RoughnessMultiplier;
-			float mipMapLevelReflectionLowerLevelTex = roughness * _RoughnessMultiplier; // * (_NumMipMapLevelsReflectionLowerLevelTex - 1) * _RoughnessMultiplier;
-			
+			float mipMapLevelReflectionLowerLevelTex = roughness * _RoughnessMultiplier; // * (_NumMipMapLevelsReflectionLowerLevelTex - 1) * _RoughnessMultiplier;			
 
 			float indexReflectionsTextureTex = tex2D(_ReflectionsTextureIndexTex, screenUV).r;
+
 			//refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
 			//refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, mipMapLevelReflectionLowerLevelTex);
 			//half3 refl2 = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
 			if (indexReflectionsTextureTex == 1.0f)
 			{
 				refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
+			}
+			else if (abs(indexReflectionsTextureTex - 0.25f) < 0.01f)
+			{
+				refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, mipMapLevelReflectionLowerLevelTex);
 			}
 			else if	(abs(indexReflectionsTextureTex - 0.5f) < 0.01f)
 			{

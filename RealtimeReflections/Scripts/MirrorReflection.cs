@@ -56,6 +56,14 @@ namespace RealtimeReflections
 
         void Start()
         {
+            int layerWater = LayerMask.NameToLayer("Water");
+            int layerUI = LayerMask.NameToLayer("UI");
+            int layerSkyLayer = LayerMask.NameToLayer("SkyLayer");
+            int layerAutomap = LayerMask.NameToLayer("Automap");
+            int layerBankPurchase = LayerMask.NameToLayer("BankPurchase");
+
+            //m_ReflectLayers = ~(1 << 4) & ~(1 << 5) & LayerMask.NameToLayer("Everything");
+            m_ReflectLayers = ~(1 << layerWater) & ~(1 << layerUI) & ~(1 << layerSkyLayer) & ~(1 << layerAutomap) & ~(1 << layerBankPurchase) & LayerMask.NameToLayer("Everything");
             GameObject stackedCameraGameObject = GameObject.Find("stackedCamera");
             if (stackedCameraGameObject != null)
             {
@@ -123,7 +131,7 @@ namespace RealtimeReflections
 		    //Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
 		    //reflectionCamera.projectionMatrix = projection; // do not set oblique projection matrix since it will fuck up fog in reflections - disabling this step seems to do not any harm ;)
 
-            reflectionCamera.cullingMask = ~(1 << 4) & LayerMask.NameToLayer("Everything"); //m_ReflectLayers.value; // never render water layer
+            reflectionCamera.cullingMask = m_ReflectLayers.value; // never render water layer
             //reflectionCamera.layerCullDistances = layerCullDistances;
 		    reflectionCamera.targetTexture = m_ReflectionTexture;
 

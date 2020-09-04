@@ -29,6 +29,7 @@ namespace RealtimeReflections
             }
         }
 
+        [SerializeField]
         private Material m_MaterialCreateReflectionTextureCoordinates;
         public Material materialCreateReflectionTextureCoordinates
         {
@@ -41,6 +42,7 @@ namespace RealtimeReflections
             }
         }
 
+        [SerializeField]
         private Shader m_ShaderCreateReflectionTextureIndex;
         public Shader shaderCreateReflectionTextureIndex
         {
@@ -53,6 +55,7 @@ namespace RealtimeReflections
             }
         }
 
+        [SerializeField]
         private Material m_MaterialCreateReflectionTextureIndex;
         public Material materialCreateReflectionTextureIndex
         {
@@ -115,6 +118,7 @@ namespace RealtimeReflections
                 m_Camera.backgroundColor = new Color(0.0f, 0.0f, 0.0f, 1.0f);
                 m_Camera.enabled = false; // important to disable camera so we can invoke Camera.RenderWithShader() manually later
             }
+            //Shader.WarmupAllShaders();
         }
 
         void Start()
@@ -145,20 +149,33 @@ namespace RealtimeReflections
             //materialCreateReflectionTextureCoordinates.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
             //materialCreateReflectionTextureCoordinates.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
             //materialCreateReflectionTextureIndex.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            //materialCreateReflectionTextureIndex.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);            
+            //materialCreateReflectionTextureIndex.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
+                    
             Shader.SetGlobalFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
             Shader.SetGlobalFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
 
-            materialCreateReflectionTextureCoordinates.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            materialCreateReflectionTextureCoordinates.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            //int prop1 = Shader.PropertyToID("_GroundLevelHeight");
+            //int prop2 = Shader.PropertyToID("_LowerLevelHeight");
+            
+            //Shader.SetGlobalFloat(prop1, componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            //Shader.SetGlobalFloat(prop2, componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
 
-            materialCreateReflectionTextureIndex.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            materialCreateReflectionTextureIndex.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            //materialCreateReflectionTextureCoordinates.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            //materialCreateReflectionTextureCoordinates.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
+
+            //materialCreateReflectionTextureIndex.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
+            //materialCreateReflectionTextureIndex.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
+            //Shader.DisableKeyword("DAGGERFALL_TERRAIN_WATER_ANIMATION");
+            //Shader.DisableKeyword("DAGGERFALL_TERRAIN_WATER_REFLECTION");
+            //materialCreateReflectionTextureCoordinates.DisableKeyword("DAGGERFALL_TERRAIN_WATER_ANIMATION");
+            //materialCreateReflectionTextureCoordinates.DisableKeyword("DAGGERFALL_TERRAIN_WATER_REFLECTION");
+            //materialCreateReflectionTextureIndex.DisableKeyword("DAGGERFALL_TERRAIN_WATER_ANIMATION");
+            //materialCreateReflectionTextureIndex.DisableKeyword("DAGGERFALL_TERRAIN_WATER_REFLECTION");
 
             m_Camera.targetTexture = renderTextureReflectionTextureCoordinates;
-            m_Camera.RenderWithShader(shaderCreateReflectionTextureCoordinates, ""); // apply custom fragment shader and write into renderTextureReflectionTextureCoordinates
+            m_Camera.RenderWithShader(shaderCreateReflectionTextureCoordinates, null); // apply custom fragment shader and write into renderTextureReflectionTextureCoordinates
             m_Camera.targetTexture = renderTextureReflectionTextureIndex;
-            m_Camera.RenderWithShader(shaderCreateReflectionTextureIndex, ""); // apply custom fragment shader and write into renderTextureReflectionTextureIndex            
+            m_Camera.RenderWithShader(shaderCreateReflectionTextureIndex, null); // apply custom fragment shader and write into renderTextureReflectionTextureIndex            
         }
     }
 }
