@@ -18,8 +18,8 @@ namespace RealtimeReflections
 {
     public class UpdateReflectionTextures : MonoBehaviour
     {
-        private GameObject reflectionPlaneBottom = null; // = floor
-        private GameObject reflectionPlaneSeaLevel = null; // = lower level
+        private GameObject reflectionPlaneGround = null; // = floor
+        private GameObject reflectionPlaneLowerLevel = null; // = lower level
 
         private MirrorReflection mirrorRefl = null; 
         private MirrorReflection mirrorReflSeaLevel = null;
@@ -102,8 +102,19 @@ namespace RealtimeReflections
         {
             get
             {
-                if (reflectionPlaneBottom)
-                    return reflectionPlaneBottom.transform.position.y;
+                if (reflectionPlaneGround)
+                    return reflectionPlaneGround.transform.position.y;
+                else
+                    return 0.0f;
+            }
+        }
+
+        public float ReflectionPlaneGroundLevelYinWorldCoords
+        {
+            get
+            {
+                if (reflectionPlaneGround)
+                    return reflectionPlaneGround.transform.TransformPoint(reflectionPlaneGround.transform.position).y;
                 else
                     return 0.0f;
             }
@@ -113,8 +124,19 @@ namespace RealtimeReflections
         {
             get
             {
-                if (reflectionPlaneSeaLevel)
-                    return reflectionPlaneSeaLevel.transform.position.y;
+                if (reflectionPlaneLowerLevel)
+                    return reflectionPlaneLowerLevel.transform.position.y;
+                else
+                    return 0.0f;
+            }
+        }
+
+        public float ReflectionPlaneLowerLevelYinWorldCoords
+        {
+            get
+            {
+                if (reflectionPlaneLowerLevel)
+                    return reflectionPlaneLowerLevel.transform.TransformPoint(reflectionPlaneLowerLevel.transform.position).y;
                 else
                     return 0.0f;
             }
@@ -385,11 +407,11 @@ namespace RealtimeReflections
 
         void Awake()
         {
-            reflectionPlaneBottom = new GameObject("ReflectionPlaneBottom");
-            reflectionPlaneBottom.layer = LayerMask.NameToLayer("Water");
-            MeshFilter meshFilter = (MeshFilter)reflectionPlaneBottom.AddComponent(typeof(MeshFilter));
+            reflectionPlaneGround = new GameObject("ReflectionPlaneGroundLevel");
+            reflectionPlaneGround.layer = LayerMask.NameToLayer("Water");
+            MeshFilter meshFilter = (MeshFilter)reflectionPlaneGround.AddComponent(typeof(MeshFilter));
             meshFilter.mesh = CreateMesh(100000.0f, 100000.0f); // create quad with normal facing into negative y-direction (so it is not visible but it will trigger OnWillRenderObject() in MirrorReflection.cs) - should be big enough to be "visible" even when looking parallel to the x/z-plane
-            MeshRenderer renderer = reflectionPlaneBottom.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
+            MeshRenderer renderer = reflectionPlaneGround.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
             
             renderer.material.shader = Shader.Find("Standard");
             Texture2D tex = new Texture2D(1, 1);
@@ -400,19 +422,19 @@ namespace RealtimeReflections
             renderer.shadowCastingMode = ShadowCastingMode.Off;
             renderer.enabled = true; // if this is set to false OnWillRenderObject() in MirrorReflection.cs will not work (workaround would be to change OnWillRenderObject() to Update()
 
-            mirrorRefl = reflectionPlaneBottom.AddComponent<MirrorReflection>();
+            mirrorRefl = reflectionPlaneGround.AddComponent<MirrorReflection>();
             mirrorRefl.m_TextureWidth = floorReflectionTextureWidth;
             mirrorRefl.m_TextureHeight = floorReflectionTextureHeight;
 
-            reflectionPlaneBottom.transform.SetParent(this.transform);
+            reflectionPlaneGround.transform.SetParent(this.transform);
 
-            InjectReflectiveMaterialProperty scriptInjectReflectiveMaterialProperty = reflectionPlaneBottom.AddComponent<InjectReflectiveMaterialProperty>(); // the inject script is parented to this plane so that the OnWillRenderObject() method of the inject script will work - this is important since update() function resulted in slightly delayed update which could be seen when ground level height changed           
+            InjectReflectiveMaterialProperty scriptInjectReflectiveMaterialProperty = reflectionPlaneGround.AddComponent<InjectReflectiveMaterialProperty>(); // the inject script is parented to this plane so that the OnWillRenderObject() method of the inject script will work - this is important since update() function resulted in slightly delayed update which could be seen when ground level height changed           
 
-            reflectionPlaneSeaLevel = new GameObject("ReflectionPlaneSeaLevel");
-            reflectionPlaneSeaLevel.layer = LayerMask.NameToLayer("Water");
-            MeshFilter meshFilterSeaLevel = (MeshFilter)reflectionPlaneSeaLevel.AddComponent(typeof(MeshFilter));
+            reflectionPlaneLowerLevel = new GameObject("ReflectionPlaneLowerLevel");
+            reflectionPlaneLowerLevel.layer = LayerMask.NameToLayer("Water");
+            MeshFilter meshFilterSeaLevel = (MeshFilter)reflectionPlaneLowerLevel.AddComponent(typeof(MeshFilter));
             meshFilterSeaLevel.mesh = CreateMesh(1000000.0f, 1000000.0f); // create quad facing into negative y-direction (so it is not visible but it will trigger OnWillRenderObject() in MirrorReflection.cs) - should be big enough to be "visible" even when looking parallel to the x/z-plane
-            MeshRenderer rendererSeaLevel = reflectionPlaneSeaLevel.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
+            MeshRenderer rendererSeaLevel = reflectionPlaneLowerLevel.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
 
 
             rendererSeaLevel.material.shader = Shader.Find("Standard");
@@ -424,11 +446,11 @@ namespace RealtimeReflections
             rendererSeaLevel.shadowCastingMode = ShadowCastingMode.Off;
             rendererSeaLevel.enabled = true; // if this is set to false OnWillRenderObject() in MirrorReflection.cs will not work (workaround would be to change OnWillRenderObject() to Update()
 
-            mirrorReflSeaLevel = reflectionPlaneSeaLevel.AddComponent<MirrorReflection>();
+            mirrorReflSeaLevel = reflectionPlaneLowerLevel.AddComponent<MirrorReflection>();
             mirrorReflSeaLevel.m_TextureWidth = lowerLevelReflectionTextureWidth;
             mirrorReflSeaLevel.m_TextureHeight = lowerLevelReflectionTextureHeight;
 
-            reflectionPlaneSeaLevel.transform.SetParent(this.transform);
+            reflectionPlaneLowerLevel.transform.SetParent(this.transform);
 
             LayerMask layerIndexWorldTerrain = LayerMask.NameToLayer("WorldTerrain");
             if (layerIndexWorldTerrain != -1)
@@ -550,15 +572,15 @@ namespace RealtimeReflections
                 RaycastHit hit;
                 float distanceToGround = 0;
 
-                if (Physics.Raycast(goPlayerAdvanced.transform.position, -Vector3.up, out hit, 100.0F))
+                if (Physics.Raycast(goPlayerAdvanced.transform.position + GameManager.Instance.MainCamera.transform.localPosition, -Vector3.up, out hit, 100.0F))
                 {
                     distanceToGround = hit.distance;
-                }                   
-                reflectionPlaneBottom.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceToGround, 0.0f);
+                }
+                reflectionPlaneGround.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, GameManager.Instance.PlayerController.height * 0.5f, 0.0f);
 
                 float distanceLevelBelow = getDistanceToLowerLevel(goPlayerAdvanced);
                 //Debug.Log(string.Format("distance to lower level: {0}", distanceLevelBelow));
-                reflectionPlaneSeaLevel.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceLevelBelow, 0.0f);                
+                reflectionPlaneLowerLevel.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceLevelBelow, 0.0f);                
             }
             else
             //if (!GameManager.Instance.IsPlayerInside)
@@ -622,15 +644,15 @@ namespace RealtimeReflections
                         float height = terrainInstance.SampleHeight(pos + terrainInstance.transform.position);
 
                         float positionY = height + terrainInstance.transform.position.y;
-                        reflectionPlaneBottom.transform.position = new Vector3(goPlayerAdvanced.transform.position.x + terrainInstance.transform.position.x, positionY, goPlayerAdvanced.transform.position.z + terrainInstance.transform.position.z);
+                        reflectionPlaneGround.transform.position = new Vector3(goPlayerAdvanced.transform.position.x + terrainInstance.transform.position.x, positionY, goPlayerAdvanced.transform.position.z + terrainInstance.transform.position.z);
                     }                   
                 }
 
                 if (!terrainInstancePlayerTerrain)
                     return;
 
-                //Debug.Log(string.Format("playerGPS: {0}, plane: {1}", goPlayerAdvanced.transform.position.y, reflectionPlaneBottom.transform.position.y));
-                if (playerGPS.transform.position.y < reflectionPlaneBottom.transform.position.y)
+                //Debug.Log(string.Format("playerGPS: {0}, plane: {1}", goPlayerAdvanced.transform.position.y, reflectionPlaneGround.transform.position.y));
+                if (playerGPS.transform.position.y < reflectionPlaneGround.transform.position.y)
                 {
                     RaycastHit hit;
                     float distanceToGround = 0;
@@ -641,7 +663,7 @@ namespace RealtimeReflections
                     }
 
                     //Debug.Log(string.Format("distance to ground: {0}", distanceToGround));
-                    reflectionPlaneBottom.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceToGround, 0.0f);                    
+                    reflectionPlaneGround.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceToGround, 0.0f);                    
                 }
 
                 StreamingWorld streamingWorld = GameObject.Find("StreamingWorld").GetComponent<StreamingWorld>();
@@ -649,7 +671,7 @@ namespace RealtimeReflections
                 Vector3 vecWaterHeightTransformed = terrainInstancePlayerTerrain.transform.TransformPoint(vecWaterHeight); // transform to world coordinates
                 //Debug.Log(string.Format("x,y,z: {0}, {1}, {2}", vecWaterHeight.x, vecWaterHeight.y, vecWaterHeight.z));
                 //Debug.Log(string.Format("transformed x,y,z: {0}, {1}, {2}", vecWaterHeightTransformed.x, vecWaterHeightTransformed.y, vecWaterHeightTransformed.z));
-                reflectionPlaneSeaLevel.transform.position = new Vector3(goPlayerAdvanced.transform.position.x, vecWaterHeightTransformed.y, goPlayerAdvanced.transform.position.z);
+                reflectionPlaneLowerLevel.transform.position = new Vector3(goPlayerAdvanced.transform.position.x, vecWaterHeightTransformed.y, goPlayerAdvanced.transform.position.z);
             }
 
             if (GameManager.Instance.IsPlayerInside && !playerInside)

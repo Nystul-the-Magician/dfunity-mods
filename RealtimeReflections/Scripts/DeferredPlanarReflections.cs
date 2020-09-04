@@ -8,6 +8,8 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
+using DaggerfallWorkshop.Game;
+
 using RealtimeReflections;
 
 #if UNITY_EDITOR
@@ -248,8 +250,9 @@ namespace RealtimeReflections
             material.SetTexture("_ReflectionsTextureIndexTex", componentCreateReflectionLookupTextures.renderTextureReflectionTextureIndex);
             material.SetTexture("_ReflectionsTextureCoordinatesTex", componentCreateReflectionLookupTextures.renderTextureReflectionTextureCoordinates);
 
-            material.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            material.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
+            material.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY); // + GameManager.Instance.MainCamera.transform.localPosition.y);
+            material.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY); // + GameManager.Instance.MainCamera.transform.localPosition.y);
+            //material.SetFloat("_CameraHeightFromGround", GameManager.Instance.MainCamera.transform.localPosition.y);
 
             int minDimValue = Math.Min(componentUpdateReflectionTextures.FloorReflectionTextureWidth, componentUpdateReflectionTextures.FloorReflectionTextureHeight);
             int numMipMapLevels = (int)(Math.Log(minDimValue) / Math.Log(2));

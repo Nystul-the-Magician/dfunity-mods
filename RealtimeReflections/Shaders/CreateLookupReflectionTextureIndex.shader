@@ -28,7 +28,7 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 
 	uniform sampler2D _MainTex;
 	uniform float4 _MainTex_TexelSize;
-
+	uniform sampler2D _MetallicGlossMap;
 	#ifdef _METALLICGLOSSMAP
 		uniform sampler2D _MetallicGlossMap;
 	#else	
@@ -39,6 +39,7 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 
 	uniform float _GroundLevelHeight;
 	uniform float _LowerLevelHeight;
+	uniform float _CameraHeightFromGround;
 
 	half2 MetallicGloss(float2 uv)
 	{
@@ -60,6 +61,7 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 			mg.g = _Glossiness;
 		#endif
 	#endif
+			mg = tex2D(_MetallicGlossMap, uv).ra;
 		return mg;
 	}
 
@@ -95,38 +97,37 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 				
     half4 frag(v2f IN) : SV_Target
     {		            
-			//half4 col = tex2D(_MainTex, IN.uv);
-			//if (col.a < 0.5f)
-			//	discard;
-
 			half4 result = half4(0.0f, 0.0f, 0.0f, 0.0f);
 			float3 vecUp = float3(0.0f,1.0f,0.0f);
-			if ( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.01f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) )
+			if ( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.2f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) )
 			{
 				result.r = 1.0f;
 			}
-			else if ((abs(IN.worldPos.y - _LowerLevelHeight) < 0.2f) /*(IN.worldPos.y < -467.73f)*/ && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.1f))
+			else if ((abs(IN.worldPos.y - _LowerLevelHeight) < 0.2f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.1f))
 			{
 				result.r = 0.25f;
 			}
-			else if	( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) ) // fragment belong to object on current ground level plane
-			{
-				result.r = 0.5f;
-			}
-			else if	(
-						(acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) &&
-						(
-						(IN.worldPos.y -_GroundLevelHeight > -0.92f) && // fragment is below (use parallax-corrected reflection)
-						(IN.worldPos.y - _GroundLevelHeight < 0.32f) // fragment is slightly above (use parallax-corrected reflection) - also valid for current ground level plane
-						)
-					)
-			{
-				result.r = 0.75f;
-			}
+			//else if ((abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f))
+			//{
+			//	result.r = 0.33f;
+			//}
+			//else if	( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) ) // fragment belong to object on current ground level plane
+			//{
+			//	result.r = 0.5f;
+			//}
+			//else if	(
+			//			(acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) &&
+			//			(
+			//			(IN.worldPos.y -_GroundLevelHeight > -0.92f) && // fragment is below (use parallax-corrected reflection)
+			//			(IN.worldPos.y - _GroundLevelHeight < 0.32f) // fragment is slightly above (use parallax-corrected reflection) - also valid for current ground level plane
+			//			)
+			//		)
+			//{
+			//	result.r = 0.75f;
+			//}
 
 			half2 mg = MetallicGloss(IN.uv);
 			result.gb = mg;
-
             return result;
     }
 
@@ -134,24 +135,9 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 
 	SubShader
 	{
-		//Pass{
-
-		//	ZWrite On
-		//	Cull Back
-		//	ColorMask 0
-		//}
-		//ZTest Never Cull Back ZWrite On
-		//Lighting Off
-		//	Blend Off
-
 		Pass
 		{
-			//Tags { "Queue" = "Geometry" "RenderType" = "Opaque" }
-			Tags{
-				"Queue" = "Geometry-100"
-				"IgnoreProjector" = "True"
-				"RenderType" = "Opaque"
-			}
+			Tags { "Queue" = "Geometry" "RenderType" = "Opaque" }
 
 			CGPROGRAM
 			#pragma exclude_renderers gles xbox360 ps3

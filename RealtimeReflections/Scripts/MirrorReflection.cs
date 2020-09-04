@@ -128,8 +128,8 @@ namespace RealtimeReflections
 		    // plane. This way we clip everything below/above it for free.
 		    Vector4 clipPlane = CameraSpacePlane( reflectionCamera, pos, normal, 1.0f );
 		    //Matrix4x4 projection = cam.projectionMatrix;
-		    //Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
-		    //reflectionCamera.projectionMatrix = projection; // do not set oblique projection matrix since it will fuck up fog in reflections - disabling this step seems to do not any harm ;)
+		    Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
+		    reflectionCamera.projectionMatrix = projection; // do not set oblique projection matrix since it will fuck up fog in reflections - disabling this step seems to do not any harm ;)
 
             reflectionCamera.cullingMask = m_ReflectLayers.value; // never render water layer
             //reflectionCamera.layerCullDistances = layerCullDistances;
@@ -147,8 +147,7 @@ namespace RealtimeReflections
 		    reflectionCamera.transform.eulerAngles = new Vector3(0, euler.y, euler.z);
 		    reflectionCamera.Render();
 		    reflectionCamera.transform.position = oldpos;
-            GL.invertCulling = false;
-
+            GL.invertCulling = false;            
 		    // Restore pixel light count
 		    if( m_DisablePixelLights )
 			    QualitySettings.pixelLightCount = oldPixelLightCount;

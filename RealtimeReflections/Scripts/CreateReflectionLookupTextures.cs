@@ -146,31 +146,10 @@ namespace RealtimeReflections
         {
             m_Camera.transform.position = Camera.main.transform.position;
             m_Camera.transform.rotation = Camera.main.transform.rotation;
-            //materialCreateReflectionTextureCoordinates.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            //materialCreateReflectionTextureCoordinates.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
-            //materialCreateReflectionTextureIndex.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            //materialCreateReflectionTextureIndex.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
-                    
-            Shader.SetGlobalFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            Shader.SetGlobalFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
-
-            //int prop1 = Shader.PropertyToID("_GroundLevelHeight");
-            //int prop2 = Shader.PropertyToID("_LowerLevelHeight");
-            
-            //Shader.SetGlobalFloat(prop1, componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            //Shader.SetGlobalFloat(prop2, componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
-
-            //materialCreateReflectionTextureCoordinates.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            //materialCreateReflectionTextureCoordinates.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
-
-            //materialCreateReflectionTextureIndex.SetFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY);
-            //materialCreateReflectionTextureIndex.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY);
-            //Shader.DisableKeyword("DAGGERFALL_TERRAIN_WATER_ANIMATION");
-            //Shader.DisableKeyword("DAGGERFALL_TERRAIN_WATER_REFLECTION");
-            //materialCreateReflectionTextureCoordinates.DisableKeyword("DAGGERFALL_TERRAIN_WATER_ANIMATION");
-            //materialCreateReflectionTextureCoordinates.DisableKeyword("DAGGERFALL_TERRAIN_WATER_REFLECTION");
-            //materialCreateReflectionTextureIndex.DisableKeyword("DAGGERFALL_TERRAIN_WATER_ANIMATION");
-            //materialCreateReflectionTextureIndex.DisableKeyword("DAGGERFALL_TERRAIN_WATER_REFLECTION");
+            float tmp = componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY;
+            Shader.SetGlobalFloat("_GroundLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneGroundLevelY); // + GameManager.Instance.MainCamera.transform.localPosition.y);
+            Shader.SetGlobalFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY); // + GameManager.Instance.MainCamera.transform.localPosition.y);
+            //Shader.SetGlobalFloat("_CameraHeightFromGround", GameManager.Instance.MainCamera.transform.localPosition.y);
 
             m_Camera.targetTexture = renderTextureReflectionTextureCoordinates;
             m_Camera.RenderWithShader(shaderCreateReflectionTextureCoordinates, null); // apply custom fragment shader and write into renderTextureReflectionTextureCoordinates

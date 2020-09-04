@@ -125,8 +125,8 @@ namespace RealtimeReflections
                 }
             }
 
-            gameObjectReflectionPlaneGroundLevel = GameObject.Find("ReflectionPlaneBottom");
-            gameObjectReflectionPlaneSeaLevel = GameObject.Find("ReflectionPlaneSeaLevel");
+            gameObjectReflectionPlaneGroundLevel = GameObject.Find("ReflectionPlaneGroundLevel");
+            gameObjectReflectionPlaneSeaLevel = GameObject.Find("ReflectionPlaneLowerLevel");
             gameObjectReflectionPlaneLowerLevel = gameObjectReflectionPlaneSeaLevel;
 
             // get inactive gameobject StreamingTarget (just GameObject.Find() would fail to find inactive gameobjects)
