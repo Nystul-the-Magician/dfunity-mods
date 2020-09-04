@@ -153,9 +153,6 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			float mipMapLevelReflectionLowerLevelTex = roughness * _RoughnessMultiplier; // * (_NumMipMapLevelsReflectionLowerLevelTex - 1) * _RoughnessMultiplier;			
 
 
-			//refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
-			//refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, mipMapLevelReflectionLowerLevelTex);
-			//half3 refl2 = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
 			if (indexReflectionsTextureTex == 1.0f)
 			{
 				refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
@@ -164,25 +161,21 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			{
 				refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, mipMapLevelReflectionLowerLevelTex);
 			}
-			//else if (abs(indexReflectionsTextureTex - 0.33f) < 0.01f)
-			//{
-			//	refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
-			//}
-			//else if	(abs(indexReflectionsTextureTex - 0.5f) < 0.01f)
-			//{
-			//	refl = getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, mipMapLevelReflectionGroundTex);
-			//}
-			//else if	(abs(indexReflectionsTextureTex - 0.75f) < 0.01f)
-			//{
-			//	const half fadeWidth = 0.3f;
-			//	half fadeOutFactX = min(1.0f, max(0.0f, abs(0.5f - parallaxCorrectedScreenUV.x) - (0.5f-fadeWidth)) / fadeWidth);
-			//	half fadeOutFactY = min(1.0f, max(0.0f, abs(0.5f - parallaxCorrectedScreenUV.y) - (0.5f-fadeWidth)) / fadeWidth);
+			else if	(abs(indexReflectionsTextureTex - 0.5f) < 0.01f)
+			{
+				refl = getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, mipMapLevelReflectionGroundTex);
+			}
+			else if	(abs(indexReflectionsTextureTex - 0.75f) < 0.01f)
+			{
+				const half fadeWidth = 0.3f;
+				half fadeOutFactX = min(1.0f, max(0.0f, abs(0.5f - parallaxCorrectedScreenUV.x) - (0.5f-fadeWidth)) / fadeWidth);
+				half fadeOutFactY = min(1.0f, max(0.0f, abs(0.5f - parallaxCorrectedScreenUV.y) - (0.5f-fadeWidth)) / fadeWidth);
 
-			//	half fadeOutFact = 0.0f;
-			//	fadeOutFact = max(fadeOutFactX, fadeOutFactY);
+				half fadeOutFact = 0.0f;
+				fadeOutFact = max(fadeOutFactX, fadeOutFactY);
 
-			//	refl = (1.0f-fadeOutFact) * getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, mipMapLevelReflectionGroundTex); //refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, _Smoothness)).rgb;
-			//}
+				refl = (1.0f-fadeOutFact) * getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, mipMapLevelReflectionGroundTex); //refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, _Smoothness)).rgb;
+			}
 		
 
 			float4 mg;

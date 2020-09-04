@@ -107,24 +107,20 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 			{
 				result.r = 0.25f;
 			}
-			//else if ((abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f))
-			//{
-			//	result.r = 0.33f;
-			//}
-			//else if	( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) ) // fragment belong to object on current ground level plane
-			//{
-			//	result.r = 0.5f;
-			//}
-			//else if	(
-			//			(acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) &&
-			//			(
-			//			(IN.worldPos.y -_GroundLevelHeight > -0.92f) && // fragment is below (use parallax-corrected reflection)
-			//			(IN.worldPos.y - _GroundLevelHeight < 0.32f) // fragment is slightly above (use parallax-corrected reflection) - also valid for current ground level plane
-			//			)
-			//		)
-			//{
-			//	result.r = 0.75f;
-			//}
+			else if	( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) ) // fragment belong to object on current ground level plane
+			{
+				result.r = 0.5f;
+			}
+			else if	(
+						(acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) &&
+						(
+						(IN.worldPos.y -_GroundLevelHeight > -3.0f) && // fragment is below (use parallax-corrected reflection)
+						(IN.worldPos.y - _GroundLevelHeight < 0.33f) // fragment is slightly above (use parallax-corrected reflection) - also valid for current ground level plane
+						)
+					)
+			{
+				result.r = 0.75f;
+			}
 
 			half2 mg = MetallicGloss(IN.uv);
 			result.gb = mg;

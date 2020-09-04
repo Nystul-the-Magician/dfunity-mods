@@ -572,11 +572,11 @@ namespace RealtimeReflections
                 RaycastHit hit;
                 float distanceToGround = 0;
 
-                if (Physics.Raycast(goPlayerAdvanced.transform.position + GameManager.Instance.MainCamera.transform.localPosition, -Vector3.up, out hit, 100.0F))
+                if (Physics.Raycast(goPlayerAdvanced.transform.position, -Vector3.up, out hit, 100.0F))
                 {
                     distanceToGround = hit.distance;
                 }
-                reflectionPlaneGround.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, GameManager.Instance.PlayerController.height * 0.5f, 0.0f);
+                reflectionPlaneGround.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceToGround, 0.0f); //new Vector3(0.0f, GameManager.Instance.PlayerController.height * 0.5f, 0.0f);
 
                 float distanceLevelBelow = getDistanceToLowerLevel(goPlayerAdvanced);
                 //Debug.Log(string.Format("distance to lower level: {0}", distanceLevelBelow));

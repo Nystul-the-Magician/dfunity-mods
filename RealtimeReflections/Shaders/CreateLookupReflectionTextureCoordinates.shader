@@ -52,7 +52,7 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates"
 			else
 			{
 				// parallax-correct reflection position
-				o.parallaxCorrectedScreenPos = ComputeScreenPos(mul(UNITY_MATRIX_VP, posWorldSpace - float4(0.0f, (posWorldSpace.y - _GroundLevelHeight) * 0.0f, 0.0f, 0.0f)));
+				o.parallaxCorrectedScreenPos = ComputeScreenPos(mul(UNITY_MATRIX_VP, posWorldSpace - float4(0.0f, (posWorldSpace.y - _GroundLevelHeight) * 1.4f, 0.0f, 0.0f)));
 			}			
 						
             return o;
@@ -68,21 +68,10 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates"
 
 	SubShader
 	{
-		//Pass{
-		//	ZWrite On
-		//	Cull Back
-		//	ColorMask 0
-		//}
-
 		ZTest LEqual Cull Back ZWrite On
-			//Lighting Off
-			//Blend Off
-		//ZTest Never Cull Back ZWrite On
 
 		Pass
 		{
-			//Tags{ "LightMode" = "Always" }
-			//Tags{ "Queue" = "Geometry" "RenderType" = "Opaque" }
 			CGPROGRAM
 			#pragma exclude_renderers gles xbox360 ps3
 			#pragma vertex vert
