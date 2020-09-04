@@ -99,15 +99,18 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
     {		            
 			half4 result = half4(0.0f, 0.0f, 0.0f, 0.0f);
 			float3 vecUp = float3(0.0f,1.0f,0.0f);
-			if ( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.2f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) )
+			float acosValue = acos(dot(normalize(IN.worldNormal), vecUp));
+			if (acosValue > 0.01f)
+				discard;
+			if (abs(IN.worldPos.y - _GroundLevelHeight) < 0.2f)
 			{
 				result.r = 1.0f;
 			}
-			else if ((abs(IN.worldPos.y - _LowerLevelHeight) < 0.2f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.1f))
+			else if (abs(IN.worldPos.y - _LowerLevelHeight) < 0.2f)
 			{
 				result.r = 0.25f;
 			}
-			else if	( (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && (acos(dot(normalize(IN.worldNormal), vecUp)) < 0.01f) ) // fragment belong to object on current ground level plane
+			else if	(abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) // fragment belong to object on current ground level plane
 			{
 				result.r = 0.5f;
 			}

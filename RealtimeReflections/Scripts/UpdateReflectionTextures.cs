@@ -567,7 +567,8 @@ namespace RealtimeReflections
             if (!playerGPS)
                 return;
 
-            if (GameManager.Instance.IsPlayerInside)
+            //if (GameManager.Instance.IsPlayerInside)
+            if (GameManager.Instance.IsPlayerInsideBuilding)
             {
                 RaycastHit hit;
                 float distanceToGround = 0;
@@ -581,6 +582,21 @@ namespace RealtimeReflections
                 float distanceLevelBelow = getDistanceToLowerLevel(goPlayerAdvanced);
                 //Debug.Log(string.Format("distance to lower level: {0}", distanceLevelBelow));
                 reflectionPlaneLowerLevel.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceLevelBelow, 0.0f);                
+            }
+            else if (GameManager.Instance.IsPlayerInsideDungeon || GameManager.Instance.IsPlayerInsideCastle)
+            {
+                RaycastHit hit;
+                float distanceToGround = 0;
+
+                if (Physics.Raycast(goPlayerAdvanced.transform.position, -Vector3.up, out hit, 100.0F))
+                {
+                    distanceToGround = hit.distance;
+                }
+                reflectionPlaneGround.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceToGround, 0.0f); //new Vector3(0.0f, GameManager.Instance.PlayerController.height * 0.5f, 0.0f);
+
+                //Debug.Log(string.Format("distance to lower level: {0}", distanceLevelBelow));
+                Vector3 pos = goPlayerAdvanced.transform.position;
+                reflectionPlaneLowerLevel.transform.position = new Vector3(pos.x, GameManager.Instance.PlayerEnterExit.blockWaterLevel * -1 * MeshReader.GlobalScale, pos.z);
             }
             else
             //if (!GameManager.Instance.IsPlayerInside)
