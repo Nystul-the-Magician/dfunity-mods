@@ -191,6 +191,13 @@ namespace RealtimeReflections
             set { shaderDeferredPlanarReflections = value; }
         }
 
+        Shader shaderDungeonWaterWithReflections = null;
+        public Shader ShaderDungeonWaterWithReflections
+        {
+            get { return shaderDungeonWaterWithReflections; }
+            set { shaderDungeonWaterWithReflections = value; }
+        }
+
         bool computeStepDownRaycast(Vector3 raycastStartPoint, Vector3 directionVec, float maxDiffMagnitude, out RaycastHit hit)
         {
             if (Physics.Raycast(raycastStartPoint, directionVec, out hit, 1000.0F))

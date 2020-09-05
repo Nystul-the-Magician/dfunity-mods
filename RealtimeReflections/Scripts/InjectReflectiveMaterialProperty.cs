@@ -267,6 +267,32 @@ namespace RealtimeReflections
         void InjectMaterialPropertiesIndoor()
         {
             // mages guild 4 floors debuging worldpos: 704,337
+
+            Renderer[] renderers = null;            
+            if (gameObjectDungeon != null)
+            {
+                renderers = gameObjectDungeon.GetComponentsInChildren<Renderer>();
+            }
+
+            if (renderers != null)
+            {
+                foreach (Renderer r in renderers)
+                {
+                    Material[] mats = r.sharedMaterials;
+
+                    for (int m = 0; m < mats.Length; m++)
+                    {
+                        if (mats[m].shader.name == "FX/DungeonWater (Basic)")
+                        {
+                            Material matWaterReflective = new Material(componentUpdateReflectionTextures.ShaderDungeonWaterWithReflections);
+                            matWaterReflective.CopyPropertiesFromMaterial(mats[m]);
+                            matWaterReflective.SetTexture("_ReflectionTex", texReflectionLowerLevel);
+                            mats[m] = matWaterReflective;
+                        }
+                    }
+                    r.sharedMaterials = mats;
+                }
+            }
         }
 
         void InjectMaterialPropertiesOutdoor()
