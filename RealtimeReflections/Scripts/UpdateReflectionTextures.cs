@@ -592,11 +592,22 @@ namespace RealtimeReflections
             {
                 RaycastHit hit;
                 float distanceToGround = 0;
-
                 if (Physics.Raycast(goPlayerAdvanced.transform.position, -Vector3.up, out hit, 100.0F))
                 {
                     distanceToGround = hit.distance;
                 }
+
+                //float distanceToGroundNorth = 0, distanceToGroundSouth = 0, distanceToGroundWest = 0, distanceToGroundEast = 0;
+                //if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(0.0f, 0.0f, -1.0f), -Vector3.up, out hit, 100.0F))
+                //    distanceToGroundNorth = hit.distance;
+                //if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(0.0f, 0.0f, 1.0f), -Vector3.up, out hit, 100.0F))
+                //    distanceToGroundSouth = hit.distance;
+                //if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(-1.0f, 0.0f, 0.0f), -Vector3.up, out hit, 100.0F))
+                //    distanceToGroundWest = hit.distance;
+                //if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(1.0f, 0.0f, 0.0f), -Vector3.up, out hit, 100.0F))
+                //    distanceToGroundEast = hit.distance;
+                //distanceToGround = Mathf.Min(distanceToGround, Mathf.Min(distanceToGroundNorth, Mathf.Min(distanceToGroundSouth, Mathf.Min(distanceToGroundWest, distanceToGroundEast))));
+
                 reflectionPlaneGround.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceToGround, 0.0f); //new Vector3(0.0f, GameManager.Instance.PlayerController.height * 0.5f, 0.0f);
 
                 float distanceLevelBelow = getDistanceToLowerLevel(goPlayerAdvanced);
@@ -618,11 +629,11 @@ namespace RealtimeReflections
                 Vector3 pos = goPlayerAdvanced.transform.position;
                 reflectionPlaneLowerLevel.transform.position = new Vector3(pos.x, GameManager.Instance.PlayerEnterExit.blockWaterLevel * -1 * MeshReader.GlobalScale, pos.z);
 
-                // prevent underwater reflections below water level
-                if (reflectionPlaneGround.transform.position.y < reflectionPlaneLowerLevel.transform.position.y)
-                {
-                    reflectionPlaneGround.transform.position = reflectionPlaneLowerLevel.transform.position;
-                }
+                //// prevent underwater reflections below water level
+                //if (reflectionPlaneGround.transform.position.y < reflectionPlaneLowerLevel.transform.position.y)
+                //{
+                //    reflectionPlaneGround.transform.position = reflectionPlaneLowerLevel.transform.position;
+                //}
             }
             else //if (!GameManager.Instance.IsPlayerInside)
             {

@@ -1,10 +1,10 @@
 {
     "ModTitle": "Realtime Reflections",
-    "ModVersion": "2.2.3",
+    "ModVersion": "2.2.4a",
     "ModAuthor": "Nystul",
     "ContactInfo": "http://forums.dfworkshop.net",
     "DFUnity_Version": "0.10.25",
-    "ModDescription": "realtime reflections for floor textures (interiors) and water tiles (exteriors)",
+    "ModDescription": "realtime reflections for floor textures (interiors) and water tiles (exteriors) as well as dungeon water reflections.",
     "GUID": "03e6ca57-eeb9-4a53-b61a-237406a9f749",
     "Files": [
         "Assets/Game/Addons/RealtimeReflections_standalone/Resources/tileatlas_reflective.png",
@@ -14,6 +14,8 @@
         "Assets/Game/Addons/RealtimeReflections_standalone/Shaders/DaggerfallTilemapTextureArrayWithReflections.shader",
         "Assets/Game/Addons/RealtimeReflections_standalone/Shaders/CreateLookupReflectionTextureCoordinates.shader",
         "Assets/Game/Addons/RealtimeReflections_standalone/Shaders/DeferredPlanarReflections.shader",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Shaders/DungeonWaterWithReflections.shader",
+        "Assets/Game/Addons/RealtimeReflections_standalone/Shaders/Invisible.shader",
         "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/InjectReflectiveMaterialProperty.cs",
         "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/MirrorReflection.cs",
         "Assets/Game/Addons/RealtimeReflections_standalone/Scripts/CreateReflectionLookupTextures.cs",

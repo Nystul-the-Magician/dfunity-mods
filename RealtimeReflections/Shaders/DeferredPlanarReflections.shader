@@ -177,10 +177,10 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			}
 		
 
-			float4 mg;
-			mg.r = max(tex2D(_CameraGBufferTexture1, screenUV).r, max(tex2D(_CameraGBufferTexture1, screenUV).g, tex2D(_CameraGBufferTexture1, screenUV).b));
-			mg.r *= tex2D(_CameraGBufferTexture1, screenUV).a;
-			half metallic = mg.r;
+			
+			half metallic = max(tex2D(_CameraGBufferTexture1, screenUV).r, max(tex2D(_CameraGBufferTexture1, screenUV).g, tex2D(_CameraGBufferTexture1, screenUV).b));
+			metallic *= tex2D(_CameraGBufferTexture1, screenUV).a;
+
 			//metallic *= tex2D(_ReflectionsTextureIndexTex, screenUV).g;
 			//metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;
 
@@ -188,8 +188,12 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			//half metallic = mg.a;
 
 			//half metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;			
-
-			refl *= metallic; // *0.5f;
+			//half3 metallicRgb = tex2D(_CameraGBufferTexture1, screenUV).rgb;
+			//refl.r *= metallicRgb.r;
+			//refl.g *= metallicRgb.g;
+			//refl.b *= metallicRgb.b;
+			//refl.rgb *= tex2D(_CameraGBufferTexture1, screenUV).a;
+			refl *= metallic;
 
 			return half4(refl, 1.0f); 
     }
@@ -266,6 +270,7 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			finalGlossyTerm *= occlusion;
 			//gbuffer3 = reflectionTexel;
             // Additively blend the glossy GI result with the output buffer
+			//return float4(tex2D(_CameraGBufferTexture1, tsP).r, tex2D(_CameraGBufferTexture1, tsP).g, tex2D(_CameraGBufferTexture1, tsP).b, 0);			
 			return gbuffer3 + float4(finalGlossyTerm, 0);
     }
 
