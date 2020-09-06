@@ -146,12 +146,11 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 
 			float indexReflectionsTextureTex = tex2D(_ReflectionsTextureIndexTex, screenUV).r;
 
-			float roughness = 1.0f - tex2D(_ReflectionsTextureIndexTex, screenUV).b; // 1.0 - tex2D(_CameraGBufferTexture1, screenUV).a;
-			//float roughness = 1.0 - tex2D(_CameraGBufferTexture1, screenUV).a;
+			//float roughness = 1.0f - tex2D(_ReflectionsTextureIndexTex, screenUV).b; // 1.0 - tex2D(_CameraGBufferTexture1, screenUV).a;
+			float roughness = 1.0 - tex2D(_CameraGBufferTexture1, screenUV).a;
 
-			float mipMapLevelReflectionGroundTex = roughness * _RoughnessMultiplier; // (_NumMipMapLevelsReflectionGroundTex - 1 ) * _RoughnessMultiplier;
-			float mipMapLevelReflectionLowerLevelTex = roughness * _RoughnessMultiplier; // * (_NumMipMapLevelsReflectionLowerLevelTex - 1) * _RoughnessMultiplier;			
-
+			float mipMapLevelReflectionGroundTex = roughness * _RoughnessMultiplier; // *(_NumMipMapLevelsReflectionGroundTex - 1) * _RoughnessMultiplier;
+			float mipMapLevelReflectionLowerLevelTex = roughness * _RoughnessMultiplier; // *(_NumMipMapLevelsReflectionLowerLevelTex - 1) * _RoughnessMultiplier;
 
 			if (indexReflectionsTextureTex == 1.0f)
 			{
@@ -179,17 +178,18 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 		
 
 			float4 mg;
-			mg.r = tex2D(_CameraGBufferTexture1, screenUV).a;
+			mg.r = max(tex2D(_CameraGBufferTexture1, screenUV).r, max(tex2D(_CameraGBufferTexture1, screenUV).g, tex2D(_CameraGBufferTexture1, screenUV).b));
+			mg.r *= tex2D(_CameraGBufferTexture1, screenUV).a;
 			half metallic = mg.r;
 			//metallic *= tex2D(_ReflectionsTextureIndexTex, screenUV).g;
-			metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;
+			//metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;
 
 			//float4 mg = tex2D(_CameraGBufferTexture1, screenUV);
 			//half metallic = mg.a;
 
 			//half metallic = tex2D(_ReflectionsTextureIndexTex, screenUV).g;			
 
-			refl *= metallic * 0.5f;
+			refl *= metallic; // *0.5f;
 
 			return half4(refl, 1.0f); 
     }
@@ -243,11 +243,11 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
             ind.specular = incomingRadiance;
 
 			float3 reflResult = UNITY_BRDF_PBS(0, specColor, oneMinusReflectivity, 1 - roughness, wsNormal, -eyeVec, light, ind).rgb;
-            float confidence = reflectionTexel.a;
+			float confidence = reflectionTexel.a;
 
-			specEmission.rgb = tex2D(_CameraReflectionsTexture, tsP).rgb;
+			
             float3 finalGlossyTerm;
-
+			//specEmission.rgb = tex2D(_CameraReflectionsTexture, tsP).rgb;
             // Subtract out Unity's glossy result: (we're just applying the delta)
             /*
             {
@@ -266,7 +266,7 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 			finalGlossyTerm *= occlusion;
 			//gbuffer3 = reflectionTexel;
             // Additively blend the glossy GI result with the output buffer
-            return gbuffer3 + float4(finalGlossyTerm, 0);
+			return gbuffer3 + float4(finalGlossyTerm, 0);
     }
 
 

@@ -198,6 +198,13 @@ namespace RealtimeReflections
             set { shaderDungeonWaterWithReflections = value; }
         }
 
+        Shader shaderInvisible = null;
+        public Shader ShaderInvisible
+        {
+            get { return shaderInvisible; }
+            set { shaderInvisible = value; }
+        }
+
         bool computeStepDownRaycast(Vector3 raycastStartPoint, Vector3 directionVec, float maxDiffMagnitude, out RaycastHit hit)
         {
             if (Physics.Raycast(raycastStartPoint, directionVec, out hit, 1000.0F))
@@ -413,19 +420,37 @@ namespace RealtimeReflections
         }
 
         void Awake()
+        {         
+            PlayerEnterExit.OnTransitionInterior += OnTransitionToInterior;
+            PlayerEnterExit.OnTransitionExterior += OnTransitionToExterior;
+            PlayerEnterExit.OnTransitionDungeonInterior += OnTransitionToInterior;
+            PlayerEnterExit.OnTransitionDungeonExterior += OnTransitionToExterior;
+        }
+
+        void OnDestroy()
+        {
+            PlayerEnterExit.OnTransitionInterior -= OnTransitionToInterior;
+            PlayerEnterExit.OnTransitionExterior -= OnTransitionToExterior;
+            PlayerEnterExit.OnTransitionDungeonInterior -= OnTransitionToInterior;
+            PlayerEnterExit.OnTransitionDungeonExterior -= OnTransitionToExterior;
+        }
+
+        void Start()
         {
             reflectionPlaneGround = new GameObject("ReflectionPlaneGroundLevel");
             reflectionPlaneGround.layer = LayerMask.NameToLayer("Water");
             MeshFilter meshFilter = (MeshFilter)reflectionPlaneGround.AddComponent(typeof(MeshFilter));
             meshFilter.mesh = CreateMesh(100000.0f, 100000.0f); // create quad with normal facing into negative y-direction (so it is not visible but it will trigger OnWillRenderObject() in MirrorReflection.cs) - should be big enough to be "visible" even when looking parallel to the x/z-plane
             MeshRenderer renderer = reflectionPlaneGround.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-            
-            renderer.material.shader = Shader.Find("Standard");
-            Texture2D tex = new Texture2D(1, 1);
-            tex.SetPixel(0, 0, Color.green);
-            tex.Apply();
-            renderer.material.mainTexture = tex;
-            renderer.material.color = Color.green;
+
+            renderer.material = new Material(ShaderInvisible);
+            // switch to this material for reflection plane height debugging
+            //renderer.material.shader = Shader.Find("Standard");
+            //Texture2D tex = new Texture2D(1, 1);
+            //tex.SetPixel(0, 0, Color.green);
+            //tex.Apply();
+            //renderer.material.mainTexture = tex;
+            //renderer.material.color = Color.green;
             renderer.shadowCastingMode = ShadowCastingMode.Off;
             renderer.enabled = true; // if this is set to false OnWillRenderObject() in MirrorReflection.cs will not work (workaround would be to change OnWillRenderObject() to Update()
 
@@ -443,13 +468,14 @@ namespace RealtimeReflections
             meshFilterSeaLevel.mesh = CreateMesh(1000000.0f, 1000000.0f); // create quad facing into negative y-direction (so it is not visible but it will trigger OnWillRenderObject() in MirrorReflection.cs) - should be big enough to be "visible" even when looking parallel to the x/z-plane
             MeshRenderer rendererSeaLevel = reflectionPlaneLowerLevel.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
 
-
-            rendererSeaLevel.material.shader = Shader.Find("Standard");
-            Texture2D texSeaLevel = new Texture2D(1, 1);
-            texSeaLevel.SetPixel(0, 0, Color.green);
-            texSeaLevel.Apply();
-            rendererSeaLevel.material.mainTexture = texSeaLevel;
-            rendererSeaLevel.material.color = Color.green;
+            rendererSeaLevel.material = new Material(ShaderInvisible);
+            // switch to this material for reflection plane height debugging
+            //rendererSeaLevel.material.shader = Shader.Find("Standard");
+            //Texture2D texSeaLevel = new Texture2D(1, 1);
+            //texSeaLevel.SetPixel(0, 0, Color.green);
+            //texSeaLevel.Apply();
+            //rendererSeaLevel.material.mainTexture = texSeaLevel;
+            //rendererSeaLevel.material.color = Color.green;
             rendererSeaLevel.shadowCastingMode = ShadowCastingMode.Off;
             rendererSeaLevel.enabled = true; // if this is set to false OnWillRenderObject() in MirrorReflection.cs will not work (workaround would be to change OnWillRenderObject() to Update()
 
@@ -497,20 +523,7 @@ namespace RealtimeReflections
             else
             {
                 updateBackgroundSettingsOutdoor();
-            }            
-
-            PlayerEnterExit.OnTransitionInterior += OnTransitionToInterior;
-            PlayerEnterExit.OnTransitionExterior += OnTransitionToExterior;
-            PlayerEnterExit.OnTransitionDungeonInterior += OnTransitionToInterior;
-            PlayerEnterExit.OnTransitionDungeonExterior += OnTransitionToExterior;
-        }
-
-        void OnDestroy()
-        {
-            PlayerEnterExit.OnTransitionInterior -= OnTransitionToInterior;
-            PlayerEnterExit.OnTransitionExterior -= OnTransitionToExterior;
-            PlayerEnterExit.OnTransitionDungeonInterior -= OnTransitionToInterior;
-            PlayerEnterExit.OnTransitionDungeonExterior -= OnTransitionToExterior;
+            }
         }
 
         void OnTransitionToInterior(PlayerEnterExit.TransitionEventArgs args)
@@ -604,6 +617,12 @@ namespace RealtimeReflections
                 //Debug.Log(string.Format("distance to lower level: {0}", distanceLevelBelow));
                 Vector3 pos = goPlayerAdvanced.transform.position;
                 reflectionPlaneLowerLevel.transform.position = new Vector3(pos.x, GameManager.Instance.PlayerEnterExit.blockWaterLevel * -1 * MeshReader.GlobalScale, pos.z);
+
+                // prevent underwater reflections below water level
+                if (reflectionPlaneGround.transform.position.y < reflectionPlaneLowerLevel.transform.position.y)
+                {
+                    reflectionPlaneGround.transform.position = reflectionPlaneLowerLevel.transform.position;
+                }
             }
             else
             //if (!GameManager.Instance.IsPlayerInside)

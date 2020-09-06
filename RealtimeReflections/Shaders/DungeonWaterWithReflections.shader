@@ -95,11 +95,12 @@ half4 frag( v2f i ) : COLOR
 	float2 screenPos = (i.screenPos / i.screenPos.w).xy;
 	//tex2D(_ReflectionTex, screenPos).rgb; // float2(fresnel, fresnel)).rgb; // lerp(water.rgb, reflCol, water.a);
 	//reflCol = lerp(tex2D(_CameraReflectionsTexture, screenPos).rgb, _horizonColor.rgb, 0.6f);
-	reflCol = lerp(tex2D(_FinalReflectionTexture, screenPos + float2(fresnel, fresnel)*0.02).rgb*0.5f, _horizonColor.rgb, 0.1f);
+	//reflCol = lerp(tex2D(_ReflectionTex, screenPos + float2(fresnel, fresnel)*0.02).rgb*0.5f, _horizonColor.rgb, 0.1f);
+	//reflCol = lerp(tex2D(_FinalReflectionTexture, screenPos + float2(fresnel, fresnel)*0.02).rgb*0.5f, _horizonColor.rgb, 0.1f);
+	reflCol = lerp(tex2D(_ReflectionTex, screenPos + float2(fresnel, fresnel)*0.02).rgb*0.5f, _horizonColor.rgb, 0.1f);
 
 	col.rgb = lerp(water.rgb, reflCol, 0.6f); // water.a);
-	col.a = 0.9f; // _transparency;
-
+	col.a = 0.8f; // _transparency;
 	UNITY_APPLY_FOG(i.fogCoord, col);
 	return col;
 }

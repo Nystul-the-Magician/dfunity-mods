@@ -34,6 +34,7 @@ namespace RealtimeReflections
         private static Shader shaderCreateLookupReflectionTextureIndex = null;
         private static Shader shaderDeferredPlanarReflections = null;
         private static Shader shaderDungeonWaterWithReflections = null;
+        private static Shader shaderInvisible = null; // used for reflection planes (which must be rendered for reflections to be generated, but should not render anything visible)
         private static Texture2D textureTileatlasReflective = null;
         private static Texture2D textureTileatlasReflectiveRaining = null;
 
@@ -63,6 +64,7 @@ namespace RealtimeReflections
             shaderCreateLookupReflectionTextureIndex = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureIndex.shader");
             shaderDeferredPlanarReflections = mod.GetAsset<Shader>("Shaders/DeferredPlanarReflections.shader");
             shaderDungeonWaterWithReflections = mod.GetAsset<Shader>("Shaders/DungeonWaterWithReflections.shader");
+            shaderInvisible = mod.GetAsset<Shader>("Shaders/Invisible.shader");
             textureTileatlasReflective = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective");
             textureTileatlasReflectiveRaining = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective_raining");
 
@@ -88,6 +90,7 @@ namespace RealtimeReflections
             shaderCreateLookupReflectionTextureIndex = Shader.Find("Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex");
             shaderDeferredPlanarReflections = Shader.Find("Daggerfall/RealtimeReflections/DeferredPlanarReflections");
             shaderDungeonWaterWithReflections = Shader.Find("Daggerfall/RealtimeReflections/DungeonWaterWithReflections");
+            shaderInvisible = Shader.Find("Daggerfall/RealtimeReflections/Invisible");
             textureTileatlasReflective = Resources.Load("tileatlas_reflective") as Texture2D;
             textureTileatlasReflectiveRaining = Resources.Load("tileatlas_reflective_raining") as Texture2D;
 
@@ -110,6 +113,7 @@ namespace RealtimeReflections
             componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureIndex = shaderCreateLookupReflectionTextureIndex;
             componentUpdateReflectionTextures.ShaderDeferredPlanarReflections = shaderDeferredPlanarReflections;
             componentUpdateReflectionTextures.ShaderDungeonWaterWithReflections = shaderDungeonWaterWithReflections;
+            componentUpdateReflectionTextures.ShaderInvisible = shaderInvisible;
             componentUpdateReflectionTextures.TextureTileatlasReflective = textureTileatlasReflective;
             componentUpdateReflectionTextures.TextureTileatlasReflectiveRaining = textureTileatlasReflectiveRaining;
         }
