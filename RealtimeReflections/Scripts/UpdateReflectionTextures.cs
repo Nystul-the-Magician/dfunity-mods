@@ -624,8 +624,7 @@ namespace RealtimeReflections
                     reflectionPlaneGround.transform.position = reflectionPlaneLowerLevel.transform.position;
                 }
             }
-            else
-            //if (!GameManager.Instance.IsPlayerInside)
+            else //if (!GameManager.Instance.IsPlayerInside)
             {
                 Terrain terrainInstancePlayerTerrain = null;
 

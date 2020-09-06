@@ -15,6 +15,7 @@ using DaggerfallConnect.Utility;
 using DaggerfallWorkshop;
 using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Utility;
+using DaggerfallWorkshop.Game.Serialization;
 using IniParser;
 
 namespace RealtimeReflections
@@ -83,6 +84,7 @@ namespace RealtimeReflections
             StreamingWorld.OnTeleportToCoordinates += InjectMaterialProperties;
             FloatingOrigin.OnPositionUpdate += InjectMaterialProperties;
             DaggerfallTerrain.OnInstantiateTerrain += InjectMaterialProperties;
+            SaveLoadManager.OnLoad += OnLoadEvent;
         }
 
         void OnDestroy()
@@ -91,6 +93,7 @@ namespace RealtimeReflections
             StreamingWorld.OnTeleportToCoordinates -= InjectMaterialProperties;
             FloatingOrigin.OnPositionUpdate -= InjectMaterialProperties;
             DaggerfallTerrain.OnInstantiateTerrain -= InjectMaterialProperties;
+            SaveLoadManager.OnLoad -= OnLoadEvent;
         }
 
         void Start()
@@ -147,7 +150,7 @@ namespace RealtimeReflections
             if ((texReflectionGround) && (texReflectionLowerLevel)) // do not change playerInside state before the reflection textures are initialized
             {
                 // mechanism implemented according to Interkarma's suggestions
-                // transition: inside -> dungeon/castle/building
+                // transition: outside -> dungeon/castle/building
                 if (GameManager.Instance.PlayerEnterExit.IsPlayerInside && !playerInside)
                 {
                     playerInside = true; // player now inside
@@ -441,6 +444,15 @@ namespace RealtimeReflections
             {
                 InjectMaterialPropertiesOutdoor();
             }
+            else
+            {
+                InjectMaterialPropertiesIndoor();
+            }
+        }
+
+        void OnLoadEvent(SaveData_v1 saveData)
+        {
+            InjectMaterialProperties();
         }
     }
 }
