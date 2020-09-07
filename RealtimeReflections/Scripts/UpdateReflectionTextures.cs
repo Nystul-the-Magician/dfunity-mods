@@ -27,7 +27,14 @@ namespace RealtimeReflections
         private bool useDeferredReflections = false;
         private DeferredPlanarReflections componentDeferredPlanarReflections = null;
 
-        private bool playerInside = false;
+        private enum PlayerEnvironment
+        {
+            Unknown,
+            Outdoors,
+            Building,
+            DungeonOrCastle
+        }        
+        private PlayerEnvironment playerEnvironment = PlayerEnvironment.Unknown;
 
         // mod settings mapping
         private bool isEnabledOutdoorGroundReflections;
@@ -567,16 +574,12 @@ namespace RealtimeReflections
                 componentDeferredPlanarReflections = GameManager.Instance.MainCameraObject.AddComponent<RealtimeReflections.DeferredPlanarReflections>();
             }
 
-            playerInside = GameManager.Instance.IsPlayerInside;
-
-            if (playerInside == true)
-            {
-                updateBackgroundSettingsIndoor();
-            }
+            if (!GameManager.Instance.IsPlayerInside)
+                playerEnvironment = PlayerEnvironment.Outdoors;
+            else if (GameManager.Instance.IsPlayerInsideBuilding)
+                playerEnvironment = PlayerEnvironment.Building;
             else
-            {
-                updateBackgroundSettingsOutdoor();
-            }
+                playerEnvironment = PlayerEnvironment.DungeonOrCastle;
         }
 
         void OnTransitionToInterior(PlayerEnterExit.TransitionEventArgs args)
@@ -608,7 +611,12 @@ namespace RealtimeReflections
 
         void updateBackgroundSettingsIndoor()
         {
-            playerInside = true; // player now inside
+            //playerInside = true; // player now inside
+
+            if (GameManager.Instance.IsPlayerInsideBuilding)
+                playerEnvironment = PlayerEnvironment.Building;
+            else if (GameManager.Instance.IsPlayerInsideCastle || GameManager.Instance.IsPlayerInsideDungeon)
+                playerEnvironment = PlayerEnvironment.DungeonOrCastle;
 
             mirrorRefl.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.IndoorSetting;
             mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.IndoorSetting;
@@ -630,12 +638,14 @@ namespace RealtimeReflections
                 componentDeferredPlanarReflections.enabled = false;
             }
 
-            if (IsEnabledIndoorBuildingFloorReflections || IsEnabledDungeonGroundReflections)
+            if ((IsEnabledIndoorBuildingFloorReflections && GameManager.Instance.IsPlayerInsideBuilding) ||
+                (IsEnabledDungeonGroundReflections && (GameManager.Instance.IsPlayerInsideDungeon || GameManager.Instance.IsPlayerInsideCastle)))
                 reflectionPlaneGround.SetActive(true);
             else
                 reflectionPlaneGround.SetActive(false);
 
-            if (IsEnabledIndoorBuildingLowerLevelReflection || IsEnabledDungeonWaterReflections)
+            if ((IsEnabledIndoorBuildingLowerLevelReflection && GameManager.Instance.IsPlayerInsideBuilding) ||
+                (IsEnabledDungeonWaterReflections && (GameManager.Instance.IsPlayerInsideDungeon || GameManager.Instance.IsPlayerInsideCastle)))
                 reflectionPlaneLowerLevel.SetActive(true);
             else
                 reflectionPlaneLowerLevel.SetActive(false);
@@ -643,7 +653,8 @@ namespace RealtimeReflections
 
         void updateBackgroundSettingsOutdoor()
         {
-            playerInside = false; // player now outside
+            //playerInside = false; // player now outside
+            playerEnvironment = PlayerEnvironment.Outdoors;
 
             mirrorRefl.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
             mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
@@ -676,7 +687,7 @@ namespace RealtimeReflections
         }
 
         void Update()
-        { 
+        {
             GameObject goPlayerAdvanced = GameObject.Find("PlayerAdvanced");
 
             PlayerGPS playerGPS = GameObject.Find("PlayerAdvanced").GetComponent<PlayerGPS>();
@@ -708,7 +719,7 @@ namespace RealtimeReflections
 
                 float distanceLevelBelow = getDistanceToLowerLevel(goPlayerAdvanced);
                 //Debug.Log(string.Format("distance to lower level: {0}", distanceLevelBelow));
-                reflectionPlaneLowerLevel.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceLevelBelow, 0.0f);                
+                reflectionPlaneLowerLevel.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceLevelBelow, 0.0f);
             }
             else if (GameManager.Instance.IsPlayerInsideDungeon || GameManager.Instance.IsPlayerInsideCastle)
             {
@@ -741,7 +752,7 @@ namespace RealtimeReflections
                 ContentReader.MapSummary mapSummary;
                 // if there is no location at current player position...
                 if (!DaggerfallUnity.Instance.ContentReader.HasLocation(referenceLocationX, referenceLocationY, out mapSummary))
-                {                    
+                {
                     // search for largest location in local 8-neighborhood and take this as reference location for location reflection plane
                     int maxLocationArea = -1;
                     for (int y = -1; y <= +1; y++)
@@ -760,7 +771,7 @@ namespace RealtimeReflections
                                     referenceLocationX = playerGPS.CurrentMapPixel.X + x;
                                     referenceLocationY = playerGPS.CurrentMapPixel.Y + y;
                                     maxLocationArea = locationArea;
-                                }       
+                                }
                             }
                         }
                     }
@@ -793,7 +804,7 @@ namespace RealtimeReflections
 
                         float positionY = height + terrainInstance.transform.position.y;
                         reflectionPlaneGround.transform.position = new Vector3(goPlayerAdvanced.transform.position.x + terrainInstance.transform.position.x, positionY, goPlayerAdvanced.transform.position.z + terrainInstance.transform.position.z);
-                    }                   
+                    }
                 }
 
                 if (!terrainInstancePlayerTerrain)
@@ -811,7 +822,7 @@ namespace RealtimeReflections
                     }
 
                     //Debug.Log(string.Format("distance to ground: {0}", distanceToGround));
-                    reflectionPlaneGround.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceToGround, 0.0f);                    
+                    reflectionPlaneGround.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceToGround, 0.0f);
                 }
 
                 StreamingWorld streamingWorld = GameObject.Find("StreamingWorld").GetComponent<StreamingWorld>();
@@ -822,14 +833,19 @@ namespace RealtimeReflections
                 reflectionPlaneLowerLevel.transform.position = new Vector3(goPlayerAdvanced.transform.position.x, vecWaterHeightTransformed.y, goPlayerAdvanced.transform.position.z);
             }
 
-            if (GameManager.Instance.IsPlayerInside && !playerInside)
+            if (GameManager.Instance.IsPlayerInsideBuilding && playerEnvironment != PlayerEnvironment.Building)
             {
                 updateBackgroundSettingsIndoor();
             }
-            else if (!GameManager.Instance.IsPlayerInside && playerInside)
+            else if ((GameManager.Instance.IsPlayerInsideCastle || GameManager.Instance.IsPlayerInsideDungeon) && playerEnvironment != PlayerEnvironment.DungeonOrCastle)
+            {
+                updateBackgroundSettingsIndoor();
+            }
+            else if (!GameManager.Instance.IsPlayerInside && playerEnvironment != PlayerEnvironment.Outdoors)
             {
                 updateBackgroundSettingsOutdoor();
             }
+            
         }
 	}
 }
