@@ -73,7 +73,7 @@ namespace RealtimeReflections
         }
     }
 
-    [RequireComponent(typeof(Camera))]    
+    [RequireComponent(typeof(Camera))]
     public class DeferredPlanarReflections : MonoBehaviour
     {
 
@@ -117,6 +117,7 @@ namespace RealtimeReflections
         }
 
         private CommandBuffer m_CommandBuffer;
+        private bool AddedCommandBuffer = false;
 
         private static int kFinalReflectionTexture;
         private static int kTempTexture;
@@ -184,7 +185,7 @@ namespace RealtimeReflections
                 }
 
                 m_CommandBuffer = null;
-            }            
+            }
         }
 
 #if UNITY_EDITOR
@@ -236,7 +237,7 @@ namespace RealtimeReflections
                     ((1.0f + P[6]) / P[5]));
 
             RenderTextureFormat intermediateFormat = camera_.allowHDR ? RenderTextureFormat.ARGBHalf : RenderTextureFormat.ARGB32;
-     
+
             Matrix4x4 cameraToWorldMatrix = GetComponent<Camera>().worldToCameraMatrix.inverse;
             material.SetVector("_ProjInfo", projInfo); // used for unprojection
             material.SetMatrix("_CameraToWorldMatrix", cameraToWorldMatrix);
@@ -275,11 +276,31 @@ namespace RealtimeReflections
                 m_CommandBuffer.Blit(BuiltinRenderTextureType.CameraTarget, kFinalReflectionTexture, material, (int)PassIndex.ReflectionStep);
 
                 m_CommandBuffer.Blit(BuiltinRenderTextureType.CameraTarget, kTempTexture, material, (int)PassIndex.CompositeFinal);
-                m_CommandBuffer.Blit(kTempTexture, BuiltinRenderTextureType.CameraTarget);                
+                m_CommandBuffer.Blit(kTempTexture, BuiltinRenderTextureType.CameraTarget);
 
                 m_CommandBuffer.ReleaseTemporaryRT(kTempTexture);
                 camera_.AddCommandBuffer(CameraEvent.AfterFinalPass, m_CommandBuffer);
+                AddedCommandBuffer = true;
             }
+        }
+
+        public void AddCommandBuffer()
+        {
+            if (m_CommandBuffer == null)
+                return;
+
+            if (!AddedCommandBuffer)
+                camera_.AddCommandBuffer(CameraEvent.AfterFinalPass, m_CommandBuffer);
+            AddedCommandBuffer = true;
+        }
+        public void RemoveCommandBuffer()
+        {
+            if (m_CommandBuffer == null)
+                return;
+
+            if (AddedCommandBuffer)
+                camera_.RemoveCommandBuffer(CameraEvent.AfterFinalPass, m_CommandBuffer);
+            AddedCommandBuffer = false;
         }
     }
 }

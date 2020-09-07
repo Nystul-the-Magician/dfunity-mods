@@ -23,6 +23,8 @@ namespace RealtimeReflections
 	    public LayerMask m_ReflectLayers = -1;
         //public float[] layerCullDistances = new float[32];
 
+
+        private GameObject goMirrorReflection;
         private Hashtable m_ReflectionCameras = new Hashtable(); // Camera -> Camera table
  
 	    public RenderTexture m_ReflectionTexture = null;
@@ -167,9 +169,11 @@ namespace RealtimeReflections
 			    Destroy( m_ReflectionTexture );
 			    m_ReflectionTexture = null;
 		    }
-		    //foreach( DictionaryEntry kvp in m_ReflectionCameras )
-			//    DestroyImmediate( ((Camera)kvp.Value).gameObject );
-		    m_ReflectionCameras.Clear();
+
+            Destroy(goMirrorReflection);
+            //foreach( DictionaryEntry kvp in m_ReflectionCameras )
+            //    DestroyImmediate( ((Camera)kvp.Value).gameObject );
+            m_ReflectionCameras.Clear();
 	    }
  
  
@@ -260,8 +264,8 @@ namespace RealtimeReflections
 		    reflectionCamera = m_ReflectionCameras[currentCamera] as Camera;
 		    if( !reflectionCamera ) // catch both not-in-dictionary and in-dictionary-but-deleted-GO
 		    {
-			    GameObject go = new GameObject( "Mirror Refl Camera id" + GetInstanceID() + " for " + currentCamera.GetInstanceID(), typeof(Camera), typeof(Skybox) );
-			    reflectionCamera = go.GetComponent<Camera>();
+			    goMirrorReflection = new GameObject( "Mirror Refl Camera id" + GetInstanceID() + " for " + currentCamera.GetInstanceID(), typeof(Camera), typeof(Skybox) );
+			    reflectionCamera = goMirrorReflection.GetComponent<Camera>();
 			    reflectionCamera.enabled = false;
                 reflectionCamera.transform.position = currentCamera.transform.position;
                 reflectionCamera.transform.rotation = currentCamera.transform.rotation;
@@ -273,7 +277,7 @@ namespace RealtimeReflections
                 {
                     if (postProcessingBehaviour != null)
                     {
-                        PostProcessingBehaviour reflectionCamPostProcessingBehaviour = go.AddComponent<PostProcessingBehaviour>();
+                        PostProcessingBehaviour reflectionCamPostProcessingBehaviour = goMirrorReflection.AddComponent<PostProcessingBehaviour>();
                         reflectionCamPostProcessingBehaviour.profile = postProcessingBehaviour.profile;
                     }
 
@@ -292,7 +296,7 @@ namespace RealtimeReflections
                     //}
                 }
 
-                go.transform.SetParent(GameObject.Find("RealtimeReflections").transform);
+                goMirrorReflection.transform.SetParent(GameObject.Find("RealtimeReflections").transform);
 		    }
 	    }
  

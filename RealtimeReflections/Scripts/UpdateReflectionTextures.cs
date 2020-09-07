@@ -29,14 +29,49 @@ namespace RealtimeReflections
 
         private bool playerInside = false;
 
-        private int floorReflectionTextureWidth = 512;
-        private int floorReflectionTextureHeight = 512;
+        // mod settings mapping
+        private bool isEnabledOutdoorGroundReflections;
+        private bool isEnabledOutdoorSeaReflections;
+        private bool isEnabledIndoorBuildingFloorReflections;
+        private bool isEnabledIndoorBuildingLowerLevelReflection;
+        private bool isEnabledDungeonGroundReflections;
+        private bool isEnabledDungeonWaterReflections;
+        private int floorReflectionTextureWidth;
+        private int floorReflectionTextureHeight;
+        private int lowerLevelReflectionTextureWidth;
+        private int lowerLevelReflectionTextureHeight;
+        private float roughnessMultiplier;
 
-        private int lowerLevelReflectionTextureWidth = 512;
-        private int lowerLevelReflectionTextureHeight = 512;
-
-        private float roughnessMultiplier = 0.4f;
-
+        public bool IsEnabledOutdoorGroundReflections
+        {
+            get { return isEnabledOutdoorGroundReflections; }
+            set { isEnabledOutdoorGroundReflections = value; }
+        }        
+        public bool IsEnabledOutdoorSeaReflections
+        {
+            get { return isEnabledOutdoorSeaReflections; }
+            set { isEnabledOutdoorSeaReflections = value; }
+        }        
+        public bool IsEnabledIndoorBuildingFloorReflections
+        {
+            get { return isEnabledIndoorBuildingFloorReflections; }
+            set { isEnabledIndoorBuildingFloorReflections = value; }
+        }        
+        public bool IsEnabledIndoorBuildingLowerLevelReflection
+        {
+            get { return isEnabledIndoorBuildingLowerLevelReflection; }
+            set { isEnabledIndoorBuildingLowerLevelReflection = value; }
+        }        
+        public bool IsEnabledDungeonGroundReflections
+        {
+            get { return isEnabledDungeonGroundReflections; }
+            set { isEnabledDungeonGroundReflections = value; }
+        }
+        public bool IsEnabledDungeonWaterReflections
+        {
+            get { return isEnabledDungeonWaterReflections; }
+            set { isEnabledDungeonWaterReflections = value; }
+        }
         public int FloorReflectionTextureWidth
         {
             get { return floorReflectionTextureWidth; }
@@ -81,11 +116,19 @@ namespace RealtimeReflections
                 }
             }
         }
-
         public float RoughnessMultiplier
         {
             get { return roughnessMultiplier; }
             set { roughnessMultiplier = value; }
+        }
+
+        public GameObject GameobjectReflectionPlaneGround
+        {
+            get { return reflectionPlaneGround; }
+        }
+        public GameObject GameobjectReflectionPlaneLowerLevel
+        {
+            get { return reflectionPlaneLowerLevel; }
         }
 
         public RenderTexture getSeaReflectionRenderTexture()
@@ -435,8 +478,20 @@ namespace RealtimeReflections
             PlayerEnterExit.OnTransitionDungeonExterior -= OnTransitionToExterior;
         }
 
+        void Enable()
+        {
+
+        }
+
+        void Disable()
+        {
+
+        }
+
         void Start()
         {
+            InjectReflectiveMaterialProperty scriptInjectReflectiveMaterialProperty = this.gameObject.AddComponent<InjectReflectiveMaterialProperty>();
+
             reflectionPlaneGround = new GameObject("ReflectionPlaneGroundLevel");
             reflectionPlaneGround.layer = LayerMask.NameToLayer("Water");
             MeshFilter meshFilter = (MeshFilter)reflectionPlaneGround.AddComponent(typeof(MeshFilter));
@@ -458,9 +513,7 @@ namespace RealtimeReflections
             mirrorRefl.m_TextureWidth = floorReflectionTextureWidth;
             mirrorRefl.m_TextureHeight = floorReflectionTextureHeight;
 
-            reflectionPlaneGround.transform.SetParent(this.transform);
-
-            InjectReflectiveMaterialProperty scriptInjectReflectiveMaterialProperty = reflectionPlaneGround.AddComponent<InjectReflectiveMaterialProperty>(); // the inject script is parented to this plane so that the OnWillRenderObject() method of the inject script will work - this is important since update() function resulted in slightly delayed update which could be seen when ground level height changed           
+            reflectionPlaneGround.transform.SetParent(this.transform);            
 
             reflectionPlaneLowerLevel = new GameObject("ReflectionPlaneLowerLevel");
             reflectionPlaneLowerLevel.layer = LayerMask.NameToLayer("Water");
@@ -560,10 +613,32 @@ namespace RealtimeReflections
             mirrorRefl.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.IndoorSetting;
             mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.IndoorSetting;
 
-            if (useDeferredReflections)
+            if (
+                ((IsEnabledIndoorBuildingFloorReflections || isEnabledIndoorBuildingLowerLevelReflection) && GameManager.Instance.IsPlayerInsideBuilding) ||
+                ((IsEnabledDungeonGroundReflections || IsEnabledDungeonWaterReflections) && (GameManager.Instance.IsPlayerInsideCastle || GameManager.Instance.IsPlayerInsideDungeon))
+                )
             {
-                componentDeferredPlanarReflections.enabled = true;
+                if (useDeferredReflections)
+                {
+                    componentDeferredPlanarReflections.enabled = true;
+                    componentDeferredPlanarReflections.AddCommandBuffer();
+                }
             }
+            else
+            {
+                componentDeferredPlanarReflections.RemoveCommandBuffer();
+                componentDeferredPlanarReflections.enabled = false;
+            }
+
+            if (IsEnabledIndoorBuildingFloorReflections || IsEnabledDungeonGroundReflections)
+                reflectionPlaneGround.SetActive(true);
+            else
+                reflectionPlaneGround.SetActive(false);
+
+            if (IsEnabledIndoorBuildingLowerLevelReflection || IsEnabledDungeonWaterReflections)
+                reflectionPlaneLowerLevel.SetActive(true);
+            else
+                reflectionPlaneLowerLevel.SetActive(false);
         }
 
         void updateBackgroundSettingsOutdoor()
@@ -573,10 +648,31 @@ namespace RealtimeReflections
             mirrorRefl.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
             mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
 
-            if (useDeferredReflections)
+            if (
+                ((isEnabledOutdoorGroundReflections || IsEnabledOutdoorSeaReflections) && !GameManager.Instance.IsPlayerInside)
+               )
             {
-                componentDeferredPlanarReflections.enabled = true;
+                if (useDeferredReflections)
+                {
+                    componentDeferredPlanarReflections.enabled = true;
+                    componentDeferredPlanarReflections.AddCommandBuffer();
+                }
             }
+            else
+            {
+                componentDeferredPlanarReflections.RemoveCommandBuffer();
+                componentDeferredPlanarReflections.enabled = false;
+            }
+
+            if (isEnabledOutdoorGroundReflections)
+                reflectionPlaneGround.SetActive(true);
+            else
+                reflectionPlaneGround.SetActive(false);
+
+            if (IsEnabledOutdoorSeaReflections)
+                reflectionPlaneLowerLevel.SetActive(true);
+            else
+                reflectionPlaneLowerLevel.SetActive(false);
         }
 
         void Update()

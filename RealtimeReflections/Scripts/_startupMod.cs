@@ -21,13 +21,6 @@ namespace RealtimeReflections
         private static GameObject gameobjectRealtimeReflections = null;
         private static UpdateReflectionTextures componentUpdateReflectionTextures = null;
 
-        // Settings
-        private static int floorReflectionTextureWidth = 512;
-        private static int floorReflectionTextureHeight = 512;
-        private static int lowerLevelReflectionTextureWidth = 512;
-        private static int lowerLevelReflectionTextureHeight = 512;
-        private static float roughnessMultiplier = 0.4f;
-
         private static Shader shaderTilemapWithReflections = null;
         private static Shader shaderTilemapTextureArrayWithReflections = null;
         private static Shader shaderCreateLookupReflectionTextureCoordinates = null;
@@ -58,11 +51,17 @@ namespace RealtimeReflections
             textureTileatlasReflective = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective");
             textureTileatlasReflectiveRaining = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective_raining");
 
-            componentUpdateReflectionTextures.FloorReflectionTextureWidth = floorReflectionTextureWidth;
-            componentUpdateReflectionTextures.FloorReflectionTextureHeight = floorReflectionTextureHeight;
-            componentUpdateReflectionTextures.LowerLevelReflectionTextureWidth = lowerLevelReflectionTextureWidth;
-            componentUpdateReflectionTextures.LowerLevelReflectionTextureHeight = lowerLevelReflectionTextureHeight;
-            componentUpdateReflectionTextures.RoughnessMultiplier = roughnessMultiplier;
+            componentUpdateReflectionTextures.IsEnabledOutdoorGroundReflections = settings.GetValue<bool>("GeneralSettings", "OutdoorGroundReflections");
+            componentUpdateReflectionTextures.IsEnabledOutdoorSeaReflections = settings.GetValue<bool>("GeneralSettings", "OutdoorSeaReflections");
+            componentUpdateReflectionTextures.IsEnabledIndoorBuildingFloorReflections = settings.GetValue<bool>("GeneralSettings", "IndoorBuildingFloorReflections");
+            componentUpdateReflectionTextures.IsEnabledIndoorBuildingLowerLevelReflection = settings.GetValue<bool>("GeneralSettings", "IndoorBuildingLowerLevelReflection");
+            componentUpdateReflectionTextures.IsEnabledDungeonGroundReflections = settings.GetValue<bool>("GeneralSettings", "DungeonGroundReflections");
+            componentUpdateReflectionTextures.IsEnabledDungeonWaterReflections = settings.GetValue<bool>("GeneralSettings", "DungeonWaterReflections");
+            componentUpdateReflectionTextures.FloorReflectionTextureWidth = settings.GetValue<int>("FloorReflectionTexture", "width");
+            componentUpdateReflectionTextures.FloorReflectionTextureHeight = settings.GetValue<int>("FloorReflectionTexture", "height");
+            componentUpdateReflectionTextures.LowerLevelReflectionTextureWidth = settings.GetValue<int>("LowerLevelReflectionTexture", "width");
+            componentUpdateReflectionTextures.LowerLevelReflectionTextureHeight = settings.GetValue<int>("LowerLevelReflectionTexture", "height");
+            componentUpdateReflectionTextures.RoughnessMultiplier = settings.GetValue<float>("ReflectionParameters", "roughnessMultiplier");
             componentUpdateReflectionTextures.ShaderTilemapWithReflections = shaderTilemapWithReflections;
             componentUpdateReflectionTextures.ShaderTilemapTextureArrayWithReflections = shaderTilemapTextureArrayWithReflections;
             componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureCoordinates = shaderCreateLookupReflectionTextureCoordinates;
@@ -78,85 +77,5 @@ namespace RealtimeReflections
         {
             mod.IsReady = true;
         }
-
-        //[Invoke(StateManager.StateTypes.Start)]
-        //public static void InitStart(InitParams initParams)
-        //{
-        //    // check if debug gameobject is present, if so do not initalize mod
-        //    if (GameObject.Find("debug_RealtimeReflections"))
-        //        return;
-
-        //    // Get this mod
-        //    mod = initParams.Mod;
-
-        //    // Load settings. Pass this mod as paramater
-        //    ModSettings settings = mod.GetSettings();
-
-        //    // settings
-        //    floorReflectionTextureWidth = settings.GetValue<int>("FloorReflectionTexture", "width");
-        //    floorReflectionTextureHeight = settings.GetValue<int>("FloorReflectionTexture", "height");
-        //    lowerLevelReflectionTextureWidth = settings.GetValue<int>("LowerLevelReflectionTexture", "width");
-        //    lowerLevelReflectionTextureHeight = settings.GetValue<int>("LowerLevelReflectionTexture", "height");
-        //    roughnessMultiplier = settings.GetValue<float>("ReflectionParameters", "roughnessMultiplier");
-
-        //    shaderTilemapWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapWithReflections.shader");
-        //    shaderTilemapTextureArrayWithReflections = mod.GetAsset<Shader>("Shaders/DaggerfallTilemapTextureArrayWithReflections.shader");
-        //    shaderCreateLookupReflectionTextureCoordinates = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureCoordinates.shader");
-        //    shaderCreateLookupReflectionTextureIndex = mod.GetAsset<Shader>("Shaders/CreateLookupReflectionTextureIndex.shader");
-        //    shaderDeferredPlanarReflections = mod.GetAsset<Shader>("Shaders/DeferredPlanarReflections.shader");
-        //    shaderDungeonWaterWithReflections = mod.GetAsset<Shader>("Shaders/DungeonWaterWithReflections.shader");
-        //    shaderInvisible = mod.GetAsset<Shader>("Shaders/Invisible.shader");
-        //    textureTileatlasReflective = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective");
-        //    textureTileatlasReflectiveRaining = mod.GetAsset<Texture2D>("Resources/tileatlas_reflective_raining");
-
-        //    initMod();
-
-        //    //after finishing, set the mod's IsReady flag to true.
-        //    ModManager.Instance.GetMod(initParams.ModTitle).IsReady = true;
-        //}
-
-        ///*  
-        //*   used for debugging
-        //*   howto debug:
-        //*       -) add a dummy GameObject to DaggerfallUnityGame scene
-        //*       -) attach this script (_startupMod) as component
-        //*       -) deactivate mod in mod list (since dummy gameobject will start up mod)
-        //*       -) attach debugger and set breakpoint to one of the mod's cs files and debug
-        //*/
-        //void Awake()
-        //{
-        //    shaderTilemapWithReflections = Shader.Find("Daggerfall/RealtimeReflections/TilemapWithReflections");
-        //    shaderTilemapTextureArrayWithReflections = Shader.Find("Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections");
-        //    shaderCreateLookupReflectionTextureCoordinates = Shader.Find("Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates");
-        //    shaderCreateLookupReflectionTextureIndex = Shader.Find("Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex");
-        //    shaderDeferredPlanarReflections = Shader.Find("Daggerfall/RealtimeReflections/DeferredPlanarReflections");
-        //    shaderDungeonWaterWithReflections = Shader.Find("Daggerfall/RealtimeReflections/DungeonWaterWithReflections");
-        //    shaderInvisible = Shader.Find("Daggerfall/RealtimeReflections/Invisible");
-        //    textureTileatlasReflective = Resources.Load("tileatlas_reflective") as Texture2D;
-        //    textureTileatlasReflectiveRaining = Resources.Load("tileatlas_reflective_raining") as Texture2D;
-
-        //    initMod();
-        //}
-
-        //public static void initMod()
-        //{
-        //    //Debug.Log("init of ReflectionMod standalone");
-        //    gameobjectRealtimeReflections = new GameObject("RealtimeReflections");
-        //    componentUpdateReflectionTextures = gameobjectRealtimeReflections.AddComponent<UpdateReflectionTextures>();
-        //    componentUpdateReflectionTextures.FloorReflectionTextureWidth = floorReflectionTextureWidth;
-        //    componentUpdateReflectionTextures.FloorReflectionTextureHeight = floorReflectionTextureHeight;
-        //    componentUpdateReflectionTextures.LowerLevelReflectionTextureWidth = lowerLevelReflectionTextureWidth;
-        //    componentUpdateReflectionTextures.LowerLevelReflectionTextureHeight = lowerLevelReflectionTextureHeight;
-        //    componentUpdateReflectionTextures.RoughnessMultiplier = roughnessMultiplier;
-        //    componentUpdateReflectionTextures.ShaderTilemapWithReflections = shaderTilemapWithReflections;
-        //    componentUpdateReflectionTextures.ShaderTilemapTextureArrayWithReflections = shaderTilemapTextureArrayWithReflections;
-        //    componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureCoordinates = shaderCreateLookupReflectionTextureCoordinates;
-        //    componentUpdateReflectionTextures.ShaderCreateLookupReflectionTextureIndex = shaderCreateLookupReflectionTextureIndex;
-        //    componentUpdateReflectionTextures.ShaderDeferredPlanarReflections = shaderDeferredPlanarReflections;
-        //    componentUpdateReflectionTextures.ShaderDungeonWaterWithReflections = shaderDungeonWaterWithReflections;
-        //    componentUpdateReflectionTextures.ShaderInvisible = shaderInvisible;
-        //    componentUpdateReflectionTextures.TextureTileatlasReflective = textureTileatlasReflective;
-        //    componentUpdateReflectionTextures.TextureTileatlasReflectiveRaining = textureTileatlasReflectiveRaining;
-        //}
     }
 }

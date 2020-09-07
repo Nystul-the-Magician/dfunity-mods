@@ -128,9 +128,9 @@ namespace RealtimeReflections
                 }
             }
 
-            gameObjectReflectionPlaneGroundLevel = GameObject.Find("ReflectionPlaneGroundLevel");
-            gameObjectReflectionPlaneSeaLevel = GameObject.Find("ReflectionPlaneLowerLevel");
-            gameObjectReflectionPlaneLowerLevel = gameObjectReflectionPlaneSeaLevel;
+            //gameObjectReflectionPlaneGroundLevel = componentUpdateReflectionTextures.GameobjectReflectionPlaneGround;
+            //gameObjectReflectionPlaneLowerLevel = componentUpdateReflectionTextures.GameobjectReflectionPlaneLowerLevel;
+            //gameObjectReflectionPlaneSeaLevel = gameObjectReflectionPlaneLowerLevel;
 
             // get inactive gameobject StreamingTarget (just GameObject.Find() would fail to find inactive gameobjects)
             GameObject[] gameObjects = Resources.FindObjectsOfTypeAll<GameObject>();
@@ -146,63 +146,61 @@ namespace RealtimeReflections
 
         void Update()
         {
-            // I am not super happy with doing this in the update function, but found no other way to make starting in dungeon correctly injecting material properties
-            if ((texReflectionGround) && (texReflectionLowerLevel)) // do not change playerInside state before the reflection textures are initialized
+            gameObjectReflectionPlaneGroundLevel = componentUpdateReflectionTextures.GameobjectReflectionPlaneGround;
+            gameObjectReflectionPlaneLowerLevel = componentUpdateReflectionTextures.GameobjectReflectionPlaneLowerLevel;
+            gameObjectReflectionPlaneSeaLevel = gameObjectReflectionPlaneLowerLevel;
+
+            if (!CheckAvailabilityAndUpdateReflectionTextures())
+                return;
+
+            // mechanism implemented according to Interkarma's suggestions
+            // transition: outside -> dungeon/castle/building
+            if (GameManager.Instance.PlayerEnterExit.IsPlayerInside && !playerInside)
             {
-                // mechanism implemented according to Interkarma's suggestions
-                // transition: outside -> dungeon/castle/building
-                if (GameManager.Instance.PlayerEnterExit.IsPlayerInside && !playerInside)
-                {
-                    playerInside = true; // player now inside
+                playerInside = true; // player now inside
 
-                    // do other stuff when player first inside                    
-                    if (GameManager.Instance.IsPlayerInsideBuilding)
-                    {
-                        gameObjectInterior = GameObject.Find("Interior");
-                        whereInside = InsideSpecification.Building;
-                    }
-                    else if ((GameManager.Instance.IsPlayerInsideDungeon) || (GameManager.Instance.IsPlayerInsideCastle))
-                    {
-                        gameObjectDungeon = GameObject.Find("Dungeon");
-                        whereInside = InsideSpecification.DungeonOrCastle;
-                    }
-
-                    InjectMaterialPropertiesIndoor();
-                }
-                // transition: dungeon/castle/building -> outside
-                else if (!GameManager.Instance.PlayerEnterExit.IsPlayerInside && playerInside)
-                {
-                    playerInside = false; // player no longer inside
-
-                    // do other stuff when player first not inside
-                    gameObjectInterior = null;
-                    gameObjectDungeon = null;
-                    InjectMaterialPropertiesOutdoor();
-                    whereInside = InsideSpecification.Unknown;
-                }
-
-                // transition: dungeon/castle -> building
-                if ((GameManager.Instance.IsPlayerInsideBuilding) && (whereInside == InsideSpecification.DungeonOrCastle))
+                // do other stuff when player first inside                    
+                if (GameManager.Instance.IsPlayerInsideBuilding)
                 {
                     gameObjectInterior = GameObject.Find("Interior");
-                    gameObjectDungeon = null;
-                    InjectMaterialPropertiesIndoor();
-                    //injectIndoor = true;
                     whereInside = InsideSpecification.Building;
                 }
-                // transition: building -> dungeon/castle
-                else if (((GameManager.Instance.IsPlayerInsideDungeon) || (GameManager.Instance.IsPlayerInsideCastle)) && (whereInside == InsideSpecification.Building))
+                else if ((GameManager.Instance.IsPlayerInsideDungeon) || (GameManager.Instance.IsPlayerInsideCastle))
                 {
                     gameObjectDungeon = GameObject.Find("Dungeon");
-                    gameObjectInterior = null;
-                    InjectMaterialPropertiesIndoor();
                     whereInside = InsideSpecification.DungeonOrCastle;
                 }
+
+                InjectMaterialPropertiesIndoor();
             }
-            else
+            // transition: dungeon/castle/building -> outside
+            else if (!GameManager.Instance.PlayerEnterExit.IsPlayerInside && playerInside)
             {
-                texReflectionGround = gameObjectReflectionPlaneGroundLevel.GetComponent<MirrorReflection>().m_ReflectionTexture;
-                texReflectionLowerLevel = gameObjectReflectionPlaneSeaLevel.GetComponent<MirrorReflection>().m_ReflectionTexture;
+                playerInside = false; // player no longer inside
+
+                // do other stuff when player first not inside
+                gameObjectInterior = null;
+                gameObjectDungeon = null;
+                InjectMaterialPropertiesOutdoor();
+                whereInside = InsideSpecification.Unknown;
+            }
+
+            // transition: dungeon/castle -> building
+            if ((GameManager.Instance.IsPlayerInsideBuilding) && (whereInside == InsideSpecification.DungeonOrCastle))
+            {
+                gameObjectInterior = GameObject.Find("Interior");
+                gameObjectDungeon = null;
+                InjectMaterialPropertiesIndoor();
+                //injectIndoor = true;
+                whereInside = InsideSpecification.Building;
+            }
+            // transition: building -> dungeon/castle
+            else if (((GameManager.Instance.IsPlayerInsideDungeon) || (GameManager.Instance.IsPlayerInsideCastle)) && (whereInside == InsideSpecification.Building))
+            {
+                gameObjectDungeon = GameObject.Find("Dungeon");
+                gameObjectInterior = null;
+                InjectMaterialPropertiesIndoor();
+                whereInside = InsideSpecification.DungeonOrCastle;
             }
         }
 
@@ -267,11 +265,36 @@ namespace RealtimeReflections
             //}
         }
 
+        bool CheckAvailabilityAndUpdateReflectionTextures()
+        {
+            bool allNeededReflectionTexturesWereAlreadyPresent = true;
+            if ((componentUpdateReflectionTextures.IsEnabledOutdoorGroundReflections ||
+                componentUpdateReflectionTextures.IsEnabledDungeonGroundReflections ||
+                componentUpdateReflectionTextures.IsEnabledIndoorBuildingFloorReflections) && texReflectionGround == null)
+            {
+                if (gameObjectReflectionPlaneGroundLevel != null)
+                    texReflectionGround = gameObjectReflectionPlaneGroundLevel.GetComponent<MirrorReflection>().m_ReflectionTexture;
+                allNeededReflectionTexturesWereAlreadyPresent = false;
+            }
+
+            if ((componentUpdateReflectionTextures.IsEnabledOutdoorSeaReflections ||
+                componentUpdateReflectionTextures.IsEnabledDungeonWaterReflections ||
+                componentUpdateReflectionTextures.IsEnabledIndoorBuildingLowerLevelReflection) && texReflectionLowerLevel == null)
+            {
+                if (gameObjectReflectionPlaneLowerLevel != null)
+                    texReflectionLowerLevel = gameObjectReflectionPlaneLowerLevel.GetComponent<MirrorReflection>().m_ReflectionTexture;
+                allNeededReflectionTexturesWereAlreadyPresent = false;
+            }
+            return allNeededReflectionTexturesWereAlreadyPresent;
+        }
+
         void InjectMaterialPropertiesIndoor()
         {
             // mages guild 4 floors debuging worldpos: 704,337
+            if ((!GameManager.Instance.IsPlayerInsideCastle && !GameManager.Instance.IsPlayerInsideDungeon) || !componentUpdateReflectionTextures.IsEnabledDungeonWaterReflections)
+                return;
 
-            Renderer[] renderers = null;            
+            Renderer[] renderers = null;
             if (gameObjectDungeon != null)
             {
                 renderers = gameObjectDungeon.GetComponentsInChildren<Renderer>();
@@ -300,6 +323,9 @@ namespace RealtimeReflections
 
         void InjectMaterialPropertiesOutdoor()
         {
+            if (GameManager.Instance.IsPlayerInside || (!componentUpdateReflectionTextures.IsEnabledOutdoorGroundReflections && !componentUpdateReflectionTextures.IsEnabledOutdoorSeaReflections))
+                return;
+            
             GameObject go = GameObject.Find("StreamingTarget");
             if (!go)
             {

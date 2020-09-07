@@ -1,6 +1,56 @@
 {
-    "Version": "2",
+    "Version": "1",
     "Sections": [
+        {
+            "Name": "GeneralSettings",
+            "Description": "general mod settings (enable or disable features)",
+            "IsAdvanced": false,
+            "Keys": [
+                {
+                    "Value": true,
+                    "Name": "OutdoorGroundReflections",
+                    "Description": "enables outdoor ground reflections",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.ToggleKey"
+                },
+                {
+                    "Value": true,
+                    "Name": "OutdoorSeaReflections",
+                    "Description": "enables outdoor sea reflections",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.ToggleKey"
+                },
+                {
+                    "Value": true,
+                    "Name": "IndoorBuildingFloorReflections",
+                    "Description": "enables indoor building floor reflections for floor beneath pc's feet",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.ToggleKey"
+                },
+                {
+                    "Value": true,
+                    "Name": "IndoorBuildingLowerLevelReflection",
+                    "Description": "enables indoor building floor reflections for next lower level",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.ToggleKey"
+                },
+                {
+                    "Value": true,
+                    "Name": "DungeonGroundReflections",
+                    "Description": "enables dungeon floor reflections for floor beneath pc's feet",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.ToggleKey"
+                },
+                {
+                    "Value": true,
+                    "Name": "DungeonWaterReflections",
+                    "Description": "enable dungeon water reflections",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.ToggleKey"
+                }
+            ],
+            "$version": "v1"
+        },
         {
             "Name": "FloorReflectionTexture",
             "Description": "reflection texture for floor reflections beneath the player",
