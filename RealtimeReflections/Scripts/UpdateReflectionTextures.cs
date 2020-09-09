@@ -720,20 +720,20 @@ namespace RealtimeReflections
                 RaycastHit hit;
                 float distanceToGround = 0;
                 if (Physics.Raycast(goPlayerAdvanced.transform.position, -Vector3.up, out hit, 100.0F))
-                {
                     distanceToGround = hit.distance;
-                }
 
-                //float distanceToGroundNorth = 0, distanceToGroundSouth = 0, distanceToGroundWest = 0, distanceToGroundEast = 0;
-                //if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(0.0f, 0.0f, -1.0f), -Vector3.up, out hit, 100.0F))
-                //    distanceToGroundNorth = hit.distance;
-                //if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(0.0f, 0.0f, 1.0f), -Vector3.up, out hit, 100.0F))
-                //    distanceToGroundSouth = hit.distance;
-                //if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(-1.0f, 0.0f, 0.0f), -Vector3.up, out hit, 100.0F))
-                //    distanceToGroundWest = hit.distance;
-                //if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(1.0f, 0.0f, 0.0f), -Vector3.up, out hit, 100.0F))
-                //    distanceToGroundEast = hit.distance;
-                //distanceToGround = Mathf.Min(distanceToGround, Mathf.Min(distanceToGroundNorth, Mathf.Min(distanceToGroundSouth, Mathf.Min(distanceToGroundWest, distanceToGroundEast))));
+                // additional checks in distance of player/character controller in all directions - important so that reflections don't disappear too early, e.g attics near ladder
+                float radius = GameManager.Instance.PlayerController.radius;
+                float distanceToGroundNorth = 0, distanceToGroundSouth = 0, distanceToGroundWest = 0, distanceToGroundEast = 0;
+                if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(0.0f, 0.0f, -radius), -Vector3.up, out hit, 100.0F))
+                    distanceToGroundNorth = hit.distance;
+                if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(0.0f, 0.0f, radius), -Vector3.up, out hit, 100.0F))
+                    distanceToGroundSouth = hit.distance;
+                if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(-radius, 0.0f, 0.0f), -Vector3.up, out hit, 100.0F))
+                    distanceToGroundWest = hit.distance;
+                if (Physics.Raycast(goPlayerAdvanced.transform.position + new Vector3(radius, 0.0f, 0.0f), -Vector3.up, out hit, 100.0F))
+                    distanceToGroundEast = hit.distance;
+                distanceToGround = Mathf.Min(distanceToGround, Mathf.Min(distanceToGroundNorth, Mathf.Min(distanceToGroundSouth, Mathf.Min(distanceToGroundWest, distanceToGroundEast))));
 
                 reflectionPlaneGround.transform.position = goPlayerAdvanced.transform.position - new Vector3(0.0f, distanceToGround, 0.0f); //new Vector3(0.0f, GameManager.Instance.PlayerController.height * 0.5f, 0.0f);
 
