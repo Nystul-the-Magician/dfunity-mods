@@ -99,14 +99,15 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 			float3 vecUp = float3(0.0f,1.0f,0.0f);
 			float acosValue = acos(dot(normalize(IN.worldNormal), vecUp));
 
-			if (abs(acosValue) > 0.01f)
+			if (abs(acosValue) > 0.09f)
 				discard;
 
-			if (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) // fragment belong to object on current ground level plane
+			if ((abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && // fragment belong to object on current ground level plane
+				(_GroundLevelHeight - 0.1f > _LowerLevelHeight)) // and ground level is reasonable above sea level (if not sample reflections from lower level reflection texture)
 			{
 				result.r = 1.0f;
 			}
-			else if (abs(IN.worldPos.y - _LowerLevelHeight) < 0.1f) // fragment belong to object on lower level plane
+			else if (abs(IN.worldPos.y - _LowerLevelHeight) < 0.25f) // fragment belong to object on lower level plane (don't make this value too small or there will be no water reflections when distant terrain is active (due to precision issues)
 			{
 				result.r = 0.5f;
 			}
