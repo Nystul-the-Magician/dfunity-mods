@@ -268,18 +268,22 @@ namespace RealtimeReflections
         bool CheckAvailabilityAndUpdateReflectionTextures()
         {
             bool allNeededReflectionTexturesWereAlreadyPresent = true;
-            if ((componentUpdateReflectionTextures.IsEnabledOutdoorGroundReflections ||
-                componentUpdateReflectionTextures.IsEnabledDungeonGroundReflections ||
-                componentUpdateReflectionTextures.IsEnabledIndoorBuildingFloorReflections) && texReflectionGround == null)
+            if ((
+                    (componentUpdateReflectionTextures.IsEnabledOutdoorGroundReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.Outdoors) ||
+                    (componentUpdateReflectionTextures.IsEnabledDungeonGroundReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.DungeonOrCastle) ||
+                    (componentUpdateReflectionTextures.IsEnabledIndoorBuildingFloorReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.Building)
+                ) && texReflectionGround == null)
             {
                 if (gameObjectReflectionPlaneGroundLevel != null)
                     texReflectionGround = gameObjectReflectionPlaneGroundLevel.GetComponent<MirrorReflection>().m_ReflectionTexture;
                 allNeededReflectionTexturesWereAlreadyPresent = false;
             }
 
-            if ((componentUpdateReflectionTextures.IsEnabledOutdoorSeaReflections ||
-                componentUpdateReflectionTextures.IsEnabledDungeonWaterReflections ||
-                componentUpdateReflectionTextures.IsEnabledIndoorBuildingLowerLevelReflection) && texReflectionLowerLevel == null)
+            if ((
+                    (componentUpdateReflectionTextures.IsEnabledOutdoorSeaReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.Outdoors) ||
+                    (componentUpdateReflectionTextures.IsEnabledDungeonWaterReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.DungeonOrCastle) ||
+                    (componentUpdateReflectionTextures.IsEnabledIndoorBuildingLowerLevelReflection && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.Building)
+                ) && texReflectionLowerLevel == null)
             {
                 if (gameObjectReflectionPlaneLowerLevel != null)
                     texReflectionLowerLevel = gameObjectReflectionPlaneLowerLevel.GetComponent<MirrorReflection>().m_ReflectionTexture;

@@ -27,7 +27,7 @@ namespace RealtimeReflections
         private bool useDeferredReflections = false;
         private DeferredPlanarReflections componentDeferredPlanarReflections = null;
 
-        private enum PlayerEnvironment
+        public enum PlayerEnvironment
         {
             Unknown,
             Outdoors,
@@ -43,6 +43,7 @@ namespace RealtimeReflections
         private bool isEnabledIndoorBuildingLowerLevelReflection;
         private bool isEnabledDungeonGroundReflections;
         private bool isEnabledDungeonWaterReflections;
+        private bool isFeatureEnabledFakeParallaxReflections;
         private int floorReflectionTextureWidth;
         private int floorReflectionTextureHeight;
         private int lowerLevelReflectionTextureWidth;
@@ -79,6 +80,11 @@ namespace RealtimeReflections
             get { return isEnabledDungeonWaterReflections; }
             set { isEnabledDungeonWaterReflections = value; }
         }
+        public bool IsFeatureEnabledFakeParallaxReflections
+        {
+            get { return isFeatureEnabledFakeParallaxReflections; }
+            set { isFeatureEnabledFakeParallaxReflections = value; }
+        }        
         public int FloorReflectionTextureWidth
         {
             get { return floorReflectionTextureWidth; }
@@ -127,6 +133,11 @@ namespace RealtimeReflections
         {
             get { return roughnessMultiplier; }
             set { roughnessMultiplier = value; }
+        }
+
+        public PlayerEnvironment CurrentPlayerEnvironment
+        {
+            get { return playerEnvironment; }
         }
 
         public GameObject GameobjectReflectionPlaneGround

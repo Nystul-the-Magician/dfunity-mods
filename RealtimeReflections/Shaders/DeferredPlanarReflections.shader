@@ -105,20 +105,23 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 
 			float mipMapLevelReflectionGroundTex = roughness * _RoughnessMultiplier; // *(_NumMipMapLevelsReflectionGroundTex - 1) * _RoughnessMultiplier;
 			float mipMapLevelReflectionLowerLevelTex = roughness * _RoughnessMultiplier; // *(_NumMipMapLevelsReflectionLowerLevelTex - 1) * _RoughnessMultiplier;
-
+			
+#ifdef _GROUND_LEVEL_REFLECTIONS
 			if (indexReflectionsTextureTex == 1.0f)
 			{
 				refl = getReflectionColor(_ReflectionGroundTex, screenUV, mipMapLevelReflectionGroundTex);
 			}
-			else if (abs(indexReflectionsTextureTex - 0.25f) < 0.01f)
+#endif
+
+#ifdef _LOWER_LEVEL_REFLECTIONS
+			if (abs(indexReflectionsTextureTex - 0.5f) < 0.01f)
 			{
 				refl = getReflectionColor(_ReflectionLowerLevelTex, screenUV, mipMapLevelReflectionLowerLevelTex);
 			}
-			else if	(abs(indexReflectionsTextureTex - 0.5f) < 0.01f)
-			{
-				refl = getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, mipMapLevelReflectionGroundTex);
-			}
-			else if	(abs(indexReflectionsTextureTex - 0.75f) < 0.01f)
+#endif
+
+#if defined(_GROUND_LEVEL_REFLECTIONS) && defined(_PARALLAX_REFLECTIONS)
+			if	(abs(indexReflectionsTextureTex - 0.25f) < 0.01f)
 			{
 				const half fadeWidth = 0.3f;
 				half fadeOutFactX = min(1.0f, max(0.0f, abs(0.5f - parallaxCorrectedScreenUV.x) - (0.5f-fadeWidth)) / fadeWidth);
@@ -129,9 +132,8 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 
 				refl = (1.0f-fadeOutFact) * getReflectionColor(_ReflectionGroundTex, parallaxCorrectedScreenUV.xy, mipMapLevelReflectionGroundTex); //refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, _Smoothness)).rgb;
 			}
+#endif
 		
-
-			
 			half metallic = max(tex2D(_CameraGBufferTexture1, screenUV).r, max(tex2D(_CameraGBufferTexture1, screenUV).g, tex2D(_CameraGBufferTexture1, screenUV).b));
 			metallic *= tex2D(_CameraGBufferTexture1, screenUV).a;
 

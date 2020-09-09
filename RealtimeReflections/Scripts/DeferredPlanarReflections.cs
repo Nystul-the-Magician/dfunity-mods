@@ -255,6 +255,38 @@ namespace RealtimeReflections
             material.SetFloat("_LowerLevelHeight", componentUpdateReflectionTextures.ReflectionPlaneLowerLevelY); // + GameManager.Instance.MainCamera.transform.localPosition.y);
             //material.SetFloat("_CameraHeightFromGround", GameManager.Instance.MainCamera.transform.localPosition.y);
 
+            if ((componentUpdateReflectionTextures.IsEnabledOutdoorGroundReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.Outdoors) ||
+                (componentUpdateReflectionTextures.IsEnabledIndoorBuildingFloorReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.Building) ||
+                (componentUpdateReflectionTextures.IsEnabledDungeonGroundReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.DungeonOrCastle))
+            {
+                material.EnableKeyword("_GROUND_LEVEL_REFLECTIONS");
+            }
+            else
+            {
+                material.DisableKeyword("_GROUND_LEVEL_REFLECTIONS");
+            }
+
+            if ((componentUpdateReflectionTextures.IsEnabledOutdoorSeaReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.Outdoors) ||
+                (componentUpdateReflectionTextures.IsEnabledIndoorBuildingLowerLevelReflection && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.Building) ||
+                (componentUpdateReflectionTextures.IsEnabledDungeonWaterReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.DungeonOrCastle))
+            {
+                material.EnableKeyword("_LOWER_LEVEL_REFLECTIONS");
+            }
+            else
+            {
+                material.DisableKeyword("_LOWER_LEVEL_REFLECTIONS");
+            }
+
+            if (componentUpdateReflectionTextures.IsFeatureEnabledFakeParallaxReflections)
+            {
+                material.EnableKeyword("_PARALLAX_REFLECTIONS");
+            }
+            else
+            {
+                material.DisableKeyword("_PARALLAX_REFLECTIONS");
+            }
+
+
             int minDimValue = Math.Min(componentUpdateReflectionTextures.FloorReflectionTextureWidth, componentUpdateReflectionTextures.FloorReflectionTextureHeight);
             int numMipMapLevels = (int)(Math.Log(minDimValue) / Math.Log(2));
             material.SetInt("_NumMipMapLevelsReflectionGroundTex", numMipMapLevels);

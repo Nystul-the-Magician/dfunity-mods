@@ -52,6 +52,21 @@
             "$version": "v1"
         },
         {
+            "Name": "Features",
+            "Description": "additional features that can be activated/deactivated",
+            "IsAdvanced": false,
+            "Keys": [
+                {
+                    "Value": true,
+                    "Name": "FakeParallaxReflections",
+                    "Description": "enable fake-parallax reflections on planes near to reflection plane",
+                    "$version": "v1",
+                    "$type": "DaggerfallWorkshop.Game.Utility.ModSupport.ModSettings.ToggleKey"
+                }
+            ],
+            "$version": "v1"
+        },
+        {
             "Name": "FloorReflectionTexture",
             "Description": "reflection texture for floor reflections beneath the player",
             "IsAdvanced": false,

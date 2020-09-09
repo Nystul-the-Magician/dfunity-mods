@@ -57,6 +57,7 @@ namespace RealtimeReflections
             componentUpdateReflectionTextures.IsEnabledIndoorBuildingLowerLevelReflection = settings.GetValue<bool>("GeneralSettings", "IndoorBuildingLowerLevelReflection");
             componentUpdateReflectionTextures.IsEnabledDungeonGroundReflections = settings.GetValue<bool>("GeneralSettings", "DungeonGroundReflections");
             componentUpdateReflectionTextures.IsEnabledDungeonWaterReflections = settings.GetValue<bool>("GeneralSettings", "DungeonWaterReflections");
+            componentUpdateReflectionTextures.IsFeatureEnabledFakeParallaxReflections = settings.GetValue<bool>("Features", "FakeParallaxReflections");
             componentUpdateReflectionTextures.FloorReflectionTextureWidth = settings.GetValue<int>("FloorReflectionTexture", "width");
             componentUpdateReflectionTextures.FloorReflectionTextureHeight = settings.GetValue<int>("FloorReflectionTexture", "height");
             componentUpdateReflectionTextures.LowerLevelReflectionTextureWidth = settings.GetValue<int>("LowerLevelReflectionTexture", "width");
