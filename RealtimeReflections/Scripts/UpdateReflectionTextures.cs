@@ -575,11 +575,20 @@ namespace RealtimeReflections
             }
 
             if (!GameManager.Instance.IsPlayerInside)
+            {
                 playerEnvironment = PlayerEnvironment.Outdoors;
+                UpdateBackgroundSettingsOutdoor();
+            }
             else if (GameManager.Instance.IsPlayerInsideBuilding)
+            {
                 playerEnvironment = PlayerEnvironment.Building;
+                UpdateBackgroundSettingsIndoor();
+            }
             else
+            {
                 playerEnvironment = PlayerEnvironment.DungeonOrCastle;
+                UpdateBackgroundSettingsIndoor();
+            }
         }
 
         void OnTransitionToInterior(PlayerEnterExit.TransitionEventArgs args)
@@ -609,7 +618,7 @@ namespace RealtimeReflections
             mirrorReflSeaLevel.CurrentBackgroundSettings = MirrorReflection.EnvironmentSetting.OutdoorSetting;
         }
 
-        void updateBackgroundSettingsIndoor()
+        void UpdateBackgroundSettingsIndoor()
         {
             //playerInside = true; // player now inside
 
@@ -651,7 +660,7 @@ namespace RealtimeReflections
                 reflectionPlaneLowerLevel.SetActive(false);
         }
 
-        void updateBackgroundSettingsOutdoor()
+        void UpdateBackgroundSettingsOutdoor()
         {
             //playerInside = false; // player now outside
             playerEnvironment = PlayerEnvironment.Outdoors;
@@ -835,15 +844,15 @@ namespace RealtimeReflections
 
             if (GameManager.Instance.IsPlayerInsideBuilding && playerEnvironment != PlayerEnvironment.Building)
             {
-                updateBackgroundSettingsIndoor();
+                UpdateBackgroundSettingsIndoor();
             }
             else if ((GameManager.Instance.IsPlayerInsideCastle || GameManager.Instance.IsPlayerInsideDungeon) && playerEnvironment != PlayerEnvironment.DungeonOrCastle)
             {
-                updateBackgroundSettingsIndoor();
+                UpdateBackgroundSettingsIndoor();
             }
             else if (!GameManager.Instance.IsPlayerInside && playerEnvironment != PlayerEnvironment.Outdoors)
             {
-                updateBackgroundSettingsOutdoor();
+                UpdateBackgroundSettingsOutdoor();
             }
             
         }

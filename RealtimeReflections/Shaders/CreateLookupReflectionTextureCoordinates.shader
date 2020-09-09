@@ -52,7 +52,7 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureCoordinates"
 			else
 			{
 				// parallax-correct reflection position
-				o.parallaxCorrectedScreenPos = ComputeScreenPos(mul(UNITY_MATRIX_VP, posWorldSpace - float4(0.0f, (posWorldSpace.y - _GroundLevelHeight) * 1.4f, 0.0f, 0.0f)));
+				o.parallaxCorrectedScreenPos = ComputeScreenPos(mul(UNITY_MATRIX_VP, posWorldSpace - float4(0.0f, (posWorldSpace.y - _GroundLevelHeight) * 1.0f, 0.0f, 0.0f)));
 			}			
 						
             return o;
