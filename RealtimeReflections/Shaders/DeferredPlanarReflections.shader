@@ -12,13 +12,6 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
     Properties
     {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
-
-		[Gamma] _Metallic("Metallic", Range(0.0, 1.0)) = 0.0
-		_MetallicGlossMap("Metallic", 2D) = "white" {}
-
-		_Glossiness("Smoothness", Range(0.0, 1.0)) = 0.5
-		_GlossMapScale("Smoothness Factor", Range(0.0, 1.0)) = 1.0
-		[Enum(Specular Alpha,0,Albedo Alpha,1)] _SmoothnessTextureChannel("Smoothness texture channel", Float) = 0
     }
 		
 	CGINCLUDE
@@ -51,47 +44,15 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 
 	uniform float _GroundLevelHeight;
 	uniform float _LowerLevelHeight;
-//	uniform float _CameraHeightFromGround;
+
 	uniform int _NumMipMapLevelsReflectionGroundTex;
 	uniform int _NumMipMapLevelsReflectionLowerLevelTex;
 	uniform float _RoughnessMultiplier;
-
-//#ifdef _METALLICGLOSSMAP
-//	sampler2D _MetallicGlossMap;
-//#else	
-//	half _Metallic;
-//	half _Glossiness;
-//#endif
-//	half _GlossMapScale;
-//
-//	half2 MetallicGloss(float2 uv)
-//	{
-//		half2 mg;
-//
-//#ifdef _METALLICGLOSSMAP
-//#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-//		mg.r = tex2D(_MetallicGlossMap, uv).r;
-//		mg.g = tex2D(_MainTex, uv).a;
-//#else
-//		mg = tex2D(_MetallicGlossMap, uv).ra;
-//#endif
-//		mg.g *= _GlossMapScale;
-//#else
-//		mg.r = _Metallic;
-//#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-//		mg.g = tex2D(_MainTex, uv).a * _GlossMapScale;
-//#else
-//		mg.g = _Glossiness;
-//#endif
-//#endif
-//		return mg;
-//	}
 
     struct v2f
     {
             float4 pos : SV_POSITION;
             float2 uv : TEXCOORD0;
-            float2 uv2 : TEXCOORD1;
     };
 
     float3 ReconstructCSPosition(float2 S, float z)
@@ -115,16 +76,9 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
     v2f vert( appdata_img v )
     {
             v2f o;
-			//UNITY_INITIALIZE_OUTPUT(v2f, o);
 
             o.pos = UnityObjectToClipPos(v.vertex);
             o.uv = v.texcoord.xy;
-            o.uv2 = v.texcoord.xy;
-						
-            #if UNITY_UV_STARTS_AT_TOP
-                if (_MainTex_TexelSize.y < 0)
-                        o.uv2.y = 1-o.uv2.y;
-            #endif
 						
             return o;
     }
@@ -139,7 +93,7 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 				
     half4 fragReflection(v2f IN) : SV_Target
     {
-			float2 screenUV = IN.uv2.xy;
+			float2 screenUV = IN.uv.xy;
 			float2 parallaxCorrectedScreenUV = tex2D(_ReflectionsTextureCoordinatesTex, screenUV).xy;
 
 			half3 refl = half3(0.0f, 0.0f, 0.0f);			
@@ -202,7 +156,7 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
     {
 					
             // Pixel being shaded
-            float2 tsP = i.uv2.xy;
+            float2 tsP = i.uv.xy;
 
             // View space point being shaded
             float3 C = GetPosition(tsP);
@@ -268,9 +222,8 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
             }
 
 			finalGlossyTerm *= occlusion;
-			//gbuffer3 = reflectionTexel;
-            // Additively blend the glossy GI result with the output buffer
-			//return float4(tex2D(_CameraGBufferTexture1, tsP).r, tex2D(_CameraGBufferTexture1, tsP).g, tex2D(_CameraGBufferTexture1, tsP).b, 0);			
+
+            // Additively blend the glossy GI result with the output buffer			
 			return gbuffer3 + float4(finalGlossyTerm, 0);
     }
 
@@ -288,7 +241,11 @@ Shader "Daggerfall/RealtimeReflections/DeferredPlanarReflections" {
 				#pragma exclude_renderers gles xbox360 ps3
 				#pragma vertex vert
 				#pragma fragment fragReflection
-				#pragma target 3.0	
+				#pragma target 3.0
+
+				#pragma multi_compile_local __ _PARALLAX_REFLECTIONS
+				#pragma multi_compile_local __ _GROUND_LEVEL_REFLECTIONS
+				#pragma multi_compile_local __ _LOWER_LEVEL_REFLECTIONS
 			ENDCG
 		}
 		

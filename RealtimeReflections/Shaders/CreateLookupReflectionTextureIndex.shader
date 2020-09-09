@@ -12,13 +12,13 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
     Properties
     {
 		_MainTex ("Base (RGB)", 2D) = "white" {}
-				
-		[Gamma] _Metallic("Metallic", Range(0.0, 1.0)) = 0.0
-		_MetallicGlossMap("Metallic", 2D) = "white" {}
+		//		
+		//[Gamma] _Metallic("Metallic", Range(0.0, 1.0)) = 0.0
+		//_MetallicGlossMap("Metallic", 2D) = "white" {}
 
-		_Glossiness("Smoothness", Range(0.0, 1.0)) = 0.5
-		_GlossMapScale("Smoothness Factor", Range(0.0, 1.0)) = 1.0
-		[Enum(Specular Alpha,0,Albedo Alpha,1)] _SmoothnessTextureChannel ("Smoothness texture channel", Float) = 0
+		//_Glossiness("Smoothness", Range(0.0, 1.0)) = 0.5
+		//_GlossMapScale("Smoothness Factor", Range(0.0, 1.0)) = 1.0
+		//[Enum(Specular Alpha,0,Albedo Alpha,1)] _SmoothnessTextureChannel ("Smoothness texture channel", Float) = 0
     }
 		
 	CGINCLUDE
@@ -27,43 +27,43 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 	//#include "UnityStandardInput.cginc" // function MetallicGloss defined there, but also lots of other stuff not needed
 
 	uniform sampler2D _MainTex;
-	uniform float4 _MainTex_TexelSize;
-	uniform sampler2D _MetallicGlossMap;
-	#ifdef _METALLICGLOSSMAP
-		uniform sampler2D _MetallicGlossMap;
-	#else	
-		uniform half _Metallic;
-		uniform half _Glossiness;
-	#endif
-	uniform half _GlossMapScale;
 
 	uniform float _GroundLevelHeight;
 	uniform float _LowerLevelHeight;
 	uniform float _CameraHeightFromGround;
 
-	half2 MetallicGloss(float2 uv)
-	{
-		half2 mg;
-	
-	#ifdef _METALLICGLOSSMAP
-		#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-			mg.r = tex2D(_MetallicGlossMap, uv).r;
-			mg.g = tex2D(_MainTex, uv).a;
-		#else
-			mg = tex2D(_MetallicGlossMap, uv).ra;
-		#endif
-		mg.g *= _GlossMapScale;
-	#else
-		mg.r = _Metallic;
-		#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-			mg.g = tex2D(_MainTex, uv).a * _GlossMapScale;
-		#else
-			mg.g = _Glossiness;
-		#endif
-	#endif
-			mg = tex2D(_MetallicGlossMap, uv).ra;
-		return mg;
-	}
+	//uniform sampler2D _MetallicGlossMap;
+	//#ifdef _METALLICGLOSSMAP
+	//	uniform sampler2D _MetallicGlossMap;
+	//#else	
+	//	uniform half _Metallic;
+	//	uniform half _Glossiness;
+	//#endif
+	//uniform half _GlossMapScale;
+	//
+	//half2 MetallicGloss(float2 uv)
+	//{
+	//	half2 mg;
+	//
+	//#ifdef _METALLICGLOSSMAP
+	//	#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+	//		mg.r = tex2D(_MetallicGlossMap, uv).r;
+	//		mg.g = tex2D(_MainTex, uv).a;
+	//	#else
+	//		mg = tex2D(_MetallicGlossMap, uv).ra;
+	//	#endif
+	//	mg.g *= _GlossMapScale;
+	//#else
+	//	mg.r = _Metallic;
+	//	#ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+	//		mg.g = tex2D(_MainTex, uv).a * _GlossMapScale;
+	//	#else
+	//		mg.g = _Glossiness;
+	//	#endif
+	//#endif
+	//		mg = tex2D(_MetallicGlossMap, uv).ra;
+	//	return mg;
+	//}
 
     struct v2f
     {
@@ -78,15 +78,9 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
     v2f vert( appdata_full v )
     {
             v2f o;
-			//UNITY_INITIALIZE_OUTPUT(v2f, o);
 
             o.pos = UnityObjectToClipPos(v.vertex);
             o.uv = v.texcoord.xy;
-            o.uv2 = v.texcoord.xy;
-            #if UNITY_UV_STARTS_AT_TOP
-                if (_MainTex_TexelSize.y < 0)
-                        o.uv2.y = 1-o.uv2.y;
-            #endif
 
 			o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
 			o.worldNormal = normalize( mul(float4(v.normal, 0.0), unity_ObjectToWorld).xyz);
@@ -96,21 +90,29 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
     }
 				
     half4 frag(v2f IN) : SV_Target
-    {		            
+    {
+			half4 col = tex2D(_MainTex, IN.uv);
+			//if (col.a == 0.0f)
+			//	discard;
+
 			half4 result = half4(0.0f, 0.0f, 0.0f, 0.0f);
 			float3 vecUp = float3(0.0f,1.0f,0.0f);
 			float acosValue = acos(dot(normalize(IN.worldNormal), vecUp));
+
+			if (abs(acosValue) > 0.01f)
+				discard;
+
 			if (abs(acosValue) < 0.01f)
 			{
-				if (abs(IN.worldPos.y - _GroundLevelHeight) < 0.2f)
+				if (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) // fragment belong to object on current ground level plane
 				{
 					result.r = 1.0f;
 				}
-				else if (abs(IN.worldPos.y - _LowerLevelHeight) < 0.2f)
+				else if (abs(IN.worldPos.y - _LowerLevelHeight) < 0.1f) // fragment belong to object on lower level plane
 				{
 					result.r = 0.25f;
 				}
-				else if (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) // fragment belong to object on current ground level plane
+				else if (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) 
 				{
 					result.r = 0.5f;
 				}
@@ -122,8 +124,8 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 					result.r = 0.75f;
 				}
 			}
-			half2 mg = MetallicGloss(IN.uv);
-			result.gb = mg;
+			//half2 mg = MetallicGloss(IN.uv);
+			//result.gb = mg;
             return result;
     }
 
@@ -140,8 +142,8 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma target 3.0
-			#pragma multi_compile_local __ _METALLICGLOSSMAP
-			#pragma multi_compile_local __ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+			//#pragma multi_compile_local __ _METALLICGLOSSMAP
+			//#pragma multi_compile_local __ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 			ENDCG
 		}
 	}	
