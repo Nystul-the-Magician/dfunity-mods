@@ -277,7 +277,7 @@ namespace RealtimeReflections
                 material.DisableKeyword("_LOWER_LEVEL_REFLECTIONS");
             }
 
-            if (componentUpdateReflectionTextures.IsFeatureEnabledFakeParallaxReflections)
+            if (componentUpdateReflectionTextures.IsFeatureEnabledFakeParallaxReflections && componentUpdateReflectionTextures.CurrentPlayerEnvironment == UpdateReflectionTextures.PlayerEnvironment.Outdoors)
             {
                 material.EnableKeyword("_PARALLAX_REFLECTIONS");
             }

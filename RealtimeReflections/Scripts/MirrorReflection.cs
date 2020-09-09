@@ -9,7 +9,9 @@
 using UnityEngine;
 using UnityEngine.PostProcessing;
 using System.Collections;
- 
+
+using DaggerfallWorkshop.Game;
+
 namespace RealtimeReflections
 {
     [ExecuteInEditMode] // Make mirror live-update even when not in play mode
@@ -129,8 +131,10 @@ namespace RealtimeReflections
 		    // Setup oblique projection matrix so that near plane is our reflection
 		    // plane. This way we clip everything below/above it for free.
 		    Vector4 clipPlane = CameraSpacePlane( reflectionCamera, pos, normal, 1.0f );
-		    //Matrix4x4 projection = cam.projectionMatrix;
-		    Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane);
+            Matrix4x4 projection = cam.projectionMatrix; // outdoor we can get along without oblique projection matrix which won't break fog because unity won't switch to forward rendering (see https://docs.unity3d.com/Manual/ObliqueFrustum.html)
+            if (GameManager.Instance.IsPlayerInside)
+		        projection = cam.CalculateObliqueMatrix(clipPlane); // important for correct indoor/dungeon reflections on upper building levels
+
 		    reflectionCamera.projectionMatrix = projection; // do not set oblique projection matrix since it will fuck up fog in reflections - disabling this step seems to do not any harm ;)
 
             reflectionCamera.cullingMask = m_ReflectLayers.value; // never render water layer
@@ -266,7 +270,9 @@ namespace RealtimeReflections
 		    {
 			    goMirrorReflection = new GameObject( "Mirror Refl Camera id" + GetInstanceID() + " for " + currentCamera.GetInstanceID(), typeof(Camera), typeof(Skybox) );
 			    reflectionCamera = goMirrorReflection.GetComponent<Camera>();
-			    reflectionCamera.enabled = false;
+                // reflectionCamera.CopyFrom(currentCamera); //breaks outdoor reflections - TODO: investigate which settings causes the issue
+                reflectionCamera.allowMSAA = false; // prevent warning in camera component
+                reflectionCamera.enabled = false;
                 reflectionCamera.transform.position = currentCamera.transform.position;
                 reflectionCamera.transform.rotation = currentCamera.transform.rotation;
 			    reflectionCamera.gameObject.AddComponent<FlareLayer>();
