@@ -1,0 +1,25 @@
+This mod adds realtime reflections for floors (interiors) and water tiles (exteriors) as well as dungeon water reflections.
+It computes planar reflections for the deferred rendering path, compatible with SSR or reflection probes
+Technically what it does is that it computes planar reflections for specific reflection planes, which are then blended together with existing reflections (thus allowing it to be used together with SSR or reflection probes) in a custom rendering step (using unity command buffer). It only blends in reflections for geometry belonging to specific planes (e.g. ground plane, sea level)
+
+**REQUIREMENTS**
+depending on mod version: version 2.3.0 needs dfunity 0.10.25+
+Deferred Rendering must be activated in the settings of Daggerfall Unity!
+NOTE: you must manually extract the textures from the provided RealtimeReflections_textures.zip file or provide own textures with metallicglossmap to make it work - see the provided ReadMe_RealtimeReflections.txt file
+
+**A WORD OF WARNING**
+this mod is computationally intensive, it will impact performance
+reason is for every reflection plane the whole scene needs to be rendered, since with all options enabled there are 2 such reflection planes, it does 2! complete additional scene rendering for every frame!
+in the mod settings you can disable some reflections if you don't need them which will improve performance.
+Each player environment (outdoors, buildings or dungeons has 2 checkboxes corresponding to the 2 extra scene renderings for that environment.
+So if you experience bad performance e.g. in dungeons try to disable one or both dungeon reflection types
+
+**INSTALLATION**
+Put the realtime reflections.dfmod package inside 'DaggerfallUnity_Data/StreamingAssets/Mods'.
+Extract the contents of RealtimeReflections_textures.zip into 'DaggerfallUnity_Data/StreamingAssets/Textures
+You can use other textures for ground textures, as long as they provide a metallicglossmap or a texture-specification xml file (for constant metallic, smoothness values) reflections should show up on ground textures
+This manual installation of textures is intended so you can tune the reflections with other textures and settings or to use it with other texture mods!
+
+**UNINSTALL**
+If you wish to uninstall, you can safely remove the mod from the StreamingAssets folder.
+It won't affect saves. Furthermore don't forget to remove the textures you had to add for this mod.

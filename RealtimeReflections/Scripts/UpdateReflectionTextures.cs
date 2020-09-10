@@ -27,14 +27,15 @@ namespace RealtimeReflections
         private bool useDeferredReflections = false;
         private DeferredPlanarReflections componentDeferredPlanarReflections = null;
 
-        public enum PlayerEnvironment
+        public static class PlayerEnvironment
         {
-            Unknown,
-            Outdoors,
-            Building,
-            DungeonOrCastle
-        }        
-        private PlayerEnvironment playerEnvironment = PlayerEnvironment.Unknown;
+            public const int Unknown = 0;
+            public const int Outdoors = 1;
+            public const int Building = 2;
+            public const int DungeonOrCastle = 3;
+        }
+      
+        private int playerEnvironment = PlayerEnvironment.Unknown;
 
         // mod settings mapping
         private bool isEnabledOutdoorGroundReflections;
@@ -135,7 +136,7 @@ namespace RealtimeReflections
             set { roughnessMultiplier = value; }
         }
 
-        public PlayerEnvironment CurrentPlayerEnvironment
+        public int CurrentPlayerEnvironment
         {
             get { return playerEnvironment; }
         }
