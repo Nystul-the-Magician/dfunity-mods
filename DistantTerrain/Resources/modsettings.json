@@ -1,9 +1,9 @@
 {
-    "Version": null,
+    "Version": "1",
     "Sections": [
         {
             "Name": "GeneralSettings",
-            "Description": null,
+            "Description": "general mod settings (enable or disable features)",
             "IsAdvanced": false,
             "Keys": [
                 {
@@ -32,7 +32,7 @@
         },
         {
             "Name": "ImprovedTerrainSettings",
-            "Description": null,
+            "Description": "enable or disable additional terrain features",
             "IsAdvanced": false,
             "Keys": [
                 {
