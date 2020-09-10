@@ -171,34 +171,12 @@ namespace RealtimeReflections
             }
         }
 
-        public float ReflectionPlaneGroundLevelYinWorldCoords
-        {
-            get
-            {
-                if (reflectionPlaneGround)
-                    return reflectionPlaneGround.transform.TransformPoint(reflectionPlaneGround.transform.position).y;
-                else
-                    return 0.0f;
-            }
-        }
-
         public float ReflectionPlaneLowerLevelY
         {
             get
             {
                 if (reflectionPlaneLowerLevel)
                     return reflectionPlaneLowerLevel.transform.position.y;
-                else
-                    return 0.0f;
-            }
-        }
-
-        public float ReflectionPlaneLowerLevelYinWorldCoords
-        {
-            get
-            {
-                if (reflectionPlaneLowerLevel)
-                    return reflectionPlaneLowerLevel.transform.TransformPoint(reflectionPlaneLowerLevel.transform.position).y;
                 else
                     return 0.0f;
             }

@@ -83,7 +83,7 @@ Shader "Daggerfall/RealtimeReflections/TilemapWithReflections" {
 			float2 screenUV = IN.screenPos.xy / IN.screenPos.w;
 			
 			half3 refl;
-			if (IN.worldPos.y > _SeaLevelHeight + 0.01f)
+			if (IN.worldPos.y > _SeaLevelHeight + 0.5f)
 			{					
 				refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, 1.0f)).rgb;			
 			}

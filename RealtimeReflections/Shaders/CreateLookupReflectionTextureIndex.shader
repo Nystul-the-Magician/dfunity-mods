@@ -103,7 +103,7 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 				//discard;
 			{
 				if ((abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) && // fragment belong to object on current ground level plane
-					(_GroundLevelHeight - 0.1f > _LowerLevelHeight)) // and ground level is reasonable above sea level (if not sample reflections from lower level reflection texture)
+					(_GroundLevelHeight - 0.5f > _LowerLevelHeight)) // and ground level is reasonable above sea level (if not sample reflections from lower level reflection texture)
 				{
 					result.r = 1.0f;
 				}
@@ -111,10 +111,6 @@ Shader "Daggerfall/RealtimeReflections/CreateLookupReflectionTextureIndex" {
 				{
 					result.r = 0.5f;
 				}
-				//else if (abs(IN.worldPos.y - _GroundLevelHeight) < 0.1f) 
-				//{
-				//	result.r = 0.5f;
-				//}
 				else if (
 					(IN.worldPos.y - _GroundLevelHeight > -3.0f) && // fragment is below (use parallax-corrected reflection)
 					(IN.worldPos.y - _GroundLevelHeight < 0.33f) // fragment is slightly above (use parallax-corrected reflection) - also valid for current ground level plane						

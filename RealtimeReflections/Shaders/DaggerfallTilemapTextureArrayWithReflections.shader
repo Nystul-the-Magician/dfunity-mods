@@ -125,7 +125,7 @@ Shader "Daggerfall/RealtimeReflections/TilemapTextureArrayWithReflections" {
 			half4 metallicGloss = UNITY_SAMPLE_TEX2DARRAY_LOD(_TileMetallicGlossMapTexArr, uv3, mipMapLevel);
 			float roughness = (1.0 - metallicGloss.a) * 4.0f;
 			half3 refl;
-			if (IN.worldPos.y > _SeaLevelHeight + 0.01f)
+			if (IN.worldPos.y > _SeaLevelHeight + 0.5f)
 			{
 				refl = tex2Dlod(_ReflectionGroundTex, float4(screenUV, 0.0f, roughness)).rgb; // 4th component is blurring of reflection
 			}
