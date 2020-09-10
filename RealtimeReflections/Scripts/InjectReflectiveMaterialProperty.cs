@@ -389,7 +389,7 @@ namespace RealtimeReflections
 
                                 newMat.SetTexture("_ReflectionSeaTex", texReflectionLowerLevel);
 
-                                newMat.SetFloat("_SeaLevelHeight", gameObjectReflectionPlaneSeaLevel.transform.position.y);
+                                newMat.SetFloat("_SeaLevelHeight", gameObjectReflectionPlaneSeaLevel.transform.TransformPoint(gameObjectReflectionPlaneSeaLevel.transform.position).y);
 
                                 terrain.materialTemplate = newMat;
                             }
