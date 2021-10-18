@@ -12,7 +12,7 @@
  */
 
 using UnityEngine;
-using UnityEngine.PostProcessing;
+using UnityEngine.Rendering.PostProcessing;
 using DaggerfallWorkshop;
 using DaggerfallWorkshop.Game;
 using DaggerfallWorkshop.Utility;
@@ -90,49 +90,49 @@ namespace EnhancedSky
         private Material _skyObjMat;
 
         // used to set post processing fog settings (excludeSkybox setting)
-        private PostProcessingBehaviour postProcessingBehaviour;
+        private PostProcessLayer postProcessingLayer;
 
         public int cloudQuality = 400;
         public int cloudSeed = -1;
         public bool EnhancedSkyCurrentToggle = false;
 
         //daggerfall tools references
-        public GameObject       dfallSky;
-        public WeatherManager   weatherMan;
-        public PlayerEnterExit  playerEE;
-        public GameObject       exteriorParent;
+        public GameObject dfallSky;
+        public WeatherManager weatherMan;
+        public PlayerEnterExit playerEE;
+        public GameObject exteriorParent;
 
         System.Diagnostics.Stopwatch _stopWatch;
-        CloudGenerator  _cloudGen;
-        GameObject      _container;
+        CloudGenerator _cloudGen;
+        GameObject _container;
         #endregion
 
         #region Properties
         public Mod ModSelf { get { return (modSelf); } set { modSelf = value; } }
 
-        DaggerfallUnity DfUnity         { get { return DaggerfallUnity.Instance;} }
-        DaggerfallDateTime TimeScript   { get { return DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime; } }
+        DaggerfallUnity DfUnity { get { return DaggerfallUnity.Instance; } }
+        DaggerfallDateTime TimeScript { get { return DaggerfallUnity.Instance.WorldTime.DaggerfallDateTime; } }
 
-        public Material SkyObjMat       { get { return _skyObjMat; } set {_skyObjMat = value ;} }
-        public Material SkyMat          { get { return _skyMat; } set { _skyMat = value ;} }
-        public Material CloudMat        { get { return (_cloudMat) ? _cloudMat : _cloudMat = GetInstanceMaterial(); } set { _cloudMat = value; } }
-        public Material MasserMat       { get { return (_masserMat) ? _masserMat : _masserMat = GetInstanceMaterial(); } set { _masserMat = value; } }
-        public Material SecundaMat      { get { return (_secundaMat) ? _secundaMat : _secundaMat = GetInstanceMaterial(); } set { _secundaMat = value; } }
-        public Material StarsMat        { get; set; }
-        public Material StarMaskMat     { get; set; }
+        public Material SkyObjMat { get { return _skyObjMat; } set { _skyObjMat = value; } }
+        public Material SkyMat { get { return _skyMat; } set { _skyMat = value; } }
+        public Material CloudMat { get { return (_cloudMat) ? _cloudMat : _cloudMat = GetInstanceMaterial(); } set { _cloudMat = value; } }
+        public Material MasserMat { get { return (_masserMat) ? _masserMat : _masserMat = GetInstanceMaterial(); } set { _masserMat = value; } }
+        public Material SecundaMat { get { return (_secundaMat) ? _secundaMat : _secundaMat = GetInstanceMaterial(); } set { _secundaMat = value; } }
+        public Material StarsMat { get; set; }
+        public Material StarMaskMat { get; set; }
 
         public GameObject Container { get { return (_container); } set { _container = value; } }
 
         public SkyObjectSize SkyObjectSizeSetting { get; set; }
-        public CloudGenerator CloudGen  { get { return (_cloudGen != null) ? _cloudGen : _cloudGen = this.GetComponent<CloudGenerator>(); } }
-        public bool UseSunFlare         { get; set; }
-        public bool IsOvercast          { get { return (weatherMan != null) ? weatherMan.IsOvercast : false; } }
-        public bool IsNight             { get { return (TimeScript != null) ? TimeScript.IsNight : false; } }
-        public float CurrentSeconds     { get { return UpdateTime(); } }
-        public float TimeRatio          { get {return (CurrentSeconds / DAYINSECONDS); }}
-        public int DawnTime             { get; private set; }
-        public int DuskTime             { get; private set; }
-        public int TimeInside           { get; set; } 
+        public CloudGenerator CloudGen { get { return (_cloudGen != null) ? _cloudGen : _cloudGen = this.GetComponent<CloudGenerator>(); } }
+        public bool UseSunFlare { get; set; }
+        public bool IsOvercast { get { return (weatherMan != null) ? weatherMan.IsOvercast : false; } }
+        public bool IsNight { get { return (TimeScript != null) ? TimeScript.IsNight : false; } }
+        public float CurrentSeconds { get { return UpdateTime(); } }
+        public float TimeRatio { get { return (CurrentSeconds / DAYINSECONDS); } }
+        public int DawnTime { get; private set; }
+        public int DuskTime { get; private set; }
+        public int TimeInside { get; set; }
         #endregion
 
         #region Singleton
@@ -141,7 +141,8 @@ namespace EnhancedSky
 
         public static SkyManager instance
         {
-            get {
+            get
+            {
                 if (_instance == null)
                     _instance = GameObject.FindObjectOfType<SkyManager>();
                 return _instance;
@@ -177,7 +178,7 @@ namespace EnhancedSky
         {
             _stopWatch.Stop();
             TimeInside = _stopWatch.Elapsed.Minutes;
-            if(EnhancedSkyCurrentToggle)
+            if (EnhancedSkyCurrentToggle)
                 ToggleSkyObjects(true);                 //enable sky objects
         }
 
@@ -186,24 +187,20 @@ namespace EnhancedSky
             if (updateSkyEvent != null)
                 updateSkyEvent(IsOvercast);
 
-            if (postProcessingBehaviour != null)
+            if (postProcessingLayer != null)
             {
                 if (weather == DaggerfallWorkshop.Game.Weather.WeatherType.Fog)
                 {
-                    if (postProcessingBehaviour != null)
+                    if (postProcessingLayer != null)
                     {
-                        var fogSettings = postProcessingBehaviour.profile.fog.settings;
-                        fogSettings.excludeSkybox = false;
-                        postProcessingBehaviour.profile.fog.settings = fogSettings;
+                        postProcessingLayer.fog.excludeSkybox = false;
                     }
                 }
                 else
                 {
-                    if (postProcessingBehaviour != null)
+                    if (postProcessingLayer != null)
                     {
-                        var fogSettings = postProcessingBehaviour.profile.fog.settings;
-                        fogSettings.excludeSkybox = true;
-                        postProcessingBehaviour.profile.fog.settings = fogSettings;
+                        postProcessingLayer.fog.excludeSkybox = true;
                     }
                 }
             }
@@ -218,34 +215,34 @@ namespace EnhancedSky
         {
             try
             {
-                if(!toggle) 
+                if (!toggle)
                 {
                     dfallSky.SetActive(true);
                     Destroy(_container);
                 }
-                else if(toggle)
+                else if (toggle)
                 {
                     GetRefrences();
-                    
-                    if(SkyMat)
+
+                    if (SkyMat)
                         RenderSettings.skybox = SkyMat;
                     else
                         throw new System.NullReferenceException();
 
                     dfallSky.SetActive(false);
-                    SkyObjectSizeChange(SkyObjectSizeSetting);                   
+                    SkyObjectSizeChange(SkyObjectSizeSetting);
                 }
-                
+
             }
             catch (System.Exception ex)
             {
                 Debug.LogWarning("Error enabling or diabling Daggerfall Sky object. ");
                 Debug.LogWarning(ex.Message + " | in ToggleSkyObjects toggle: " + toggle);
             }
-            
+
             //trigger toggleSkyObject event - this event is not used by ESKY anymore
-            if(toggleSkyObjectsEvent != null)
-               toggleSkyObjectsEvent(IsOvercast);
+            if (toggleSkyObjectsEvent != null)
+                toggleSkyObjectsEvent(IsOvercast);
 
         }
 
@@ -310,11 +307,11 @@ namespace EnhancedSky
             */
             _stopWatch = new System.Diagnostics.Stopwatch();
 
-            PlayerEnterExit.OnTransitionInterior        += InteriorTransitionEvent; //interior transition
+            PlayerEnterExit.OnTransitionInterior += InteriorTransitionEvent; //interior transition
             PlayerEnterExit.OnTransitionDungeonInterior += InteriorTransitionEvent; //dungeon interior transition
-            PlayerEnterExit.OnTransitionExterior        += ExteriorTransitionEvent; //exterior transition
+            PlayerEnterExit.OnTransitionExterior += ExteriorTransitionEvent; //exterior transition
             PlayerEnterExit.OnTransitionDungeonExterior += ExteriorTransitionEvent; //dungeon exterior transition
-            StreamingWorld.OnTeleportToCoordinates      += EnhancedSkyUpdate;
+            StreamingWorld.OnTeleportToCoordinates += EnhancedSkyUpdate;
             WeatherManager.OnWeatherChange += WeatherManagerSkyEventsHandler;
 
             //ToggleEnhancedSky(true);
@@ -323,7 +320,7 @@ namespace EnhancedSky
 
         // Use this for initialization
         void Start()
-        {            
+        {
             GameObject container = GameManager.Instance.ExteriorParent.transform.Find("NewEnhancedSkyContainer(Clone)").gameObject;
             container.AddComponent<MoonController>();
             container.AddComponent<AmbientFogLightController>();
@@ -331,16 +328,16 @@ namespace EnhancedSky
             container.transform.Find("SkyCam").gameObject.AddComponent<SkyCam>();
             container.transform.Find("Stars").Find("StarParticles").gameObject.AddComponent<StarController>();
             container.transform.Find("Rotator").gameObject.AddComponent<RotationScript>();
-            container.transform.Find("cloudPrefab").gameObject.AddComponent<Cloud>();            
+            container.transform.Find("cloudPrefab").gameObject.AddComponent<Cloud>();
 
-            DuskTime = DaggerfallDateTime.DuskHour * 3600;     
+            DuskTime = DaggerfallDateTime.DuskHour * 3600;
             DawnTime = DaggerfallDateTime.DawnHour * 3600;
-          
+
             GetRefrences();
             //Register Console Commands
             //EnhancedSkyConsoleCommands.RegisterCommands();
 
-            
+
             //if (DaggerfallUnity.Instance.IsReady)
             //    EnhancedSkyCurrentToggle = DaggerfallUnity.Settings.LypyL_EnhancedSky;
 
@@ -349,20 +346,20 @@ namespace EnhancedSky
             if (playerEE != null && !playerEE.IsPlayerInside)
                 ToggleEnhancedSky(EnhancedSkyCurrentToggle);
 
-           
+
         }
 
         void OnDestroy()
-        {     
+        {
             ToggleSkyObjects(false);
 
             //Unsubscribe from events
-            PlayerEnterExit.OnTransitionInterior        -= InteriorTransitionEvent; //interior transition
+            PlayerEnterExit.OnTransitionInterior -= InteriorTransitionEvent; //interior transition
             PlayerEnterExit.OnTransitionDungeonInterior -= InteriorTransitionEvent; //dungeon interior transition
-            PlayerEnterExit.OnTransitionExterior        -= ExteriorTransitionEvent; //exterior transition
+            PlayerEnterExit.OnTransitionExterior -= ExteriorTransitionEvent; //exterior transition
             PlayerEnterExit.OnTransitionDungeonExterior -= ExteriorTransitionEvent; //dungeon exterior transition
-            StreamingWorld.OnTeleportToCoordinates      -= EnhancedSkyUpdate;
-            WeatherManager.OnWeatherChange -= WeatherManagerSkyEventsHandler;   
+            StreamingWorld.OnTeleportToCoordinates -= EnhancedSkyUpdate;
+            WeatherManager.OnWeatherChange -= WeatherManagerSkyEventsHandler;
 
             StopAllCoroutines();
             if (_instance == this)
@@ -372,7 +369,7 @@ namespace EnhancedSky
 
         #region methods
 
-   
+
 
         private bool GetRefrences()
         {
@@ -392,8 +389,8 @@ namespace EnhancedSky
                 if (!weatherMan)
                     weatherMan = GameManager.Instance.WeatherManager;
 
-                if (!postProcessingBehaviour)
-                    postProcessingBehaviour = Camera.main.GetComponent<PostProcessingBehaviour>();
+                if (!postProcessingLayer)
+                    postProcessingLayer = Camera.main.GetComponent<PostProcessLayer>();
             }
             catch
             {
@@ -432,37 +429,37 @@ namespace EnhancedSky
             }
         }
 
-        
+
         public void ToggleEnhancedSky(bool toggle)
-        {           
-            if(!GetRefrences() && toggle)
+        {
+            if (!GetRefrences() && toggle)
             {
                 DaggerfallUnity.LogMessage("Skymanager missing refrences, can't enable");
                 return;
 
             }
-            
+
             EnhancedSkyCurrentToggle = toggle;
             Debug.Log("before ToggleSkyObjects");
             ToggleSkyObjects(toggle);
         }
 
-    
+
         public void SkyObjectSizeChange(SkyObjectSize size)
         {
             SkyObjectSizeSetting = size;
-            if(!EnhancedSkyCurrentToggle || SkyMat == null)
+            if (!EnhancedSkyCurrentToggle || SkyMat == null)
             {
                 //Debug.Log("Sky Material was null");
                 return;
             }
 
-            if(size == SkyObjectSizes.Normal)
+            if (size == SkyObjectSizes.Normal)
                 SkyMat.SetFloat("_SunSize", PresetContainer.SUNSIZENORMAL);
             else
                 SkyMat.SetFloat("_SunSize", PresetContainer.SUNSIZELARGE);
-            
-            
+
+
             if (updateSkySettingsEvent != null)
                 updateSkySettingsEvent();
         }
@@ -470,9 +467,9 @@ namespace EnhancedSky
 
         public void SetCloudTextureResolution(int resolution)
         {
-            if(resolution < PresetContainer.MINCLOUDDIMENSION)
+            if (resolution < PresetContainer.MINCLOUDDIMENSION)
                 resolution = PresetContainer.MINCLOUDDIMENSION;
-            else if(resolution > PresetContainer.MAXCLOUDDIMENSION)
+            else if (resolution > PresetContainer.MAXCLOUDDIMENSION)
                 resolution = PresetContainer.MAXCLOUDDIMENSION;
             else
                 cloudQuality = resolution;

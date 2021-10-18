@@ -1,9 +1,9 @@
 {
     "ModTitle": "Enhanced Sky",
-    "ModVersion": "2.2.0",
+    "ModVersion": "3.0.0",
     "ModAuthor": "Lypyl",
     "ContactInfo": "http://forums.dfworkshop.net/viewtopic.php?f=14&t=29",
-    "DFUnity_Version": "0.10.25",
+    "DFUnity_Version": "0.13.0",
     "ModDescription": "Standalone version of the Enhanced Sky mod",
     "GUID": "d3639c51-0754-4eb9-bf83-cabb817adfbb",
     "Files": [
