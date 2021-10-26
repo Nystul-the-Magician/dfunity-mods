@@ -131,10 +131,10 @@ namespace RealtimeReflections
 		    // Setup oblique projection matrix so that near plane is our reflection
 		    // plane. This way we clip everything below/above it for free.
 		    Vector4 clipPlane = CameraSpacePlane( reflectionCamera, pos, normal, 1.0f );
-            //Matrix4x4 projection = cam.projectionMatrix; // outdoor we can get along without oblique projection matrix which won't break fog because unity won't switch to forward rendering (see https://docs.unity3d.com/Manual/ObliqueFrustum.html)
+            //Matrix4x4 projection = cam.projectionMatrix; // maybe outdoor we can get away (update: no we can't how it seems...) without oblique projection matrix which won't break fog because unity won't switch to forward rendering (see https://docs.unity3d.com/Manual/ObliqueFrustum.html)
             //if (GameManager.Instance.IsPlayerInside)
             //  projection = cam.CalculateObliqueMatrix(clipPlane); // important for correct indoor/dungeon reflections on upper building levels
-            Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane); // always calculate oblique projection matrix - otherwise problems when distant terrain is enabled
+            Matrix4x4 projection = cam.CalculateObliqueMatrix(clipPlane); // always calculate oblique projection matrix - otherwise problems when distant terrain is enabled and terrain flats are not reflected
 
             reflectionCamera.projectionMatrix = projection; // do not set oblique projection matrix since it will fuck up fog in reflections - disabling this step seems to do not any harm ;)
 
@@ -287,20 +287,6 @@ namespace RealtimeReflections
                         PostProcessingBehaviour reflectionCamPostProcessingBehaviour = goMirrorReflection.AddComponent<PostProcessingBehaviour>();
                         reflectionCamPostProcessingBehaviour.profile = postProcessingBehaviour.profile;
                     }
-
-                    //// attach global fog to camera - this is important to get the same reflections like on normal terrain when deferred rendering is used
-                    //if ((reflectionCamera.renderingPath == RenderingPath.DeferredShading) || (reflectionCamera.renderingPath == RenderingPath.UsePlayerSettings))
-                    //{
-                    //    UnityStandardAssets.ImageEffects.GlobalFog scriptGlobalFog = go.AddComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
-                    //    UnityStandardAssets.ImageEffects.GlobalFog globalFogMainCamera = Camera.main.gameObject.GetComponent<UnityStandardAssets.ImageEffects.GlobalFog>();
-                    //    scriptGlobalFog.distanceFog = globalFogMainCamera.distanceFog;
-                    //    scriptGlobalFog.excludeFarPixels = true; // skybox + sun will show up in reflections (otherwise no sun reflection)
-                    //    scriptGlobalFog.useRadialDistance = globalFogMainCamera.useRadialDistance;
-                    //    scriptGlobalFog.heightFog = globalFogMainCamera.heightFog;
-                    //    scriptGlobalFog.height = globalFogMainCamera.height;
-                    //    scriptGlobalFog.heightDensity = globalFogMainCamera.heightDensity;
-                    //    scriptGlobalFog.startDistance = globalFogMainCamera.startDistance;
-                    //}
                 }
 
                 goMirrorReflection.transform.SetParent(GameObject.Find("RealtimeReflections").transform);

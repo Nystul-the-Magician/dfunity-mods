@@ -6,7 +6,7 @@
 //Contributors: Hazelnut, Lypyl, Interkarma
 
 using UnityEngine;
-using UnityEngine.PostProcessing;
+using UnityEngine.Rendering.PostProcessing;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -80,7 +80,7 @@ namespace DistantTerrain
         public RenderTexture reflectionSeaTexture = null;
 
         // use same post processing profile as main camera
-        private PostProcessingBehaviour postProcessingBehaviour;
+        private PostProcessLayer postProcessingLayer;
 
         private float extraTranslationY = -5.0f; // only minimum amount (5m) since terrain heights almost match when terrain transition is active (the mismatch is because no neighbor terrains can be set)
         private float extraTranslationY_noTerrainTransition = -60.0f; //-400.0f; // this is used when terrain transition is disabled - large amount to minimize terrain seams
@@ -250,7 +250,7 @@ namespace DistantTerrain
         // stacked camera (used for far terrain) to prevent floating-point rendering precision problems for huge clipping ranges
         Camera stackedCamera = null;
 
-        PostProcessingBehaviour stackedCameraPostProcessingBehaviour = null;
+        PostProcessLayer stackedCameraPostProcessingLayer = null;
 
         public Camera getFarTerrainCamera() { return stackedCamera; }
         public Camera getStackedNearCamera() { return stackedNearCamera; }
@@ -351,8 +351,8 @@ namespace DistantTerrain
                 layerWorldTerrain = 31;
             }
 
-            // get post processing behaviour before first call to SetupGameObjects()
-            postProcessingBehaviour = Camera.main.GetComponent<PostProcessingBehaviour>();
+            // get post processing layer before first call to SetupGameObjects()
+            //postProcessingLayer = Camera.main.GetComponent<PostProcessLayer>();
 
             SetupGameObjects(); // create cameras here in OnAwake() so MirrorReflection script of ReflectionsMod can find cameras in its Start() function
         }
@@ -552,7 +552,7 @@ namespace DistantTerrain
                 }
             }
 
-            textureTerrainInfoTileMap = new Texture2D(terrainInfoTileMapDim, terrainInfoTileMapDim, TextureFormat.RGBA32, false);
+            textureTerrainInfoTileMap = new Texture2D(terrainInfoTileMapDim, terrainInfoTileMapDim, TextureFormat.RGBA32, false, true);
             textureTerrainInfoTileMap.filterMode = FilterMode.Point;
             textureTerrainInfoTileMap.wrapMode = TextureWrapMode.Clamp;
 
@@ -710,10 +710,9 @@ namespace DistantTerrain
                 stackedCamera.gameObject.AddComponent<CloneCameraPositionFromMainCamera>();
                 stackedCamera.transform.SetParent(this.transform);
 
-                if (postProcessingBehaviour != null)
+                if (postProcessingLayer != null)
                 {
-                    stackedCameraPostProcessingBehaviour = goStackedCamera.AddComponent<PostProcessingBehaviour>();
-                    stackedCameraPostProcessingBehaviour.profile = postProcessingBehaviour.profile;
+                    //stackedCameraPostProcessingLayer = goStackedCamera.AddComponent<PostProcessLayer>();
                 }
             }
             // important that camera properties are propagated every time SetupGameObjects() is called,
@@ -724,6 +723,8 @@ namespace DistantTerrain
             stackedCamera.farClipPlane = blendEnd;
             stackedCamera.fieldOfView = Camera.main.fieldOfView;
             stackedCamera.renderingPath = Camera.main.renderingPath;
+            stackedCamera.allowHDR = Camera.main.allowHDR;
+            stackedCamera.allowMSAA = Camera.main.allowMSAA;
 
             Camera.main.farClipPlane = mainCameraFarClipPlane;
             //Camera.main.farClipPlane = blendEnd;
