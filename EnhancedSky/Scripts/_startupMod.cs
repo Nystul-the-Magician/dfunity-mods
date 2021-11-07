@@ -40,6 +40,7 @@ namespace EnhancedSky
         private static CloudGenerator componentCloudGenerator = null;
 
         // Settings
+        private static float sunSize = 2.0f;
         private static bool enableSunFlare = true;
         private static int cloudQuality = 400;
 
@@ -81,6 +82,7 @@ namespace EnhancedSky
             //enableSunFlare = settings.GetBool("GeneralSettings", "UseSunFlare");
             //cloudQuality = settings.GetInt("GeneralSettings", "CloudQuality");
 
+            sunSize = settings.GetValue<float>("GeneralSettings", "SunSize");
             enableSunFlare = settings.GetValue<bool>("GeneralSettings", "UseSunFlare");
             cloudQuality = settings.GetValue<int>("GeneralSettings", "CloudQuality");
 
@@ -176,6 +178,8 @@ namespace EnhancedSky
 
                 GameObject goSun = container.transform.Find("Rotator").Find("Sun").gameObject;
                 goSun.GetComponent<LensFlare>().flare = sunFlare;
+                goSun.GetComponent<Light>().intensity = sunSize;
+
             }
             else
                 throw new System.NullReferenceException();            

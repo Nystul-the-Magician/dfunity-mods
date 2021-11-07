@@ -1,4 +1,4 @@
-﻿//Enhanced Sky for Daggerfall Tools for Unity by Lypyl, contact at lypyl@dfworkshop.net
+//Enhanced Sky for Daggerfall Tools for Unity by Lypyl, contact at lypyl@dfworkshop.net
 //http://www.reddit.com/r/dftfu
 //http://www.dfworkshop.net/
 //Author: LypyL
@@ -17,7 +17,9 @@ namespace EnhancedSky
         LensFlare   _sunFlare;
         Color       _skyTint = Color.clear;
         Color       _groundColor = Color.clear;
-        FlareLayer flareLayer = null;
+        //FlareLayer flareLayer = null;
+        Light       sunLight = null;
+        GameObject  goSun = null;
 
         SkyManager SkyMan           { get { return SkyManager.instance;} }
         Material SkyMat             { get { return SkyManager.instance.SkyMat;}}
@@ -87,8 +89,10 @@ namespace EnhancedSky
 
             SetSkyObjectSize();
 
-            flareLayer = this.transform.Find("SkyCam").gameObject.GetComponent<FlareLayer>();
-
+            //flareLayer = this.transform.Find("SkyCam").gameObject.GetComponent<FlareLayer>();
+            goSun = this.transform.Find("Rotator").Find("Sun").gameObject;
+            sunLight = goSun.GetComponent<Light>();
+            goSun = this.transform.Find("Rotator").Find("Sun").gameObject;
 
             _skyTint = PresetContainer.Instance.skyTint;
             SkyMat.SetColor("_SkyTint", _skyTint);
@@ -118,20 +122,23 @@ namespace EnhancedSky
                 else if (!SkyMan.IsNight)
                 {
                     SunFlare.enabled = true;
-                    flareLayer.enabled = true;
+                    //flareLayer.enabled = true;
+                    sunLight.flare = goSun.GetComponent<LensFlare>().flare;
                 }
                 else
                 {
                     SunFlare.enabled = false;
-                    flareLayer.enabled = false;
+                    //flareLayer.enabled = false;
+                    sunLight.flare = null;
                 }
             }
             else
             {
                 SunFlare.enabled = false;
-                flareLayer.enabled = false;
+                //flareLayer.enabled = false;
+                sunLight.flare = null;
             }
-            }
+        }
 
         public void SetSkyObjectSize()
         {
