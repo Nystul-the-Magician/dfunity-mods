@@ -22,6 +22,8 @@ namespace EnhancedSky
         public GameObject mainCamera;
         public Camera skyCamera;
 
+        int lastRetroMode = -1;
+
         // Use this for initialization
         void Start()
         {
@@ -33,6 +35,19 @@ namespace EnhancedSky
             //SkyCamera.renderingPath = MainCamera.GetComponent<Camera>().renderingPath;
             GetCameraSettings();
 
+        }
+
+        private void Update()
+        {
+            if (DaggerfallUnity.Settings.RetroRenderingMode != lastRetroMode)
+            {
+                if (skyCamera && DaggerfallUnity.Settings.RetroRenderingMode != 0)
+                    skyCamera.targetTexture = DaggerfallWorkshop.Game.GameManager.Instance.RetroRenderer.RetroTexture;
+                else
+                    skyCamera.targetTexture = null;
+
+                lastRetroMode = DaggerfallUnity.Settings.RetroRenderingMode;
+            }
         }
 
         void LateUpdate()
@@ -56,12 +71,7 @@ namespace EnhancedSky
                 skyCamera.renderingPath = RenderingPath.DeferredShading;
 
             }
-            
 
-            if (DaggerfallUnity.Settings.RetroRenderingMode > 0)
-            {
-                skyCamera.targetTexture = DaggerfallWorkshop.Game.GameManager.Instance.RetroRenderer.RetroTexture;
-            }
 
         }
 
