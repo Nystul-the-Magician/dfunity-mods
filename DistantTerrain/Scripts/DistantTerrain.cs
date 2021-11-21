@@ -64,6 +64,8 @@ namespace DistantTerrain
         public float SnowyFogDensity = 0.00025f;
         public float HeavyFogDensity = 0.05f;
 
+        int lastRetroMode = -1;
+
         //public RenderTexture renderTextureSky;
 
         //[Range(0.0001f, 0.000001f)]
@@ -771,7 +773,7 @@ namespace DistantTerrain
 
             // set up camera stack - AFTER layer "WorldTerrain" has been assigned to worldTerrainGameObject (is done in function generateWorldTerrain())
 
-            Camera.main.clearFlags = CameraClearFlags.Depth;
+            Camera.main.clearFlags = CameraClearFlags.Depth;            
             //stackedNearCamera.clearFlags = CameraClearFlags.Depth;
             stackedCamera.clearFlags = CameraClearFlags.Depth;
             //stackedNearCamera.depth = stackedNearCameraDepth;
@@ -782,12 +784,7 @@ namespace DistantTerrain
             cameraRenderSkyboxToTexture.renderingPath = Camera.main.renderingPath;
             cameraRenderSkyboxToTexture.targetTexture = renderTextureSky;
 
-            if (DaggerfallUnity.Settings.RetroRenderingMode > 0)
-            {
-                Camera.main.targetTexture = DaggerfallWorkshop.Game.GameManager.Instance.RetroRenderer.RetroTexture;
-                stackedCamera.targetTexture = DaggerfallWorkshop.Game.GameManager.Instance.RetroRenderer.RetroTexture;
-            }
-
+            stackedCamera.targetTexture = Camera.main.targetTexture;
         }
 
         void setMaterialFogParameters(ref Material terrainMaterial)
@@ -904,6 +901,13 @@ namespace DistantTerrain
             {
                 SetUpCameras();
                 justToggledEnhancedSky = false;
+            }
+
+            if (DaggerfallUnity.Settings.RetroRenderingMode != lastRetroMode)
+            {
+                SetUpCameras();
+
+                lastRetroMode = DaggerfallUnity.Settings.RetroRenderingMode;
             }
         }
 
